@@ -29,6 +29,8 @@ For every WaitFor and Execute method, decide the applicable:
 - Attribute or map-instance locks
 - exhausted-retry failure route
 
+RPC registration options make the same fixed load and lock decisions for every invocation. When an RPC's exact AttributeMap or ChannelMap instance comes from request data, use the language's additive RPC invocation options instead. They cannot add timeout, singleton Attribute locks, whole-map loads, singleton Channel loads, or transactionality. A dynamic AttributeMap read-modify-write must add both the exact instance load and its matching instance lock.
+
 For Execute, also decide the heartbeat timeout. Regular execution defaults to one minute. Keep that default unless a healthy operation can remain silent longer. Then raise it to the longest acceptable healthy silent interval. Use method timeout to cap the whole attempt. Heartbeats and Stream frames show Worker liveness; only heartbeat values provide retry checkpoints.
 
 Do not infer durability from a large attempt timeout. Attempt timeout is a safety bound. Running classification estimates where most successful calls complete.

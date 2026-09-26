@@ -63,9 +63,15 @@ Choose one Attribute when the value is a cohesive snapshot that handlers normall
 
 Use stable domain identifiers or monotonic chunk IDs as instance keys. Do not place volatile or unbounded user text in keys. Group very small records into bounded chunks when per-instance overhead would dominate, and define when old instances are deleted.
 
+For append-only history, keep a bounded active instance such as `current`. Append there until it reaches the fixed chunk size, archive it under the zero-padded first sequence, and install a new `current` value in the same commit. Archived chunks stay immutable. A page token identifies exactly one chunk, so the reader uses invocation-time exact loading rather than loading the whole map. This bounds rewrite amplification but serializes all appenders on the active instance.
+
+For keyed lookup, use a fixed partition count and a stable cross-language hash. The official pattern trims ASCII whitespace, lowercases ASCII `A-Z`, rejects empty or non-ASCII input, computes 32-bit wrapping FNV-1a over the canonical bytes, and selects `hash % 1000` as `partition-000` through `partition-999`. Store a dictionary keyed by the full canonical value inside the partition. A collision chooses the same bucket; it does not replace another key. Changing the partition count or canonicalization requires a complete rehash or a new Flow version.
+
 Inside a handler, map size and instance-key enumeration include buffered writes and deletes. They do not provide server-side pagination. An unbounded map can therefore avoid blob rewrite amplification while still becoming expensive to enumerate, transfer, and decode.
 
 Locks are scoped to one AttributeMap instance. Lock the exact instance when parallel Steps or RPCs perform a read-modify-write on the same value; unrelated instances can remain concurrent.
+
+RPC registration options describe fixed locks and loads. Invocation options can add exact AttributeMap locks, exact AttributeMap loads, and exact ChannelMap loads chosen from request data. The SDK unions, sorts, and deduplicates both sets; invocation options cannot remove a registered requirement. Locking and loading are independent, so every dynamic read-modify-write selects the same AttributeMap instance in both collections.
 
 An indexed AttributeMap does not create one searchable entry per instance. Every instance writes the same fixed Flow search field, a later instance can replace the prior indexed value, and the instance key is not searchable. Use a regular Attribute with a keyword-array index for a bounded searchable collection, or an external projection for per-instance queries.
 

@@ -11,7 +11,7 @@
       "name": "superdurable-dex",
       "source": "./",
       "description": "Dex SDK guidance, end-to-end process product development, and official connector contribution.",
-      "version": "0.23.0",
+      "version": "0.24.0",
       "logo": "assets/logo.png"
     }
   ]

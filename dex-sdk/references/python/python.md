@@ -1,6 +1,6 @@
 # Python handbook
 
-Use this page first for Python. The [baseline project](https://github.com/superdurable/dex/blob/sdk-go/v0.12.1/examples/python/pyproject.toml) selects `dex-python-sdk==0.9.0`; check `pyproject.toml`/lockfile and installed metadata before relying on baseline syntax.
+Use this page first for Python. The [baseline project](https://github.com/superdurable/dex/blob/sdk-go/v0.13.1/examples/python/pyproject.toml) selects `dex-python-sdk==0.13.0`; check `pyproject.toml`/lockfile and installed metadata before relying on baseline syntax.
 
 ## Runtime choice
 
@@ -25,7 +25,7 @@ The Connector local JSON loader and generated `NewLocalConnection` API are Go-on
 
 ## Minimal Flow
 
-[Pinned runnable source](https://github.com/superdurable/dex/blob/sdk-go/v0.12.1/examples/python/dex_examples/primitives/flow/example_flow.py)
+[Pinned runnable source](https://github.com/superdurable/dex/blob/sdk-go/v0.13.1/examples/python/dex_examples/primitives/flow/example_flow.py)
 <!-- dex-source: examples/python/dex_examples/primitives/flow/example_flow.py -->
 ```python
 status = Attribute("status", str)
@@ -48,7 +48,7 @@ Instantiate Steps once per Flow object and return those same instances in `StepL
 
 A synchronous Step directly returns a decision:
 
-[Pinned runnable source](https://github.com/superdurable/dex/blob/sdk-go/v0.12.1/examples/python/dex_examples/primitives/flow/example_flow.py)
+[Pinned runnable source](https://github.com/superdurable/dex/blob/sdk-go/v0.13.1/examples/python/dex_examples/primitives/flow/example_flow.py)
 <!-- dex-source: examples/python/dex_examples/primitives/flow/example_flow.py -->
 ```python
 class Finish(Step[int]):
@@ -59,7 +59,7 @@ class Finish(Step[int]):
 
 ## Registry, Worker, Client
 
-The async [application composition](https://github.com/superdurable/dex/blob/sdk-go/v0.12.1/examples/python/dex_examples/app.py) shows Flow construction, Registry, BlobCache, AsyncClient, and AsyncWorker. The [sync example](https://github.com/superdurable/dex/blob/sdk-go/v0.12.1/examples/python/sync-python/sync_examples/app.py) shows the synchronous counterpart. Inject services in constructors; use a provider for a Client needed after circular bootstrap.
+The async [application composition](https://github.com/superdurable/dex/blob/sdk-go/v0.13.1/examples/python/dex_examples/app.py) shows Flow construction, Registry, BlobCache, AsyncClient, and AsyncWorker. The [sync example](https://github.com/superdurable/dex/blob/sdk-go/v0.13.1/examples/python/sync-python/sync_examples/app.py) shows the synchronous counterpart. Inject services in constructors; use a provider for a Client needed after circular bootstrap.
 
 ## Route by task
 

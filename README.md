@@ -96,7 +96,7 @@ Backend implementation is Go-only, starts from
 `superdurable/dex-template-basic-process`, and must satisfy strict Dex Web v2 /
 FDG 2.0 rendering. The supported stack is basic-process release `v0.2.1`
 (template contract `1.4.1`), Dex Server `v0.13.2`, Dex CLI `v0.13.8`, and Dex
-Go SDK `v0.12.1`. Advance the scaffold's Server and CLI baseline files to these
+Go SDK `v0.13.1`. Advance the scaffold's Server and CLI baseline files to these
 versions before verification. Dex Web v2 is embedded in the Server and CLI
 artifacts. Connector integrations reuse released
 dedicated connectors from `superdurable/dex-connectors-library`. Generic HTTP

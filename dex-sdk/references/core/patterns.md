@@ -88,6 +88,13 @@ String and Boolean Attributes support equal and not-equal. Integer and floating-
 
 Represent one entity lifecycle as a Flow, keep its current state in Attributes, mutate it through RPCs or Channels, and synchronize selected Attributes to an application-owned relational schema when external queries need them. Define optimistic concurrency, deletion, retention, and open-Flow compatibility.
 
+## Partitioned AttributeMap state
+
+- **Sequentially chunked:** append to one bounded `current` instance. When it reaches the fixed chunk size, copy it to an immutable sequence-named instance and replace `current` in the same commit. This preserves append order and supports newest-first page tokens without rewriting all history. All appenders contend on the active-instance lock; retry only the rejected invocation after a typed RPC lock conflict.
+- **Hash-partitioned:** canonicalize a stable lookup key, hash its bytes with a versioned algorithm, and choose one of a fixed number of instances. Store a dictionary keyed by the complete canonical value inside each bucket so hash collisions cannot overwrite records. Lock and load the same exact instance for an upsert; a read loads only that instance. Changing the hash algorithm or partition count requires migration because the mapping is persisted schema.
+
+Use sequential chunks for append-only messages, audit events, or subscriber history. Use hash partitions for customer profiles, account metadata, or configuration records that need direct keyed lookup and updates. Neither pattern creates server-side map pagination or a secondary index.
+
 ## Selection checklist
 
 - Does the Flow graph expose every success, wait, retry exhaustion, cancellation, timeout, and terminal path?
@@ -100,4 +107,6 @@ Represent one entity lifecycle as a Flow, keep its current state in Attributes, 
 Sources:
 
 - Pattern catalog: https://docs.superdurable.io/design-patterns
-- Baseline runnable implementations: https://github.com/superdurable/dex/tree/sdk-go/v0.12.1/examples
+- Sequential chunking: https://docs.superdurable.io/design-patterns/sequentially-chunked-attribute-map
+- Hash partitioning: https://docs.superdurable.io/design-patterns/hash-partitioned-attribute-map
+- Baseline runnable implementations: https://github.com/superdurable/dex/tree/sdk-go/v0.13.1/examples

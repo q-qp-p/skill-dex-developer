@@ -14,4 +14,4 @@
 - Keep schema/Flow packages below registry composition to avoid import cycles; inject late Client providers.
 - Temporal Cloud API-key deployments require externally provisioned indexes and `attributeIndexesManagedExternally: true`.
 
-Prefer pinned [compile contracts](https://github.com/superdurable/dex/blob/sdk-go/v0.12.1/sdk-go/dex/contracts_test.go) and runnable examples over remembered names.
+Prefer pinned [compile contracts](https://github.com/superdurable/dex/blob/sdk-go/v0.13.1/sdk-go/dex/contracts_test.go) and runnable examples over remembered names.

@@ -1,6 +1,6 @@
 {
   "name": "superdurable-dex",
-  "version": "0.23.0",
+  "version": "0.24.0",
   "description": "Build with Dex SDK, create process products, and contribute official connectors.",
   "author": {
     "name": "Super Durable",

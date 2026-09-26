@@ -2,6 +2,14 @@
 
 All notable changes to Dex Skills are documented here.
 
+## 0.24.0 - 2026-09-26
+
+- Add sequentially chunked and hash-partitioned AttributeMap patterns across Core and all five language handbooks.
+- Document stable ASCII email canonicalization, wrapping FNV-1a 32-bit partitioning, collision handling, and partition migration.
+- Add additive invocation-time exact AttributeMap locks, AttributeMap loads, and ChannelMap loads through each SDK's RPC invocation options.
+- Upgrade the Dex SDK source baseline to `sdk-go/v0.13.1` and refresh pinned source links.
+- Synchronize the Codex, Claude Code, and Cursor plugin manifests at version 0.24.0.
+
 ## 0.23.0 - 2026-09-26
 
 - Make Dex App Builder prefer released Connector Query/Mutation Steps and typed Trigger targets for Flow starts and RPC delivery before application-local provider code.

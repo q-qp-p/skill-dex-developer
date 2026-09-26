@@ -92,6 +92,10 @@ When one response requires multiple Attributes or AttributeMap instances, assemb
 
 Select transactional execution when an RPC must atomically validate a pending Channel message ID and commit its deletion with other Flow-state writes. Handle the Channel-message-not-found error as a stale queue view and refresh before retrying.
 
+Keep registration-time and invocation-time options separate. Registration options own fixed timeout, locks, transactionality, whole-map loads, singleton Channel loads, and other state requirements. Invocation options are additive and intentionally narrow: they can add exact AttributeMap instance locks, exact AttributeMap instance loads, and exact ChannelMap instance loads selected from request data. They never replace or clear registration options.
+
+The Client validates invocation selections before network I/O. Every definition must belong to the RPC's Flow, every dynamic lock must target an AttributeMap instance, and every instance name must be nonempty and slash-free. A dynamic read-modify-write must include the same instance as both a lock and a load. Reads need only the load. All cooperating writers must use the same instance lock, and lock conflicts are explicit contention rather than queued execution.
+
 Docs: https://docs.superdurable.io/primitives/rpc
 
 ## Stream
