@@ -192,6 +192,8 @@ dexcli visualize path/to/flow.go \
 
 Require the JSON graph to report `valid: true`. Treat diagnostics for missing or repeated directives, mismatched keys/types, non-read-only views, invalid typed Action registration, invalid Action inputs, or unsupported editable fields as blocking defects.
 
+Write these JSON files into the persistent `--flow-rendering-dir` of the user-facing `dexcli dev` stack as soon as the first graph renders, and start that stack immediately rather than after verification (see [Stage 3](../SKILL.md#stage-3-design-and-implement-the-flow)). Isolated test stacks render their own copies.
+
 Validate every Flow file. The template's `scripts/check-fdg-v2.sh` visualizes only `internal/process/flow.go` (template `v0.2.1`). With several Flows, such as a parent and its SubFlows, run the analyzer on each Flow source, write every JSON into the `--flow-rendering-dir` directory, and fail when any graph is invalid or reports an unexpected diagnostic.
 
 The template check fails on any diagnostic, including warnings. While the application deliberately tests an uncommitted local connector `replace`, `connector_release_required` on those Connector Steps is the only acceptable diagnostic. Record it as the release blocker, do not weaken the committed check, and require a diagnostic-free run after pinning the release.

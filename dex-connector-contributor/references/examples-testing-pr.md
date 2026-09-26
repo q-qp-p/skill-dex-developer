@@ -11,6 +11,12 @@ pre-ack delivery, typed Flow start and/or typed RPC routing, application filter,
 duplicate handling, restart replay, Query/Mutation usage, and explicit recovery
 for uncertain writes.
 
+As soon as the example Flow first renders with `dexcli visualize --schema-version 2.0`,
+start a long-lived `dexcli dev` for the user with that graph in `--flow-rendering-dir`
+(plus `--connector-release-override` for the local connector) and share the Dex Web
+URL before continuing. Keep it running while you finish provider tests and the
+verification matrix on separate isolated stacks.
+
 Without a Trigger:
 
 1. define a typed Flow that uses the operation-specific factory;

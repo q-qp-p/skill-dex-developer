@@ -10,6 +10,8 @@ For **Custom UI**, use `make mock` as the interaction-approval loop and run `mak
 
 Treat mock results as HTTP/UI evidence only. They cannot establish Dex durability, Worker replacement, Timer, RPC, retry, or provider semantics.
 
+Show Dex Web early. Once the first Flow graph renders, keep one user-facing `dexcli dev` stack running with a persistent `--flow-rendering-dir`, stable ports, and persistent state, and give the user its URL before continuing. Then keep implementing and testing against isolated test stacks. Do not wait until verification passes to start it, and do not let test scripts reuse or stop it. Report its URL again at handoff.
+
 ## Baselines and local CLI
 
 Advance these template pins together; `internal/templatecontract/contract_test.go` hard-codes the template's own values (`server/v0.12.0`, `cli-v0.12.0`, `sdk-go v0.11.3`, and the skill submodule commit in template `v0.2.1`), so changing only some of them fails `make check`:

@@ -9,6 +9,7 @@ All notable changes to Dex Skills are documented here.
 - Reconcile the five-second SYNC heuristic with the seven-second ASYNC local-phase limit and add heartbeat guidance for silent non-streaming provider calls.
 - Add Dex Web v2 Start Flow requirements, headless start and connection endpoints, safe pre-release connector verification without polluting `GOMODCACHE`, multi-Flow validation, and an FDG 2.0 analyzer rules table observed with Dex CLI v0.13.8.
 - Document advancing all basic-process template pins with its contract test, checking the local `dexcli` version, application-owned local artifacts, Go SDK pin selection with released connectors, crash simulation with a killed Worker subprocess, and superseded `dex-developer` direct installs.
+- Require starting a long-lived, user-facing `dexcli dev` stack with a persistent `--flow-rendering-dir` as soon as the first Flow graph renders, sharing the Dex Web URL immediately, and keeping it running while tests use isolated stacks (App Builder, Dex SDK, and Connector Contributor examples).
 - Synchronize the Codex, Claude Code, and Cursor plugin manifests at version 0.25.2.
 
 ## 0.25.1 - 2026-09-26

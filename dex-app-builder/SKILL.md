@@ -143,6 +143,15 @@ Dex SDK supplies the public SDK guidance. The platform constraints in this skill
 
 Read [Dex Web v2](references/dex-web-v2.md) before editing a Flow. State the Flow identity, input/output, Steps, transitions, Attributes, Channels, RPCs, timers, retries, recovery, and connector boundaries before code.
 
+Start Dex Web as soon as the first Flow graph exists. The moment a Flow source first renders with `dexcli visualize --schema-version 2.0 --json` (even with warnings), and before finishing implementation or tests:
+
+1. render every Flow file into one persistent `--flow-rendering-dir` directory;
+2. start one long-lived `dexcli dev` for the user in the background on stable ports with persistent state, passing that directory and any `--connector-release-override` a local connector needs;
+3. give the user the Dex Web URL right away so they can inspect the graph, Connections, and Run views while you continue;
+4. start the application Worker against that stack as soon as it compiles, so Runs appear live.
+
+Keep that stack running for the rest of the task. Re-render the graphs after each Flow change and restart only that stack when Dex Web does not pick them up. Run automated tests on their own isolated stacks with free ports and temporary state, so tests never disturb or replace the stack the user is watching.
+
 Model each human operation as a typed Go Action with one **ActionRequiresPermission** option. Use lowercase domain keys such as **refund.manage** or **refund.message**. An Action RPC rechecks current state and uses business locks when its state check and effect must commit atomically.
 
 Do not add projection-only locks. The Server atomically adds newly matched Action permissions to the Flow execution's Work Queue permission history. A historical match supports discovery; it does not prove current eligibility or caller authorization.
