@@ -2,6 +2,15 @@
 
 All notable changes to Dex Skills are documented here.
 
+## 0.25.2 - 2026-09-26
+
+- Add a verified maintainer branch path for Connector Contributor alongside the default fork path, replace the Codex-only `codex/` branch prefix with the repository branch convention, and replace the undefined `$opr` step with concrete `gh` publish, check-watch, and fix-and-push instructions.
+- Document connector-library version bumps for additive work, the hard-coded `cmd/connectorctl` registry tests, a new-connector checklist, one operation per Step with bounded requests, Query classification for stateless compute, and exact-scope and paid-API live testing.
+- Reconcile the five-second SYNC heuristic with the seven-second ASYNC local-phase limit and add heartbeat guidance for silent non-streaming provider calls.
+- Add Dex Web v2 Start Flow requirements, headless start and connection endpoints, safe pre-release connector verification without polluting `GOMODCACHE`, multi-Flow validation, and an FDG 2.0 analyzer rules table observed with Dex CLI v0.13.8.
+- Document advancing all basic-process template pins with its contract test, checking the local `dexcli` version, application-owned local artifacts, Go SDK pin selection with released connectors, crash simulation with a killed Worker subprocess, and superseded `dex-developer` direct installs.
+- Synchronize the Codex, Claude Code, and Cursor plugin manifests at version 0.25.2.
+
 ## 0.25.1 - 2026-09-26
 
 - Publish a patch version so installations on 0.25.0 can exercise the once-per-chat newer-version notice against the repository version.

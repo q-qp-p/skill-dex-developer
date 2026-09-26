@@ -68,7 +68,7 @@ explicitly approves that replacement.
 ## Fixed product boundary
 
 - Use `https://github.com/superdurable/dex-template-basic-process` as the application template.
-- Target Dex Server `v0.13.2`, Dex CLI `v0.13.8`, and Dex Go SDK `v0.13.1`. Advance the scaffold's Server and CLI baseline files before verification. Dex Web v2 is embedded in Server and CLI.
+- Target Dex Server `v0.13.2`, Dex CLI `v0.13.8`, and Dex Go SDK `v0.13.1`. Before verification, advance the scaffold's pins together as described in [build, test, and handoff](references/build-test-handoff.md#baselines-and-local-cli), and confirm `dexcli version` is at least `v0.13.8`. Dex Web v2 is embedded in Server and CLI.
 - Implement Dex backend code only with the Go SDK.
 - Target strict Dex Web v2 / FDG 2.0 rendering. Never fall back to rendering v1.
 - Treat Dex Web v2 as the process-management UI for Runs, Work Queue, search, details, edits, and Actions unless the user confirms a custom UI is necessary.
@@ -172,8 +172,9 @@ For connectors:
    and use `$dex-connector-contributor` to create or modify it;
 7. after the local connector change builds, immediately test the application
    against its local module using an uncommitted `go.work` or temporary Go
-   `replace`, while the contributor workflow pushes the user's fork and opens
-   the upstream PR against the official connector library;
+   `replace`, while the contributor workflow pushes its contribution branch
+   (the user's fork by default) and opens the upstream PR against the official
+   connector library;
 8. never commit a branch, commit SHA, pseudo-version, `go.work`, or local
    replacement as a production dependency; after release, remove the local
    override, pin the exact connector tag, and rerun real integration and E2E

@@ -178,6 +178,13 @@ The former plugin ID `dex` and invocation `$dex-developer` were replaced by
 install **Dex** from the **Super Durable** marketplace, and start a new task so
 the new skill names are discovered.
 
+A direct skill install is not replaced by the plugin. If
+`~/.claude/skills/dex-developer`, another client's skills-directory copy, or an
+`npx skills` install of `dex-developer` exists, it keeps loading its older
+pinned Server and CLI guidance and can shadow the plugin. Remove it with the
+tool that installed it, install `superdurable-dex@superdurable`, and start a new
+task.
+
 ## Dex SDK
 
 `dex-sdk` uses progressive disclosure. Shared semantics live under
@@ -219,9 +226,11 @@ Backend implementation is Go-only, starts from
 `superdurable/dex-template-basic-process`, and must satisfy strict Dex Web v2 /
 FDG 2.0 rendering. The supported stack is basic-process release `v0.2.1`
 (template contract `1.4.1`), Dex Server `v0.13.2`, Dex CLI `v0.13.8`, and Dex
-Go SDK `v0.13.1`. Advance the scaffold's Server and CLI baseline files to these
-versions before verification. Dex Web v2 is embedded in the Server and CLI
-artifacts. Connector integrations reuse released
+Go SDK `v0.13.1`. Before verification, advance the scaffold's Server and CLI
+baseline files, `go.mod` SDK requirement, `.agents/skills` submodule pin, and
+template contract test together, and confirm `dexcli version` meets the CLI
+baseline. Dex Web v2 is embedded in the Server and CLI artifacts. Connector
+integrations reuse released
 dedicated connectors from `superdurable/dex-connectors-library`. Generic HTTP
 is reserved for controlled internal systems; a missing or defective
 external-provider connector routes to `dex-connector-contributor` and blocks
@@ -258,7 +267,9 @@ implements provider behavior, adds Trigger and configuration UI units when
 needed, and includes a runnable connector-local example. It first discovers and
 verifies the user's GitHub fork; when none exists, it asks permission, opens the
 official fork page, and waits for the user to click **Create fork** before
-cloning that fork locally.
+cloning that fork locally. A maintainer with verified push access may
+explicitly choose an upstream topic branch that follows the repository's branch
+convention instead.
 
 The workflow loads `dex-sdk` Core and Go semantics plus the shared Dex Web v2
 reference. It validates module-isolated race tests and vet, UI tests/build,
@@ -271,7 +282,8 @@ Connector source excerpts are pinned to the repository snapshot in
 `CONNECTOR_LIBRARY_BASELINE`. The reference releases are Connector SDK
 `sdkgo/v0.8.0`, Slack `connectors/slack/v0.9.0`, Gmail
 `connectors/google/gmail/v0.10.0`, and Google Sheets
-`connectors/google/spreadsheet/v0.7.0`.
+`connectors/google/spreadsheet/v0.7.0`. The snapshot deliberately trails newer
+connector releases; new work pins the latest published component tag.
 
 ## Releases
 

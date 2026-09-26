@@ -34,6 +34,11 @@ Dex SDK owns Flow, Step, retry, Attribute, Stream, RPC, and versioning
 semantics. Do not restate or weaken them. The connector-library rules in this
 skill are additional constraints.
 
+The connector repository's instructions name the `dex-developer` skill
+(`$dex-developer`, `/dex:dex-developer`). That is the former name of `dex-sdk`;
+the sibling `dex-sdk` satisfies the requirement. Do not load or install a
+separate `dex-developer` copy, which pins older releases.
+
 ## Scope gate
 
 Use this skill only for the official connector library. If the task only uses a
@@ -53,10 +58,14 @@ Use this order:
 
 1. Resolve and verify the user's GitHub fork of
    `superdurable/dex-connectors-library` using the discovery and user handoff
-   in [repository workflow](references/repository-workflow.md).
+   in [repository workflow](references/repository-workflow.md). Use the
+   verified maintainer branch path there only when the user explicitly
+   chooses it.
 2. Clone or check out that fork locally, configure it as `origin`, configure
-   the official repository as `upstream`, fetch the latest `upstream/main`, and
-   create an isolated `codex/` branch without disturbing unrelated files.
+   the official repository as `upstream` (the maintainer path pushes to the
+   official remote instead), fetch the latest `upstream/main`, and create an
+   isolated topic branch that follows the repository's branch convention (for
+   example `<user>/<topic>`) without disturbing unrelated files.
 3. Inspect repository instructions and identify the provider capability,
    public contract, auth scopes, rate limits,
    idempotency support, pagination, event acknowledgement, and failure modes.
@@ -65,9 +74,9 @@ Use this order:
 6. Add Trigger and UI-unit behavior when the capability needs them.
 7. Add or extend a connector-local runnable example.
 8. Run the complete verification matrix and inspect generated/catalog drift.
-9. Commit one clean module-scoped change, push to the user's fork, open a
-   ready-for-review PR against the official repository, and monitor required CI
-   until it passes.
+9. Commit one clean module-scoped change, push to the user's fork (or the
+   verified maintainer branch), open a ready-for-review PR against the official
+   repository, and monitor required CI until it passes.
 
 Do not skip the manifest-first step. Generated `Config`, `Credentials`,
 definitions, branch constants, operation-specific factories, UI constants, and
@@ -80,9 +89,14 @@ defaults must remain derived from `connector.yaml`.
 - Require only the happy-path branch by default. Mark every other operation
   branch `optional: true`; make one required only when the application must
   choose a distinct continuation and explain why.
-- Default Execute durability to `async`. Use `sync` only when the provider call
-  is very likely to exceed seven seconds, not merely because its timeout is
-  high.
+- Default Execute durability to `async`. Use `sync` only when the operation is
+  more likely than not to exceed five seconds, the Dex SDK heuristic that leaves
+  margin inside the ASYNC local phase's limit of about seven seconds; a high
+  timeout alone does not qualify.
+- Size the heartbeat for silent calls. A non-streaming provider call emits no
+  heartbeat, so a call longer than the one-minute default needs
+  `heartbeatTimeout` at least equal to `executeMethodTimeout`, or streamed
+  progress.
 - Keep credentials and raw secrets out of Flow input, Attributes, Results,
   receipts, Streams, logs, generated values, fixtures, and release artifacts.
 - Register every application-provided Attribute and Stream in the consuming
@@ -121,4 +135,6 @@ Do not call the contribution complete until:
 - the worktree contains one clean commit and no unrelated changes;
 - the ready-for-review PR records test evidence and required CI is green.
 
-Use the repository's `$opr` workflow for publication and CI monitoring.
+Publish and monitor CI with the `gh` steps in
+[examples, testing, and PR](references/examples-testing-pr.md#publish-and-monitor-ci).
+Codex users who have an `$opr` workflow may use it for the same steps.
