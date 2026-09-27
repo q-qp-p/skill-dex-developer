@@ -109,7 +109,69 @@ Agent Skills clients can install the same bundle directly:
 npx skills add superdurable/dex-skills --all
 ```
 
-### Migrating from the old plugin
+## Upgrade
+
+An active chat keeps the plugin version it loaded when the chat started. After
+an upgrade, restart the client when applicable and begin a new chat in the
+repository.
+
+At the beginning of a new chat, each Dex skill makes a short, best-effort check
+against the repository's current stable version. When a newer version exists,
+the first substantive response includes a brief BTW notice with this upgrade
+guide. The check is silent when the plugin is current or the network is
+unavailable, and it never upgrades the plugin automatically.
+
+### Codex desktop app
+
+Open the plugin browser's marketplace management view, find **Super Durable**,
+and select **Upgrade**. Wait for the upgrade to finish, restart the desktop app,
+and start a new task. No Codex CLI command is required for this route.
+
+### Codex CLI
+
+Refresh only the Super Durable marketplace, then start a new Codex session:
+
+```bash
+codex plugin marketplace upgrade superdurable
+codex
+```
+
+Inside Codex CLI, open `/plugins` and confirm that **Dex** is enabled.
+
+### Claude Code CLI
+
+Update Dex directly from a shell:
+
+```bash
+claude plugin update superdurable-dex@superdurable
+```
+
+Or update the marketplace inside an interactive Claude Code session:
+
+```text
+/plugin marketplace update superdurable
+```
+
+Start a new session after a manual update. To receive future releases
+automatically, open `/plugin`, select **Marketplaces → Super Durable**, and
+select **Enable auto-update**.
+
+### Claude web and desktop
+
+Claude's public web and desktop documentation does not describe a separate
+per-user upgrade command. Organization-managed GitHub marketplaces are updated
+by an owner from **Organization settings → Plugins & skills → Marketplaces →
+Update**; account users receive the synced version. The Claude Code commands
+above are the documented manual route for a personally registered marketplace.
+
+### Cursor
+
+For a GitHub-imported team marketplace, an administrator can click **Refresh**
+or enable **Auto Refresh**, then users reload the Cursor window. Cursor does not
+document a personal `cursor plugin update` shell command for a direct GitHub
+import; manage that installation through **Customize** instead of guessing one.
+
+## Migrating from the old plugin
 
 The former plugin ID `dex` and invocation `$dex-developer` were replaced by
 `superdurable-dex` and `$dex-sdk`. Remove or update the old marketplace install,

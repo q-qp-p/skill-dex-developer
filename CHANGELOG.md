@@ -2,6 +2,12 @@
 
 All notable changes to Dex Skills are documented here.
 
+## 0.25.0 - 2026-09-26
+
+- Add a once-per-chat, best-effort plugin version check to all three Dex skills.
+- Notify users in the first substantive response only when the repository has a newer stable version, without blocking the requested task or requesting network approval solely for the check.
+- Synchronize the Codex, Claude Code, and Cursor plugin manifests at version 0.25.0.
+
 ## 0.24.2 - 2026-09-26
 
 - Require Dex App Builder to initialize effectively empty repositories from the pinned basic-process template before selecting a stack or installing dependencies.

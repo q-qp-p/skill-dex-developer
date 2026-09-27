@@ -13,6 +13,7 @@ SDK = ROOT / "dex-sdk"
 APP_BUILDER = ROOT / "dex-app-builder"
 CONNECTOR_CONTRIBUTOR = ROOT / "dex-connector-contributor"
 SDK_REFERENCES = SDK / "references"
+PLUGIN_VERSION_CHECK = ROOT / "references" / "plugin-version-check.md"
 LOGO = ROOT / "assets" / "logo.png"
 MANIFESTS = {
     "codex": ROOT / ".codex-plugin" / "plugin.json",
@@ -332,6 +333,28 @@ def check_invocation_policy() -> None:
             fail(f"{agent.relative_to(ROOT)} must contain: {policy}")
 
 
+def check_plugin_version_check() -> None:
+    if not PLUGIN_VERSION_CHECK.is_file():
+        fail("references/plugin-version-check.md must exist")
+    content = PLUGIN_VERSION_CHECK.read_text()
+    for text in (
+        "https://raw.githubusercontent.com/superdurable/dex-skills/main/VERSION",
+        "without additional user approval",
+        "single stable semantic version",
+        "repository version is higher",
+        "substantive response",
+        "Do not repeat the notice",
+    ):
+        if text not in content:
+            fail(f"plugin version check must contain: {text}")
+
+    relative_link = "../references/plugin-version-check.md"
+    for skill in (APP_BUILDER, SDK, CONNECTOR_CONTRIBUTOR):
+        content = (skill / "SKILL.md").read_text()
+        if relative_link not in content:
+            fail(f"{skill.name}/SKILL.md must load the plugin version check")
+
+
 def check_skills(baseline: str) -> None:
     skills = sorted(path.parent for path in ROOT.glob("*/SKILL.md"))
     expected = sorted((SDK, APP_BUILDER, CONNECTOR_CONTRIBUTOR))
@@ -342,6 +365,7 @@ def check_skills(baseline: str) -> None:
         fail("plugins/ wrapper must not exist")
     if any(path.name == "dex-ai-platform-backend" for path in ROOT.rglob("*")):
         fail("backend companion skill must not exist")
+    check_plugin_version_check()
     check_sdk(baseline)
     check_app_builder()
     check_connector_contributor()

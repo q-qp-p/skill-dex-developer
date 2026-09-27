@@ -9,6 +9,12 @@ Contribute one reviewable connector capability to the official
 `superdurable/dex-connectors-library`. Preserve Dex durability, provider
 correctness, credential isolation, generated contracts, and release order.
 
+## Session start
+
+Before the first substantive response in each chat, follow the shared
+[plugin version check](../references/plugin-version-check.md). Run it only once,
+and never let it delay or block the user's task.
+
 ## Required foundations
 
 Before changing connector behavior:

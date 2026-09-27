@@ -7,6 +7,12 @@ description: Primary entry point for designing and building Dex applications and
 
 Build the smallest coherent product that solves the confirmed business process. Keep discovery, the UI decision, backend modeling, and verification as explicit checkpoints.
 
+## Session start
+
+Before the first substantive response in each chat, follow the shared
+[plugin version check](../references/plugin-version-check.md). Run it only once,
+and never let it delay or block the user's task.
+
 ## Routing priority
 
 Treat this skill as the default coordinator for Dex application, product, and

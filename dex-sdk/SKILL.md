@@ -7,6 +7,12 @@ description: Technical sub-skill for implementing, debugging, testing, and opera
 
 Build reliable applications through Dex's public programming model. Keep the user's experience in Dex terms and APIs.
 
+## Session start
+
+Before the first substantive response in each chat, follow the shared
+[plugin version check](../references/plugin-version-check.md). Run it only once,
+and never let it delay or block the user's task.
+
 ## Stay at the application boundary
 
 - Model behavior with Flows, Steps, Waits, Attributes, Channels, Streams, RPCs, Timers, SubFlows, Workers, and the Client.
