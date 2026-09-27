@@ -709,6 +709,16 @@ def check_agent_rules() -> None:
         fail("AGENTS.md and CLAUDE.md must contain equivalent rules")
     if not cursor.endswith(agents):
         fail("Cursor rule must contain the same repository instructions")
+    normalized_agents = " ".join(agents.split())
+    for required in (
+        "Whenever `VERSION` increases",
+        "superdurable/dex-template-basic-process",
+        ".agents/skills/dex-app-builder/upstream",
+        "Open a separate template pull request",
+        "never substitute a floating branch or an unreleased commit",
+    ):
+        if required not in normalized_agents:
+            fail(f"release agent rules must contain: {required}")
     pull_request_template = (ROOT / ".github" / "PULL_REQUEST_TEMPLATE.md").read_text()
     if "Dex-AI-Platform-PR:" in pull_request_template:
         fail("pull request template must not require a paired repository")
