@@ -2,6 +2,8 @@
 
 Baselines: Dex Server `v0.13.2`, Dex CLI `v0.13.8`, and Dex Go SDK `v0.13.1`. Both Server and CLI embed Web v2, including permission-based Work Queue, cumulative permission history, trusted-header enforcement, dynamic definition sources, embedded reverse-proxy mounts, local Flow starts, and local setup for Connector operations, Trigger bindings, and configuration UI units.
 
+Released connector modules may require an older Go SDK; at connectors `main` `d975226` every connector required `sdk-go v0.11.3`. Go minimum version selection builds the application with its own `v0.13.1` requirement, so keep the application pin and do not wait for connector re-releases.
+
 Web v2 is Go-only. Validate every Flow with the v2 analyzer and never fall back to v1.
 
 ## Run and Work Queue surfaces
@@ -35,6 +37,34 @@ a coded error. Do not work around those errors by removing types or bypassing
 the Worker health check. A connector with a real provider Trigger uses that
 Trigger instead of Start Flow for its Trigger acceptance path.
 
+Observed with Dex CLI v0.13.8 and Go SDK v0.12.1:
+
+- Dex Web loads local definitions only from
+  `dexcli dev --flow-rendering-dir DIRECTORY`, which holds the FDG 2.0 JSON
+  files. Without it the catalog is empty. Regenerate the JSON after every Flow
+  change.
+- Start Flow sends the FDG's Flow and Step type names. The analyzer uses the
+  bare Go type name, while the Go SDK registers package-qualified defaults such
+  as `orders.OrderFlow`, so the Worker rejects the start. Override
+  `GetFlowType` and `GetStepType` with compile-time strings on every Flow and
+  Step; the same names let Run-timeline nodes match the graph. They are durable
+  identities, so choose them before Flows are open.
+- Dex Web invokes `WaitFor` on the start Step, and the Worker rejects that call
+  for an execute-only Step (`dex.StepDefaultsNoWaitFor`). Embed
+  `dex.StepDefaults` in the start Step and return `dex.SkipWaitImmediately()`
+  from its `WaitFor`.
+- FDG 2.0 requires `GetDexSummary` and `GetDexDisplay`, both registered as
+  RPCs, even when a Flow has little to show (`v2_view_rpc`).
+- A start input field of type `map[string]any` cannot drive the form
+  (`v2_start_input`).
+
+For a headless check, use the same endpoints as the browser:
+`GET /api/v2/catalog` returns `definitionRevision`;
+`GET /api/v2/connector-connections` reports each connection's status;
+`POST /api/v2/worker-health` probes a Worker address; and `POST /api/v2/start`
+accepts `flowType`, `flowId`, `workerTargetAddress`, and raw JSON `input` with
+that revision in the `X-Dex-Flow-Definition-Revision` header.
+
 ## Connections mode
 
 In loopback **dexcli dev**, `/v2/connections` groups Connector Steps and Trigger bindings by connector ID and static connection name. It shows the exact module version, dependent Flows, Steps, operations, and bindings, plus **Missing**, **Ready**, **Expired**, **Conflict**, or **Unsupported** status. The Step drawer links the same identity to its setup page.
@@ -45,7 +75,11 @@ For connector development only, `dexcli dev` accepts
 `--connector-release-override connector-id=artifact-directory`. Use an artifact
 built from the same local connector source and display the visible **Local
 override** status. Do not treat an override as a published release or commit it
-as an application dependency.
+as an application dependency. Never make an unreleased connector look released
+by serving its working tree as the declared next version into the default Go
+module cache; that copy persists in `GOMODCACHE` and shadows or conflicts with
+the real release. Use the override, or a temporary `GOMODCACHE` for any
+consumer that must resolve pre-release versions.
 
 Dex Web verifies release metadata and the Studio artifact. A supported Studio bundle runs in an opaque-origin sandbox; otherwise the host renders the manifest form. Neither surface receives stored credential values. OAuth client credentials, PKCE state, and UI sessions are memory-only.
 
@@ -157,3 +191,27 @@ dexcli visualize path/to/flow.go \
 ```
 
 Require the JSON graph to report `valid: true`. Treat diagnostics for missing or repeated directives, mismatched keys/types, non-read-only views, invalid typed Action registration, invalid Action inputs, or unsupported editable fields as blocking defects.
+
+Write these JSON files into the persistent `--flow-rendering-dir` of the user-facing `dexcli dev` stack as soon as the first graph renders, and start that stack immediately rather than after verification (see [Stage 3](../SKILL.md#stage-3-design-and-implement-the-flow)). Isolated test stacks render their own copies.
+
+Validate every Flow file. The template's `scripts/check-fdg-v2.sh` visualizes only `internal/process/flow.go` (template `v0.2.1`). With several Flows, such as a parent and its SubFlows, run the analyzer on each Flow source, write every JSON into the `--flow-rendering-dir` directory, and fail when any graph is invalid or reports an unexpected diagnostic.
+
+The template check fails on any diagnostic, including warnings. While the application deliberately tests an uncommitted local connector `replace`, `connector_release_required` on those Connector Steps is the only acceptable diagnostic. Record it as the release blocker, do not weaken the committed check, and require a diagnostic-free run after pinning the release.
+
+## FDG 2.0 analyzer rules
+
+A Flow that compiles, runs, and passes real-Dex tests can still fail `dexcli visualize --schema-version 2.0`. These rules were observed with Dex CLI v0.13.8:
+
+| Code | Severity | Rule |
+| --- | --- | --- |
+| `hidden_dex_decision` | error | Every `Execute` returns its own Dex decisions. A helper that returns `*dex.StepDecision`, such as `router.enterStage(ctx, stage)`, hides the transition. Helpers may only compute inputs or record state. |
+| `connector_factory_step_type` | error | A Connector factory `StepType` is a non-empty compile-time string. A helper that builds `slack.NewPostThreadReplyStep(...)` from a parameter fails, and every `sdkgo.StepRef` to it then reports `unknown_step_target`. |
+| `dynamic_type_name` | error | `GetFlowType` and `GetStepType` return a string literal or constant. |
+| `v2_view_rpc` | error | The Flow defines `GetDexSummary` and `GetDexDisplay` and registers both as RPCs. |
+| `v2_view_rpc_output` | error | Each view returns one `map[string]any` literal whose keys are exactly the declared `dex:field` keys. A map built in a loop "omits declared field". |
+| `v2_directive` | error | `value-type` matches the Go type: an unnamed slice Attribute is `array` (`string-array` for `[]string`), not `json`. An optional `dex:input` (`required:false`) is a pointer field such as `*string`. |
+| `unused_resource` | warning | Each declared Attribute has at least one direct `Get` or `Set` call with `ctx` inside a Step or RPC method of the Flow file. Access only inside helpers, including passing the handle as an argument, counts as unused. |
+| `v2_start_input` | warning | Every start input field can drive a form; `map[string]any` cannot. This also applies to a Flow started only as a SubFlow. |
+| `connector_release_required` | warning | A Connector Step resolves to an exact official released module without a local replacement. It is unavoidable while testing a local connector. |
+
+Keep decisions explicit in the method body. A helper computes, and the method decides: `input, err := prepareReview(ctx)`, return the error when it is non-nil, then `return dex.GoTo(ReviewStep{}, input), nil`.

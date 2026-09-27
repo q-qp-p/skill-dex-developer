@@ -6,9 +6,17 @@ durability, retries, Attributes, Streams, or transitions.
 ## Contract design
 
 Model reads as typed Query operations and external writes as typed Mutation
-operations. Give every public operation stable lower-camel identity, typed
-input/output, a concise provider-neutral description, and operation-specific
-generated factory. Application code normally calls a factory such as
+operations. Classify by provider state, not by whether the call feels like a
+read: a stateless call that creates no provider resource, such as generation
+without storage, is a Query because retry is safe and only costs tokens. Use a
+Mutation when the provider stores or changes a resource. The manifest schema
+pairs `mutation` with `idempotency: required` and `query` with `none`, so a
+keyless stateless call declared as a Mutation would claim idempotency the
+provider does not offer.
+
+Give every public operation stable lower-camel identity, typed input/output, a
+concise provider-neutral description, and operation-specific generated
+factory. Application code normally calls a factory such as
 `openai.NewCreateResponseStep`; generic `sdkgo.NewQueryStep` and
 `sdkgo.NewMutationStep` are advanced escape hatches.
 
@@ -25,10 +33,14 @@ openai.NewCreateResponseStep(openai.CreateResponseStepConfig[Input]{
 })
 ```
 
-One Step execution makes one provider call. Keep the call in `Execute`; never
-call the provider from `WaitFor` or an RPC. Persist application business context
-before entering the Connector Step because a branch target receives only the
-current operation Result.
+One Step execution runs one operation. An operation may make a small, bounded
+number of provider requests, such as a lookup before a write or pagination up
+to a declared limit; some shipped operations make two to five. When the result
+set is unbounded, return a next-page cursor in the typed output and let the
+Flow request the next page in a later Step execution. Keep every request in
+`Execute`; never call the provider from `WaitFor` or an RPC. Persist
+application business context before entering the Connector Step because a
+branch target receives only the current operation Result.
 
 ## Branches, retries, and uncertainty
 
@@ -47,9 +59,20 @@ current operation Result.
   bodies, arbitrary metadata, or secrets into it.
 
 Default Execute durability to `async`. Use `sync` only when the operation is
-very likely to exceed the seven-second local-activity limit. A long LLM
-generation may qualify; an ordinary HTTP call with a 30-second timeout does
-not.
+more likely than not to exceed five seconds. Five seconds is the Dex SDK
+[classification heuristic](../../dex-sdk/references/core/step-options.md); it
+leaves margin inside the ASYNC local phase, which permits at most about seven
+seconds. A long LLM generation may qualify; an ordinary HTTP call with a
+30-second timeout does not.
+
+A non-streaming provider call emits no heartbeat while it waits, so the
+one-minute default heartbeat timeout fails a healthy 90-second generation. Set
+the operation's `heartbeatTimeout` at least equal to `executeMethodTimeout`, or
+heartbeat or stream progress during the call. A long heartbeat timeout did not
+delay crash recovery in local measurements: Dex CLI v0.13.8 detected a lost
+Worker connection in about two seconds. The released OpenAI `createResponse`
+manifest (150-second `sync` timeout, default heartbeat, observed at connectors
+`main` `d975226`) carries the same risk.
 
 ## Idempotency and bounded provider work
 
@@ -81,3 +104,5 @@ idempotency headers/fields, retryable failures, conclusive branches, uncertain
 dispatch, redaction, and malformed responses. Use a local fake provider for
 deterministic coverage. Run live tests only with dedicated safe credentials and
 state exactly what remained unverified when those credentials are unavailable.
+See [live provider tests](examples-testing-pr.md#live-provider-tests) for
+exact-scope tokens and paid APIs.

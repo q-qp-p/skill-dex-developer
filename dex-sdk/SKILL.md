@@ -29,6 +29,8 @@ Preserve the installed SDK version unless the user asks to upgrade. The project'
 
 If the project version differs from the baseline, name the matching installed-source path or immutable tag/commit used before writing exact API code. If that source is unavailable, stop at the version-independent Flow model, identify what is needed, and ask to inspect or fetch it. Never claim verification without an auditable version-matched source, label baseline syntax as compatible with an unverified version, or invent a Dex API.
 
+Check for a superseded copy of this skill. `dex-developer` is its former name. A direct install such as `~/.claude/skills/dex-developer`, or one added with `npx skills`, is not updated by the plugin and can remain the Dex skill that loads, with older pinned Server and CLI releases. When a `dex-developer` skill is also available, tell the user to remove that direct install, install `superdurable-dex@superdurable`, and start a new session; do not delete it yourself. When `dexcli version` is newer than the source repository's `DEX_CLI_BASELINE`, say that the loaded guidance may trail the installed CLI and suggest updating the plugin.
+
 ## Load references progressively
 
 Always read the entry page for the project's language first:
@@ -79,7 +81,7 @@ Deduplicate root Flow starts with Dex start identity, not an application-owned d
 
 At application boundaries, preserve typed Dex failures until domain policy can distinguish business rejection, a closed-Flow race, a retryable service failure, and a local defect. Reconcile a not-active result from existing authoritative state; inspect the Flow only when an otherwise unknown terminal distinction changes the outcome. Use retained Streams only for best-effort observation, never as authoritative business state.
 
-Prefer the nearest official pattern to an ad hoc coordination loop. Preserve its Flow shape while replacing the domain and integrations. When changing a Go or Python Flow, use `dexcli visualize SOURCE` after the shape is explicit; the visualizer does not currently support Java, TypeScript, or Rust.
+Prefer the nearest official pattern to an ad hoc coordination loop. Preserve its Flow shape while replacing the domain and integrations. When changing a Go or Python Flow, use `dexcli visualize SOURCE` after the shape is explicit; the visualizer does not currently support Java, TypeScript, or Rust. As soon as the first graph renders, write it to a `--flow-rendering-dir`, start a long-lived `dexcli dev` for the user with that directory, and share the Dex Web URL before continuing; keep it running while you implement and test on separate isolated stacks.
 
 ## Complete the vertical slice
 

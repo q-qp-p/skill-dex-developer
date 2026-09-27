@@ -92,6 +92,12 @@ generic HTTP connector is permitted only for an organization-controlled
 internal system after the internal-library decision below. Do not use it as an
 escape hatch for external SaaS APIs.
 
+An application-owned local artifact, such as a generated HTML file, is not a
+provider interaction and needs no connector. Write it from `Execute`
+idempotently (a deterministic path that a retry can safely overwrite), keep the
+durable copy in an Attribute (Dex offloads large values to blob storage), and
+expose the file path as a display field.
+
 ## Reuse and contribution
 
 Inspect `https://github.com/superdurable/dex-connectors-library` and its
@@ -105,7 +111,8 @@ call the provider directly from the application. Explain the exact capability
 gap and load sibling `$dex-connector-contributor` completely. That skill owns
 fork discovery, manifest-first authoring, generated surfaces, provider tests,
 connector-local examples, real Dex coverage, release ordering, pushing the
-user's fork `origin`, and the upstream PR to the official repository.
+contribution branch (the user's fork by default), and the upstream PR to the
+official repository.
 
 As soon as the local connector module builds, continue application verification
 against its checkout through an uncommitted `go.work` or temporary Go

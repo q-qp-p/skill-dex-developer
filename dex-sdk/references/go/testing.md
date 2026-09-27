@@ -25,7 +25,7 @@ make e2eTests
 ## Required scenarios
 
 1. Start, wait, and assert output plus terminal status.
-2. Stop a Worker after a durable boundary; replace it with identical definitions and prove resumption.
+2. Stop a Worker after a durable boundary; replace it with identical definitions and prove resumption. `Worker.Stop` drains in-flight handlers until its context expires, so it cannot simulate a crash during an in-flight Execute; run that Worker as a subprocess and SIGKILL it.
 3. Fail Execute until retry exhaustion; assert terminal failure or configured recovery.
 4. Publish Channel data before/during the wait; assert consumption, deletion, and RPC idempotency.
 5. Restart across a Timer and prove it fires without sleeps in the test.

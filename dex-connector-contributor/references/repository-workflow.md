@@ -1,8 +1,9 @@
 # Repository workflow
 
 Contribute through the user's GitHub fork of the official
-`superdurable/dex-connectors-library` repository. Treat the GitHub fork and the
-local clone as separate steps.
+`superdurable/dex-connectors-library` repository by default. A verified
+maintainer may instead choose the [maintainer branch path](#maintainer-branch-path).
+Treat the GitHub fork and the local clone as separate steps.
 
 ## Fork discovery and user handoff
 
@@ -35,10 +36,30 @@ fork. Configure remotes so:
 - `upstream` is `https://github.com/superdurable/dex-connectors-library`.
 
 Fetch the latest `upstream/main`, read its `AGENTS.md`, preserve unrelated user
-files, and create an isolated `codex/` branch or managed worktree from
-`upstream/main`. Push only to the user's fork. Open the PR from that fork branch
-to the official repository's `main`. Never replace, delete, or repoint an
-in-use local clone without confirming it is safe.
+files, and create an isolated topic branch or managed worktree from
+`upstream/main`. Name the branch by the repository's branch convention, for
+example `<user>/<topic>`; do not add a tool-specific prefix.
+Push only to the user's fork on this default path. Open the PR from that fork
+branch to the official repository's `main`. Never replace, delete, or repoint
+an in-use local clone without confirming it is safe.
+
+## Maintainer branch path
+
+Offer an upstream topic branch instead of a fork only when all of these hold:
+
+1. `gh api repos/superdurable/dex-connectors-library --jq .permissions.push`
+   prints `true` for the authenticated account (admin is not required);
+2. the repository convention uses upstream topic branches, for example merged
+   PRs from `superdurable/<user>/<topic>` in
+   `git log --merges --format=%s upstream/main`;
+3. the user explicitly chooses it after you explain that the branch is
+   published in the official repository.
+
+Push permission alone is not consent. On this path, clone or reuse a clone of
+the official repository, branch from its latest `main` as `<user>/<topic>`,
+push only that topic branch, and open the PR from it to `main`. Never push to
+`main`, create tags, or push another contributor's branch. If any condition is
+not met, use the fork path.
 
 ## Repository boundaries
 
@@ -67,12 +88,36 @@ Treat `connector.yaml` as the release and code-generation source of truth for:
 Run `connectorctl generate` after the manifest changes. Review generated code;
 do not hand-edit it. Run the corresponding `--check` target before handoff.
 
+Root `go test ./...` also runs `cmd/connectorctl/main_test.go`, which
+hard-codes every registered connector's name and version plus every
+operation's happy-path branch and durability. A version bump, new operation, or
+branch or durability change fails
+`TestCatalogLoadsRepositoryDirectoryRegistry` or
+`TestRegisteredOperationsKeepOnlyHappyPathBranchesRequired` until you update
+them in the same change (observed at connectors `main` `d975226`).
+
+## New connector checklist
+
+A new connector directory also updates:
+
+- the sorted root `connectors.yaml` registry;
+- the root `go.work` `use` list;
+- `cmd/connectorctl/main_test.go`: connector count, names, versions,
+  happy-branch map, and the `sync` durability allowlist;
+- `cmd/connectorctl/catalog_test.go`: connector count;
+- `docs/architecture.md` and `docs/acceptance.md`.
+
+The release matrix is computed from the registry. There is no release-workflow
+choice list to regenerate.
+
 ## Versions and release order
 
 `metadata.version` is the connector release source of truth. Leaving it
 unchanged deliberately defers a release. A declared version must equal the
 latest tag or the next patch, minor, or major version; first releases use
-`v0.1.0`.
+`v0.1.0`. In v0, a new operation or configuration field is a minor bump.
+Confirm the computed release with
+`go run ./cmd/connectorctl release-matrix --registry connectors.yaml`.
 
 SDK tags use `sdkgo/vX.Y.Z`. Connector tags use the module directory, for
 example `connectors/slack/vX.Y.Z`. Pin only an exact published SDK tag in a
@@ -123,8 +168,10 @@ published component versions are:
 - Gmail `connectors/google/gmail/v0.10.0`;
 - Google Sheets `connectors/google/spreadsheet/v0.7.0`.
 
-These are reference baselines, not permission to downgrade a repository. For
-new work, inspect current `origin/main` and the latest published component tag.
-If a required tag is absent or its release failed, stop and report the release
-blocker; never substitute a branch, pseudo-version, or commit SHA in public
-guidance.
+These are reference baselines, not permission to downgrade a repository. The
+snapshot deliberately trails current releases until a reviewed baseline
+refresh. For new work, inspect the official repository's current `main` and the
+latest published component tag, for example
+`git tag -l 'connectors/slack/v*' --sort=-v:refname | head -1`. If a required
+tag is absent or its release failed, stop and report the release blocker; never
+substitute a branch, pseudo-version, or commit SHA in public guidance.
