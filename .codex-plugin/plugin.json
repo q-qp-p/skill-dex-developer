@@ -1,6 +1,6 @@
 {
   "name": "superdurable-dex",
-  "version": "0.25.2",
+  "version": "0.25.3",
   "description": "Build Dex process products in a repository-backed coding workspace.",
   "author": {
     "name": "Super Durable",
@@ -30,9 +30,9 @@
     "websiteURL": "https://docs.superdurable.io/build-with-ai/dex-developer-skill",
     "defaultPrompt": [
       "Use $dex-app-builder to discover and design a process application.",
-      "Use $dex-app-builder to prototype and build this workflow.",
+      "Use $dex-connector-contributor to build and upstream this connector capability.",
       "Use $dex-sdk to design a reliable Dex Flow.",
-      "Use $dex-connector-contributor to build and upstream this connector capability."
+      "Use $dex-app-builder to prototype and build this workflow."
     ],
     "brandColor": "#78C51C",
     "composerIcon": "./assets/logo.png",

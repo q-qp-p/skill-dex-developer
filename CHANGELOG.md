@@ -2,6 +2,17 @@
 
 All notable changes to Dex Skills are documented here.
 
+## 0.25.3 - 2026-09-26
+
+- Make the pinned basic-process template release the single default technology-stack authority for new or effectively empty Dex applications.
+- Preserve the template's exact Go SDK, Server, CLI, toolchains, dependencies, lockfiles, layout, generators, and commands unless the user explicitly requests a stack change.
+- Clarify that TypeScript is optional frontend code only while Dex application backends, Flows, and Connector integrations remain Go-only.
+- Make the published Connector catalog the mandatory first source for selecting released provider capabilities.
+- Require exact Trigger, Query, Mutation, and UI capability matches to be verified against the immutable release-tagged `connector.yaml` before integration code is written.
+- Fail closed when the catalog or release manifest cannot be verified, and route confirmed public-provider gaps to Connector Contributor instead of falling back to direct provider code.
+- Put Connector Contributor second in the Codex starter examples while retaining App Builder as the primary first example.
+- Synchronize the Codex, Claude Code, and Cursor plugin manifests at version 0.25.3.
+
 ## 0.25.2 - 2026-09-26
 
 - Add a verified maintainer branch path for Connector Contributor alongside the default fork path, replace the Codex-only `codex/` branch prefix with the repository branch convention, and replace the undefined `$opr` step with concrete `gh` publish, check-watch, and fix-and-push instructions.

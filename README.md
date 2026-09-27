@@ -206,8 +206,10 @@ When the target repository is empty or contains only placeholders such as a
 README, App Builder first initializes it from the pinned
 `superdurable/dex-template-basic-process` release. It preserves the repository's
 Git history and intentional files, then uses the template's `make bootstrap`
-path. It does not invent a TypeScript backend, create an ad hoc npm scaffold, or
-borrow SDK setup from a neighboring project.
+path. That release's Go module, npm lockfile, Server/CLI baselines, generators,
+directory layout, and Make targets are the default technology stack. App Builder
+does not independently select a newer Dex Go SDK, invent a TypeScript backend,
+create an ad hoc npm scaffold, or borrow SDK setup from a neighboring project.
 
 No custom UI uses Dex Web v2 for every management interaction. The application
 keeps only a non-business Hello World page, one `GetApplicationInfo` OpenAPI
@@ -224,17 +226,27 @@ the mock journey, then `make check` for real Dex durability and rendering.
 
 Backend implementation is Go-only, starts from
 `superdurable/dex-template-basic-process`, and must satisfy strict Dex Web v2 /
-FDG 2.0 rendering. The supported stack is basic-process release `v0.2.1`
-(template contract `1.4.1`), Dex Server `v0.13.2`, Dex CLI `v0.13.8`, and Dex
-Go SDK `v0.13.1`. Before verification, advance the scaffold's Server and CLI
-baseline files, `go.mod` SDK requirement, `.agents/skills` submodule pin, and
-template contract test together, and confirm `dexcli version` meets the CLI
-baseline. Dex Web v2 is embedded in the Server and CLI artifacts. Connector
+FDG 2.0 rendering. The default stack is basic-process release `v0.2.1`
+(template contract `1.4.1`) with the exact Dex Go SDK, Dex Server, Dex CLI,
+Go/Node dependencies, and commands pinned by that release. The independent
+`DEX_BASELINE`, `DEX_SERVER_BASELINE`, and `DEX_CLI_BASELINE` files validate the
+skill's reference guidance; they do not authorize upgrading a generated
+application. Dex Web v2 is embedded in the template-pinned Server and CLI
+artifacts. The current Connector SDK supports application integration only from
+the Go backend; TypeScript remains optional frontend code. Connector
 integrations reuse released
 dedicated connectors from `superdurable/dex-connectors-library`. Generic HTTP
 is reserved for controlled internal systems; a missing or defective
 external-provider connector routes to `dex-connector-contributor` and blocks
 production handoff until released.
+
+Connector selection starts from the canonical published
+[`catalog.yaml`](https://superdurable.github.io/dex-connectors-library/catalog.yaml),
+then verifies every exact Trigger, Query, Mutation, or UI capability against the
+selected component tag's immutable `connector.yaml`. If the catalog or release
+manifest cannot be verified, App Builder stops connector-dependent
+implementation instead of guessing from memory or falling back to a provider
+SDK.
 
 Flow design prefers existing released connector capabilities throughout:
 Query/Mutation factories become Connector Steps, Triggers start typed Flows or

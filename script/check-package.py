@@ -205,15 +205,30 @@ def check_app_builder() -> None:
         "project workspace",
         "effectively empty",
         "../TEMPLATE_BASELINE",
+        "`TEMPLATE_BASELINE` is the",
+        "application stack authority",
+        "In the first implementation update for an effectively empty repository",
+        "do not fall back to a self-selected stack",
+        "authorize upgrading an application's template-pinned dependencies",
+        "TypeScript is limited to the",
+        "template's optional React frontend",
+        "SDK integration are Go-only",
+        "cannot use the current Connector SDK",
         "preserving its `.git` directory",
         "`make bootstrap` as the first dependency/bootstrap command",
         "do not start a TypeScript Dex backend",
+        "Do not advance the scaffold independently",
+        "Connector SDK supports application integration only from Go",
         "infer SDK versions from a neighboring workspace",
         "### No custom UI",
         "### Custom UI",
         "GetApplicationInfo",
         "trusted authentication boundary",
         "public external product",
+        "https://superdurable.github.io/dex-connectors-library/catalog.yaml",
+        "match every required Trigger, Query, Mutation, and UI capability",
+        "stop connector-dependent",
+        "do not infer support from memory",
         "$dex-connector-contributor",
         "schedules a Connector Step",
         "temporary Go",
@@ -231,7 +246,13 @@ def check_app_builder() -> None:
 
     connector_architecture = (references_dir / "connector-architecture.md").read_text()
     for text in (
+        "application integration only from a Go backend",
+        "it is not a Connector SDK backend",
         "## Application composition",
+        "## Released capability discovery",
+        "connectors.dex.dev/catalog/v1alpha1",
+        "<directory>/<version>",
+        "verification blocker",
         "User/API RPC requests provider work",
         "connector, operation, or Trigger is a connector contribution",
         "## Internal connector library decision",
@@ -242,7 +263,15 @@ def check_app_builder() -> None:
             fail(f"connector architecture must contain: {text}")
 
     product_discovery = (references_dir / "product-discovery.md").read_text()
-    for text in ("connector capability matrix", "internal connector library"):
+    for text in (
+        "## Stack checkpoint",
+        "defaults to the exact stack",
+        "without Connector SDK support",
+        "connector capability matrix",
+        "canonical published catalog",
+        "immutable `connector.yaml`",
+        "internal connector library",
+    ):
         if text not in product_discovery:
             fail(f"product discovery must contain: {text}")
 
@@ -268,6 +297,8 @@ def check_connector_contributor() -> None:
         "superdurable/dex-connectors-library",
         "documented public API or official SDK",
         "connector.yaml",
+        "Connector SDK and official connector modules are Go-only",
+        "ask the user to open",
         "operation-specific",
         "optional: true",
         "seven seconds",
@@ -404,6 +435,8 @@ def check_manifests(version: str) -> None:
     prompts = interface.get("defaultPrompt")
     if not isinstance(prompts, list) or not prompts or "$dex-app-builder" not in prompts[0]:
         fail("Codex default prompts must put $dex-app-builder first")
+    if len(prompts) < 2 or "$dex-connector-contributor" not in prompts[1]:
+        fail("Codex default prompts must put $dex-connector-contributor second")
     if not any("$dex-sdk" in prompt for prompt in prompts):
         fail("Codex default prompts must expose $dex-sdk")
     if not any("$dex-connector-contributor" in prompt for prompt in prompts):

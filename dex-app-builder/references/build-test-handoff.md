@@ -4,6 +4,12 @@
 
 Use the basic-process template's stable commands. Change `openapi/openapi.yaml`, then regenerate; never hand-edit generated Go or TypeScript clients.
 
+Keep the template release's `go.mod`, `go.sum`, npm lockfile, Go toolchain,
+Dex Server/CLI baselines, generators, and Make targets unchanged unless the
+user explicitly requested the corresponding stack or dependency change. A
+newer `DEX_BASELINE` in the skill repository is not an application upgrade
+instruction.
+
 For **No custom UI**, reduce OpenAPI to `GetApplicationInfo` plus confirmed integration ingress, regenerate both clients, and remove process-management routes and mock lifecycle code. Verify the Hello World page through the generated client. Do not run a mock approval checkpoint for an inert shell.
 
 For **Custom UI**, use `make mock` as the interaction-approval loop and run `make test-mock-e2e` after UI behavior changes. Run the narrowest relevant unit or frontend check after each edit batch. Before handoff run the repository's full `make check`, including mock E2E, real Dex integration and E2E, Worker replacement, FDG 2.0 validation, and the production build.
@@ -14,7 +20,12 @@ Show Dex Web early. Once the first Flow graph renders, keep one user-facing `dex
 
 ## Baselines and local CLI
 
-Advance these template pins together; `internal/templatecontract/contract_test.go` hard-codes the template's own values (`server/v0.12.0`, `cli-v0.12.0`, `sdk-go v0.11.3`, and the skill submodule commit in template `v0.2.1`), so changing only some of them fails `make check`:
+Do not advance the template pins during ordinary application work. If the user
+explicitly requests a template-stack upgrade, advance these pins together;
+`internal/templatecontract/contract_test.go` hard-codes the template's own
+values (`server/v0.12.0`, `cli-v0.12.0`, `sdk-go v0.11.3`, and the skill
+submodule commit in template `v0.2.1`), so changing only some of them fails
+`make check`:
 
 - `DEX_SERVER_BASELINE` and `DEX_CLI_BASELINE`;
 - the `github.com/superdurable/dex/sdk-go` requirement in `go.mod`;
@@ -56,11 +67,16 @@ Use deadline-based polling and report Flow IDs and status on failure. Do not hid
 Ensure:
 
 - `superverse.yaml` and `.superverse/template.json` remain valid;
+- application dependencies, runtime baselines, lockfiles, and commands still
+  match the pinned template unless an explicit user-approved deviation is
+  recorded;
 - the confirmed UI mode is recorded;
 - a No custom UI shell contains no business controls or management routes;
 - custom UI interactions are approved against the mock server and Mock Controls;
 - secrets are absent from files, logs, generated values, and archives;
 - dependencies and released connector versions are pinned;
+- every connector capability matrix records the canonical published catalog,
+  exact capability name and kind, component tag, and immutable manifest URL;
 - every public-provider boundary reuses an available released connector
   capability or records the contributor PR and release blocker;
 - every internal-service boundary records the existing/new internal connector

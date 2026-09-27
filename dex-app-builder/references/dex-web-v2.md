@@ -1,6 +1,14 @@
 # Dex Web v2 and FDG 2.0
 
-Baselines: Dex Server `v0.13.2`, Dex CLI `v0.13.8`, and Dex Go SDK `v0.13.1`. Both Server and CLI embed Web v2, including permission-based Work Queue, cumulative permission history, trusted-header enforcement, dynamic definition sources, embedded reverse-proxy mounts, local Flow starts, and local setup for Connector operations, Trigger bindings, and configuration UI units.
+Reference capability baselines: Dex Server `v0.13.2`, Dex CLI `v0.13.8`, and
+Dex Go SDK `v0.13.1`. These validate this skill's guidance; they are not an
+instruction to upgrade an application. A generated application uses the exact
+Server, CLI, and Go SDK versions pinned by its `TEMPLATE_BASELINE` release unless
+the user explicitly requests an upgrade. Both Server and CLI embed Web v2,
+including permission-based Work Queue, cumulative permission history,
+trusted-header enforcement, dynamic definition sources, embedded reverse-proxy
+mounts, local Flow starts, and local setup for Connector operations, Trigger
+bindings, and configuration UI units.
 
 Released connector modules may require an older Go SDK; at connectors `main` `d975226` every connector required `sdk-go v0.11.3`. Go minimum version selection builds the application with its own `v0.13.1` requirement, so keep the application pin and do not wait for connector re-releases.
 

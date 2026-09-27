@@ -84,6 +84,10 @@ defaults must remain derived from `connector.yaml`.
 
 ## Non-negotiable boundaries
 
+- The current Connector SDK and official connector modules are Go-only.
+  TypeScript is limited to optional configuration UI units. If another backend
+  language is required, explain that it is unsupported and ask the user to open
+  an issue; do not invent a connector runtime or application API.
 - Make provider calls only from a Connector Step `Execute`. RPCs route or
   mutate Dex state; they do not call providers.
 - Require only the happy-path branch by default. Mark every other operation
