@@ -19,6 +19,9 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.13"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
       - name: Read upstream baselines
         id: baselines
         shell: bash
@@ -52,6 +55,8 @@ jobs:
           fetch-depth: 0
       - name: Validate package and manifests
         run: python3 script/check-package.py
+      - name: Test lifecycle version hook
+        run: node --test test/version-check.test.mjs
       - name: Validate Dex SDK reference sources
         run: python3 script/check-reference-sources.py --dex-root upstream-dex-sdk
       - name: Validate Connector reference sources

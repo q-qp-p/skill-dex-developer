@@ -1,0 +1,17 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|clear",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${PLUGIN_ROOT}/hooks/version-check.mjs\" --client codex",
+            "timeout": 2,
+            "additionalContextLimit": 1200
+          }
+        ]
+      }
+    ]
+  }
+}

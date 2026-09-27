@@ -115,11 +115,33 @@ An active chat keeps the plugin version it loaded when the chat started. After
 an upgrade, restart the client when applicable and begin a new chat in the
 repository.
 
-At the beginning of a new chat, each Dex skill makes a short, best-effort check
-against the repository's current stable version. When a newer version exists,
-the first substantive response includes a brief BTW notice with this upgrade
-guide. The check is silent when the plugin is current or the network is
-unavailable, and it never upgrades the plugin automatically.
+### Automatic future-version reminder
+
+Versions `0.25.4` and earlier do not contain the lifecycle hook, so they cannot
+reliably discover `0.25.5`. Upgrade to `0.25.5` manually once. Starting with
+`0.25.5`, each new session checks GitHub's latest formal release and can remind
+you about a future `0.25.6` or later release.
+
+Codex and Claude Code run the check at session start. Cursor warms the cache
+when a workspace opens and reads it when a session starts. A result is cached
+for 15 minutes. When the cache has expired, the GitHub request waits at most
+about one second and uses ETag revalidation. Until you upgrade, every new Dex
+chat can include the reminder; unrelated chats remain silent. Restoring an old
+chat or compacting its context does not repeat it.
+
+The hook reads the installed `VERSION` and requests only public release
+metadata from GitHub. It does not read or upload the prompt, repository files,
+credentials, or project content. It only suggests an upgrade; it never changes
+or upgrades the plugin automatically.
+
+Codex asks you to review and trust the hook the first time `0.25.5` is enabled.
+A later change to the hook definition may require another review. Claude Code
+and Cursor use their own plugin hooks; disable the hook in the client's hook
+settings, or disable the plugin, to turn it off. If hooks are disabled,
+untrusted, blocked by enterprise policy, missing a Node runtime, or unsupported
+in the current cloud environment, the loaded Dex skill falls back to one
+best-effort release check. All hook and fallback failures are silent and never
+block the requested work.
 
 ### Codex desktop app
 

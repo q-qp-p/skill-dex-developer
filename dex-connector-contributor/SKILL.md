@@ -11,9 +11,10 @@ correctness, credential isolation, generated contracts, and release order.
 
 ## Session start
 
-Before the first substantive response in each chat, follow the shared
-[plugin version check](../references/plugin-version-check.md). Run it only once,
-and never let it delay or block the user's task.
+Before the first substantive Dex-related response, follow the shared
+[plugin version check](../references/plugin-version-check.md). Prefer the
+lifecycle hook status; run the Skill fallback only when that status is
+`unavailable` or absent. Run it only once and never delay or block the task.
 
 ## Required foundations
 

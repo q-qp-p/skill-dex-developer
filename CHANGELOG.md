@@ -2,6 +2,15 @@
 
 All notable changes to Dex Skills are documented here.
 
+## 0.25.5 - 2026-09-26
+
+- Add dedicated Codex, Claude Code, and Cursor lifecycle hooks that compare the installed plugin version with GitHub's latest stable release at session start.
+- Cache release metadata for 15 minutes with ETag revalidation and a one-second network timeout, while keeping all hook and cache failures silent and non-blocking.
+- Inject an internal current, outdated, or unavailable status so update notices appear only in the first Dex-related response and Skill-level checks remain a compatibility fallback.
+- Document hook trust, privacy, disablement, unsupported environments, and the one-time manual upgrade needed from 0.25.4 and earlier.
+- Add deterministic hook tests and package checks for client-specific events, output schemas, paths, timeouts, and the absence of a shared auto-discovered hook file.
+- Synchronize the Codex, Claude Code, and Cursor plugin manifests at version 0.25.5.
+
 ## 0.25.4 - 2026-09-26
 
 - Replace the Custom UI mock-first approval gate with a low-fidelity static React wireframe checkpoint limited to pages, fields, actions, and navigation.

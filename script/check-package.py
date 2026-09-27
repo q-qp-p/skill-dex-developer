@@ -14,6 +14,12 @@ APP_BUILDER = ROOT / "dex-app-builder"
 CONNECTOR_CONTRIBUTOR = ROOT / "dex-connector-contributor"
 SDK_REFERENCES = SDK / "references"
 PLUGIN_VERSION_CHECK = ROOT / "references" / "plugin-version-check.md"
+VERSION_CHECK_SCRIPT = ROOT / "hooks" / "version-check.mjs"
+HOOK_CONFIGS = {
+    "codex": ROOT / "hooks" / "codex.json",
+    "claude": ROOT / "hooks" / "claude.json",
+    "cursor": ROOT / "hooks" / "cursor.json",
+}
 LOGO = ROOT / "assets" / "logo.png"
 MANIFESTS = {
     "codex": ROOT / ".codex-plugin" / "plugin.json",
@@ -432,12 +438,15 @@ def check_plugin_version_check() -> None:
         fail("references/plugin-version-check.md must exist")
     content = PLUGIN_VERSION_CHECK.read_text()
     for text in (
-        "https://raw.githubusercontent.com/superdurable/dex-skills/main/VERSION",
+        "Dex Skills lifecycle version check",
+        "status=current",
+        "status=outdated",
+        "status=unavailable",
+        "https://api.github.com/repos/superdurable/dex-skills/releases/latest",
         "without additional user approval",
-        "single stable semantic version",
-        "repository version is higher",
-        "substantive response",
-        "Do not repeat the notice",
+        "vMAJOR.MINOR.PATCH",
+        "first substantive Dex-related",
+        "Do not show the notice in a non-Dex conversation",
     ):
         if text not in content:
             fail(f"plugin version check must contain: {text}")
@@ -447,6 +456,103 @@ def check_plugin_version_check() -> None:
         content = (skill / "SKILL.md").read_text()
         if relative_link not in content:
             fail(f"{skill.name}/SKILL.md must load the plugin version check")
+
+
+def command_hook(config: dict, event: str, matcher: str, path: Path) -> dict:
+    events = config.get("hooks")
+    if not isinstance(events, dict):
+        fail(f"{path.relative_to(ROOT)} must define hooks")
+    entries = events.get(event)
+    if not isinstance(entries, list) or len(entries) != 1:
+        fail(f"{path.relative_to(ROOT)} must define exactly one {event} hook")
+    entry = entries[0]
+    if matcher:
+        if entry.get("matcher") != matcher:
+            fail(f"{path.relative_to(ROOT)} {event} matcher must be {matcher}")
+        handlers = entry.get("hooks")
+        if not isinstance(handlers, list) or len(handlers) != 1:
+            fail(f"{path.relative_to(ROOT)} {event} must contain one command hook")
+        return handlers[0]
+    return entry
+
+
+def check_hook_configs(manifests: dict) -> None:
+    expected_paths = {
+        "codex": "./hooks/codex.json",
+        "claude": "./hooks/claude.json",
+        "cursor": "./hooks/cursor.json",
+    }
+    for name, expected in expected_paths.items():
+        if manifests[name].get("hooks") != expected:
+            fail(f"{name} manifest hooks must be {expected}")
+        if not HOOK_CONFIGS[name].is_file():
+            fail(f"missing {HOOK_CONFIGS[name].relative_to(ROOT)}")
+
+    shared = ROOT / "hooks" / "hooks.json"
+    if shared.exists():
+        fail("hooks/hooks.json must not exist; clients require dedicated hook configs")
+    if not VERSION_CHECK_SCRIPT.is_file():
+        fail("hooks/version-check.mjs must exist")
+    script = VERSION_CHECK_SCRIPT.read_text()
+    for text in (
+        "releases/latest",
+        "CACHE_TTL_MS = 15 * 60 * 1000",
+        "HTTP_TIMEOUT_MS = 1000",
+        "PLUGIN_DATA",
+        "CLAUDE_PLUGIN_DATA",
+        'allowNetwork: client !== "cursor" || refreshOnly',
+        "additionalContext",
+        "additional_context",
+    ):
+        if text not in script:
+            fail(f"version hook script must contain: {text}")
+
+    codex_path = HOOK_CONFIGS["codex"]
+    codex = load_json(codex_path)
+    codex_hook = command_hook(codex, "SessionStart", "startup|clear", codex_path)
+    if codex_hook.get("type") != "command":
+        fail("Codex SessionStart hook must be a command hook")
+    if codex_hook.get("command") != 'node "${PLUGIN_ROOT}/hooks/version-check.mjs" --client codex':
+        fail("Codex hook must run the shared version script with the Codex client")
+    if codex_hook.get("timeout") != 2:
+        fail("Codex hook timeout must be two seconds")
+
+    claude_path = HOOK_CONFIGS["claude"]
+    claude = load_json(claude_path)
+    claude_hook = command_hook(
+        claude, "SessionStart", "startup|clear|fork", claude_path
+    )
+    if claude_hook.get("type") != "command" or claude_hook.get("command") != "node":
+        fail("Claude SessionStart hook must run Node directly")
+    if claude_hook.get("args") != [
+        "${CLAUDE_PLUGIN_ROOT}/hooks/version-check.mjs",
+        "--client",
+        "claude",
+    ]:
+        fail("Claude hook must run the shared version script with the Claude client")
+    if claude_hook.get("timeout") != 2:
+        fail("Claude hook timeout must be two seconds")
+
+    cursor_path = HOOK_CONFIGS["cursor"]
+    cursor = load_json(cursor_path)
+    if cursor.get("version") != 1:
+        fail("Cursor hook config version must be 1")
+    cursor_workspace = command_hook(cursor, "workspaceOpen", "", cursor_path)
+    cursor_session = command_hook(cursor, "sessionStart", "", cursor_path)
+    if cursor_workspace.get("command") != (
+        'node "${CURSOR_PLUGIN_ROOT}/hooks/version-check.mjs" '
+        "--client cursor --refresh-only"
+    ):
+        fail("Cursor workspaceOpen must prewarm the version cache")
+    if cursor_session.get("command") != (
+        'node "${CURSOR_PLUGIN_ROOT}/hooks/version-check.mjs" --client cursor'
+    ):
+        fail("Cursor sessionStart must inject the cached version result")
+    if cursor_workspace.get("timeout") != 2 or cursor_session.get("timeout") != 2:
+        fail("Cursor hook timeouts must be two seconds")
+    for forbidden in ("resume", "compact", "SessionEnd", "sessionEnd"):
+        if forbidden in json.dumps({"codex": codex, "claude": claude, "cursor": cursor}):
+            fail(f"version hooks must not run on {forbidden}")
 
 
 def check_skills(baseline: str) -> None:
@@ -481,6 +587,7 @@ def check_manifests(version: str) -> None:
     manifests = {name: load_json(path) for name, path in MANIFESTS.items()}
     for name, manifest in manifests.items():
         check_manifest_common(MANIFESTS[name], manifest, version)
+    check_hook_configs(manifests)
 
     codex = manifests["codex"]
     if codex.get("skills") != "./":
