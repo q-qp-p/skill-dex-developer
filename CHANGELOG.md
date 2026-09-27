@@ -2,6 +2,12 @@
 
 All notable changes to Dex Skills are documented here.
 
+## 0.25.9 - 2026-09-27
+
+- Advance the basic-process template baseline from `v0.2.1` to `v1.6.0`.
+- Require the released template to use Coding Sandbox contract revision 3 without project-local skills.
+- Synchronize the Codex, Claude Code, and Cursor plugin manifests at version 0.25.9.
+
 ## 0.25.8 - 2026-09-27
 
 - Remove project-local skill-submodule guidance and make the Coding Sandbox's immutable Dex Skills release the only agent-skill authority.
