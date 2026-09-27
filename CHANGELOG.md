@@ -2,6 +2,12 @@
 
 All notable changes to Dex Skills are documented here.
 
+## 0.25.6 - 2026-09-26
+
+- Describe the Codex SessionStart hook as a read-only Dex Skills version check in the trust-review metadata.
+- Show `Checking for Dex Skills updates` while the hook runs, making its purpose clear without implying that it installs updates.
+- Synchronize the Codex, Claude Code, and Cursor plugin manifests at version 0.25.6.
+
 ## 0.25.5 - 2026-09-26
 
 - Add dedicated Codex, Claude Code, and Cursor lifecycle hooks that compare the installed plugin version with GitHub's latest stable release at session start.

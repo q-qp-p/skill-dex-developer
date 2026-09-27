@@ -509,6 +509,11 @@ def check_hook_configs(manifests: dict) -> None:
 
     codex_path = HOOK_CONFIGS["codex"]
     codex = load_json(codex_path)
+    if codex.get("description") != (
+        "Checks GitHub for a newer stable Dex Skills version. "
+        "Reads public release metadata only and never installs updates."
+    ):
+        fail("Codex hook review description must explain its read-only version check")
     codex_hook = command_hook(codex, "SessionStart", "startup|clear", codex_path)
     if codex_hook.get("type") != "command":
         fail("Codex SessionStart hook must be a command hook")
@@ -516,6 +521,8 @@ def check_hook_configs(manifests: dict) -> None:
         fail("Codex hook must run the shared version script with the Codex client")
     if codex_hook.get("timeout") != 2:
         fail("Codex hook timeout must be two seconds")
+    if codex_hook.get("statusMessage") != "Checking for Dex Skills updates":
+        fail("Codex hook status message must identify the version check")
 
     claude_path = HOOK_CONFIGS["claude"]
     claude = load_json(claude_path)

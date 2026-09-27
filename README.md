@@ -134,14 +134,16 @@ metadata from GitHub. It does not read or upload the prompt, repository files,
 credentials, or project content. It only suggests an upgrade; it never changes
 or upgrades the plugin automatically.
 
-Codex asks you to review and trust the hook the first time `0.25.5` is enabled.
-A later change to the hook definition may require another review. Claude Code
-and Cursor use their own plugin hooks; disable the hook in the client's hook
-settings, or disable the plugin, to turn it off. If hooks are disabled,
-untrusted, blocked by enterprise policy, missing a Node runtime, or unsupported
-in the current cloud environment, the loaded Dex skill falls back to one
-best-effort release check. All hook and fallback failures are silent and never
-block the requested work.
+Codex asks you to review and trust the hook when a hook-enabled release is first
+enabled. Because `0.25.6` adds clearer review metadata, upgrading from `0.25.5`
+requires one more review; later hook-definition changes may do the same. The
+review description states that the hook reads public GitHub release metadata
+only and never installs updates. Claude Code and Cursor use their own plugin
+hooks; disable the hook in the client's hook settings, or disable the plugin,
+to turn it off. If hooks are disabled, untrusted, blocked by enterprise policy,
+missing a Node runtime, or unsupported in the current cloud environment, the
+loaded Dex skill falls back to one best-effort release check. All hook and
+fallback failures are silent and never block the requested work.
 
 ### Codex desktop app
 
