@@ -54,7 +54,11 @@ inside the current repository while preserving its `.git` directory and any
 intentional user files. Review collisions before writing, do not initialize or
 read project-local agent-skill submodules, inspect `.superverse/template.json`,
 and use `make bootstrap` as the first dependency/bootstrap command. The
-platform-provided Dex Skills release is the only skill authority.
+installed Dex Skills release loaded by the current coding-agent host is the
+only skill authority. In Superverse Coding Sandbox, the runtime supplies that
+release. External developers install the released plugin in Codex, Claude Code,
+Cursor, or another Agent Skills-compatible host. Never assume a fixed skill
+filesystem path.
 
 For a new or effectively empty application, `TEMPLATE_BASELINE` is the
 application stack authority. Before proposing implementation, inspect that

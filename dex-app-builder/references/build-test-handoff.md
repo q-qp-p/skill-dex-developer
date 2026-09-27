@@ -51,8 +51,9 @@ release values, so changing only some of them fails `make check`:
 - the `github.com/superdurable/dex/sdk-go` requirement in `go.mod`;
 - the expectations in the template contract test.
 
-Do not add or update a project-local skill submodule. The Coding Sandbox owns
-the immutable Dex Skills release independently from the application template.
+Do not add or update a project-local skill submodule. The coding-agent host
+supplies the immutable Dex Skills release independently from the application
+template.
 
 Template scripts call `dexcli` from `PATH` and do not check its version. Run `dexcli version` first and require at least `v0.13.8`. When upgrading the global CLI would break other projects pinned to older Servers, install a project-local CLI and put its directory first on `PATH` for the template commands; `scripts/check-fdg-v2.sh` also honors `DEXCLI`.
 

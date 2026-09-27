@@ -88,7 +88,7 @@ def add_changelog(root: Path, next_version: str, release_date: str, previous: st
     entry = (
         f"## {next_version} - {release_date}\n\n"
         f"- Advance the basic-process template baseline from `{previous}` to `{latest}`.\n"
-        "- Require the released template to use Coding Sandbox contract revision 3 without project-local skills.\n"
+        "- Require the released template to preserve sandbox contract revision 3 without project-local skills.\n"
         f"- Synchronize the Codex, Claude Code, and Cursor plugin manifests at version {next_version}.\n\n"
     )
     changelog_path.write_text(changelog.replace(marker, marker + entry, 1))

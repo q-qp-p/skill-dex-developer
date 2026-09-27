@@ -2,6 +2,14 @@
 
 All notable changes to Dex Skills are documented here.
 
+## 0.25.10 - 2026-09-27
+
+- Advance the basic-process template baseline from `v1.6.0` to `v1.6.1`.
+- Load the installed Dex Skills release through the current coding-agent host for both Superverse and external development.
+- Remove fixed-path and Coding Sandbox-only assumptions from App Builder guidance.
+- Require the released template to preserve sandbox contract revision 3 without project-local skills.
+- Synchronize the Codex, Claude Code, and Cursor plugin manifests at version 0.25.10.
+
 ## 0.25.9 - 2026-09-27
 
 - Advance the basic-process template baseline from `v0.2.1` to `v1.6.0`.
