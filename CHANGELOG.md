@@ -2,6 +2,12 @@
 
 All notable changes to Dex Skills are documented here.
 
+## 0.24.2 - 2026-09-26
+
+- Require Dex App Builder to initialize effectively empty repositories from the pinned basic-process template before selecting a stack or installing dependencies.
+- Preserve the target repository and intentional files while rejecting ad hoc TypeScript backends, npm scaffolds, and SDK inference from neighboring workspaces.
+- Synchronize the Codex, Claude Code, and Cursor plugin manifests at version 0.24.2.
+
 ## 0.24.1 - 2026-09-26
 
 - Make Dex App Builder the primary workflow for Dex product, application, and process requests.

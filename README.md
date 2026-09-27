@@ -32,36 +32,76 @@ run tests, build artifacts, or deploy the application from an ordinary chat.
 
 ## Install
 
-### Codex
+### Codex desktop app
+
+Open the plugin browser, choose **Add a marketplace**, and use:
+
+| Field | Value |
+| --- | --- |
+| Source | `https://github.com/superdurable/dex-skills` |
+| Git ref | `main` |
+| Sparse paths | Leave empty. |
+
+Add the marketplace, open **Super Durable**, and install **Dex**. This route
+does not require the separate Codex CLI.
+
+### Codex CLI
+
+Only use this route when `codex --version` works in the shell:
 
 ```bash
 codex plugin marketplace add superdurable/dex-skills
-codex plugin add superdurable-dex@superdurable
+codex
 ```
+
+Inside Codex CLI, open `/plugins`, select the **Super Durable** marketplace,
+and install **Dex**. There is no `codex plugin add` step in these instructions.
 
 Open an existing repository or create an empty one, then start a new task. Use
 `$dex-app-builder` for the primary product workflow. Explicitly invoke
 `$dex-sdk` only for standalone SDK work or `$dex-connector-contributor` only
 for standalone official connector-library contribution.
 
-### Claude Code
+### Claude web and desktop
 
-Run inside Claude Code:
+Open **Customize → Plugins → Add → Add marketplace**, choose **Add from a
+repository**, and enter `https://github.com/superdurable/dex-skills`. Install
+**Dex** from the **Super Durable** marketplace. Claude saves the installation
+to the account, so it is also available in Claude Code when signed in with the
+same account.
+
+### Claude Code CLI
+
+Run from a shell where the `claude` command is installed:
+
+```bash
+claude plugin marketplace add superdurable/dex-skills
+claude plugin install superdurable-dex@superdurable
+```
+
+Or run the slash-command equivalents inside an interactive Claude Code session:
 
 ```text
 /plugin marketplace add superdurable/dex-skills
 /plugin install superdurable-dex@superdurable
-/reload-plugins
 ```
 
 Invoke `/superdurable-dex:dex-sdk`, `/superdurable-dex:dex-app-builder`, or
 `/superdurable-dex:dex-connector-contributor`.
 
-### Cursor
+### Cursor desktop app
 
 Import `https://github.com/superdurable/dex-skills` from **Customize → From
-GitHub Repository**, then install `superdurable-dex`. The three skills appear
-as `/dex-sdk`, `/dex-app-builder`, and `/dex-connector-contributor`.
+GitHub Repository**, then open **Dex**, select **Install**, and choose a user or
+project scope. The three skills appear as `/dex-sdk`, `/dex-app-builder`, and
+`/dex-connector-contributor`.
+
+### Cursor CLI
+
+Cursor's official documentation describes marketplace installation through
+**Customize** and does not document a separate shell command for installing
+this GitHub marketplace. Install the plugin through the desktop app; do not
+guess a `cursor plugin install` command.
 
 Agent Skills clients can install the same bundle directly:
 
@@ -73,8 +113,8 @@ npx skills add superdurable/dex-skills --all
 
 The former plugin ID `dex` and invocation `$dex-developer` were replaced by
 `superdurable-dex` and `$dex-sdk`. Remove or update the old marketplace install,
-install `superdurable-dex@superdurable`, and start a new task so the new skill
-names are discovered.
+install **Dex** from the **Super Durable** marketplace, and start a new task so
+the new skill names are discovered.
 
 ## Dex SDK
 
@@ -92,6 +132,13 @@ The project dependency and lockfile remain authoritative when versions differ.
 `dex-app-builder` starts with business discovery: process maintainers, managers,
 terminal users, permissions, triggers, actions, waits, approvals, recovery, and
 audit requirements. It then confirms **No custom UI** or **Custom UI**.
+
+When the target repository is empty or contains only placeholders such as a
+README, App Builder first initializes it from the pinned
+`superdurable/dex-template-basic-process` release. It preserves the repository's
+Git history and intentional files, then uses the template's `make bootstrap`
+path. It does not invent a TypeScript backend, create an ad hoc npm scaffold, or
+borrow SDK setup from a neighboring project.
 
 No custom UI uses Dex Web v2 for every management interaction. The application
 keeps only a non-business Hello World page, one `GetApplicationInfo` OpenAPI

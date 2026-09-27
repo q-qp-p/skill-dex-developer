@@ -33,6 +33,32 @@ claim to create files, run tests, build artifacts, or deploy the application.
 Recommend continuing the confirmed plan in Codex or another coding-agent host
 connected to the target repository.
 
+## Repository bootstrap
+
+Inspect the repository before selecting a language, creating manifests, or
+installing dependencies. Treat a repository as effectively empty when it has no
+application source or build manifests, even if it contains a README, license,
+editor configuration, or other project placeholders.
+
+For an effectively empty repository, initialize the application from
+`https://github.com/superdurable/dex-template-basic-process` at the exact release
+recorded in [TEMPLATE_BASELINE](../TEMPLATE_BASELINE). Materialize the template
+inside the current repository while preserving its `.git` directory and any
+intentional user files. Review collisions before writing, initialize the
+template's pinned submodules, inspect `.superverse/template.json`, and use
+`make bootstrap` as the first dependency/bootstrap command.
+
+Do not invent a new application stack for an empty repository. In particular,
+do not start a TypeScript Dex backend, create an ad hoc npm application, or
+infer SDK versions from a neighboring workspace. Do not copy bootstrap code
+from another project. Dex App Builder starts from the template's Go backend and
+its optional React TypeScript UI skeleton.
+
+When the repository already contains an application and build manifests,
+preserve its intentional structure. Compare it with the pinned template and
+adapt the required architecture without replacing existing work unless the user
+explicitly approves that replacement.
+
 ## Fixed product boundary
 
 - Use `https://github.com/superdurable/dex-template-basic-process` as the application template.
