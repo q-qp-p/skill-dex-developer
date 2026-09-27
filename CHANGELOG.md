@@ -2,6 +2,14 @@
 
 All notable changes to Dex Skills are documented here.
 
+## 0.25.7 - 2026-09-26
+
+- Make Dex Flow Attributes and AttributeMaps the default durable application storage instead of introducing a database, cache, ORM, outbox, or shadow read model by default.
+- Add a storage decision matrix covering ownership, access paths, scale, contention, Dex primitives, and evidence for any external-store gap.
+- Prefer a stable domain/entity Flow and typed operations for Dex-owned shared domain data before treating cross-Flow reuse as a database requirement.
+- Limit external stores to confirmed needs such as complex indexes/search, hot-record concurrency, cross-record joins or transactions, and analytical scans, with explicit authority and reconciliation semantics.
+- Synchronize the Codex, Claude Code, and Cursor plugin manifests at version 0.25.7.
+
 ## 0.25.6 - 2026-09-26
 
 - Describe the Codex SessionStart hook as a read-only Dex Skills version check in the trust-review metadata.

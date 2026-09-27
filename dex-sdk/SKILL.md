@@ -76,7 +76,26 @@ Use **Execute** for work-oriented transitions and **WaitFor** for durable waitin
 
 Treat each WaitFor, Execute, and RPC invocation as a separate commit boundary. Split a provider action into its own Step when its successful completion deserves an independent checkpoint, retry/timeout policy, failure-recovery route, or audit boundary. For example, an idempotent Kafka or SQS send often merits its own Step so later failures do not resend it. Do not split solely because there is another API call: keep consecutive work in one Step when it shares one meaningful recovery boundary.
 
-For a product mutation that entails multiple actions, cross-service calls, durable waits, retries, reconciliation, or cleanup, prefer starting one domain-named Dex Flow directly at the API boundary. Let that Flow own admission, orchestration, recovery, and completion. Keep the database for durable domain records, invariants, and read projections; do not introduce a database outbox plus dispatcher, polling command queue, or generic event-driven coordinator solely to start or sequence the Flow. A single bounded local operation can remain synchronous, and independently owned external integrations may still require explicit events.
+For a product mutation that entails multiple actions, cross-service calls, durable waits, retries, reconciliation, or cleanup, prefer starting one domain-named Dex Flow directly at the API boundary. Let that Flow own admission, orchestration, recovery, completion, and the durable process state that Dex can model. Do not introduce a database outbox plus dispatcher, polling command queue, or generic event-driven coordinator solely to start or sequence the Flow. A single bounded local operation can remain synchronous, and independently owned external integrations may still require explicit events.
+
+### Dex-first state ownership
+
+Default durable application state to typed Flow Attributes and AttributeMaps,
+not to a new database dependency. Prefer a stable domain/entity Flow when Dex
+can own facts shared by multiple processes; cross-Flow reuse is an
+ownership-design question, not by itself a storage gap. Use indexed Attributes
+and Dex search for supported lookup paths, typed RPCs for reads and mutations,
+Channels for queued intent, bounded AttributeMap chunks or partitions for
+growing collections, and Dex blob storage for large values.
+
+Introduce an external database or search store only for a confirmed access or
+scale requirement Dex cannot reasonably satisfy: complex/ad-hoc indexes,
+full-text or vector search, sustained high-contention reads and writes to one
+hot record, relational joins or multi-record transactions, or large analytical
+scans. First consider a Dex Attribute Store projection when Dex can remain the
+authority and only the query shape is missing. Never create ambiguous dual
+authority: identify the source of truth per fact and define synchronization,
+failure, and reconciliation behavior.
 
 Deduplicate root Flow starts with Dex start identity, not an application-owned database mechanism. Derive a stable Flow ID for the logical operation, derive the start Request ID from the complete logical request, choose the explicit ID reuse policy, and handle the SDK's typed already-started result. Never add a table, row, outbox, lease, lock, cache, or generic admission projection solely to deduplicate or serialize `startFlow`. If the API must confirm durable admission, wait for the admission Step or Flow result and read accepted business state from its owning domain record.
 

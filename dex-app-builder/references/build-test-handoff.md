@@ -27,6 +27,15 @@ Before handoff run the repository's full `make check`, including mock E2E, real
 Dex integration and E2E, Worker replacement, FDG 2.0 validation, and the
 production build. After visual polish, rerun both mock and real E2E.
 
+Before installing a database, cache, ORM, or separate read model, review the
+storage decision matrix and name the exact query, concurrency, transaction, or
+analytics requirement that Dex Attributes, AttributeMaps, indexes/search,
+typed RPCs, partitioning/chunking, blob storage, and Attribute Store projection
+cannot satisfy. Remove an unneeded dependency when Dex meets the requirement.
+When external storage is justified, test its declared authority boundary,
+projection/synchronization lag, retry behavior, outage handling, and
+reconciliation instead of treating a successful happy-path write as proof.
+
 Treat mock results as HTTP/UI evidence only. They cannot establish Dex durability, Worker replacement, Timer, RPC, retry, or provider semantics.
 
 Show Dex Web early. Once the first Flow graph renders, keep one user-facing `dexcli dev` stack running with a persistent `--flow-rendering-dir`, stable ports, and persistent state, and give the user its URL before continuing. Then keep implementing and testing against isolated test stacks. Do not wait until verification passes to start it, and do not let test scripts reuse or stop it. Report its URL again at handoff.

@@ -45,6 +45,30 @@ Confirm:
 - searchable/indexed fields and detailed display fields;
 - sensitive data that must not enter IDs, logs, Streams, or generated artifacts.
 
+## Storage decision
+
+Default each durable fact to Dex before proposing an external dependency.
+Capture a storage decision matrix:
+
+| Fact or collection | Owning Flow/business identity | Reads and writes | Volume/contention | Dex primitive and access path | Proven external-store gap |
+| --- | --- | --- | --- | --- | --- |
+| Process state | Process Flow ID | Step and Action updates, status/detail reads | product-specific | typed Attribute plus RPC/index when needed | normally none |
+| Keyed or growing records | Stable domain/entity owner | exact lookup, bounded page, independent mutation | product-specific | partitioned or chunked AttributeMap with exact loads and locks | only a confirmed query or contention limit |
+| Shared domain facts | Stable domain/entity Flow | reused by several process/API paths | product-specific | one owner with typed application operations | cross-Flow reuse alone is not a gap |
+
+Do not select PostgreSQL, another database, a cache, an ORM, or a shadow read
+model merely because data must persist. Dex already provides durable
+Attributes, AttributeMaps, indexes/search, locks, exact instance loading, blob
+offload, and optional Attribute Store projections. An Attribute Store
+projection still introduces an external database; use it only for a confirmed
+query gap, and prefer its server-managed projection over application dual
+writes when Dex remains authoritative. Require an external store only for a
+specific unsupported need such as complex/ad-hoc indexes, full-text or vector
+search, high-concurrency access to one hot record, relational joins or
+multi-record transactions, or large analytical scans. Record the exact
+operation, expected scale/SLO, authority, synchronization, failure, and
+reconciliation design. “We may need it later” is not evidence.
+
 ## UI-mode decision
 
 Ask directly whether the product needs a custom process UI. Evaluate Dex Web
@@ -100,8 +124,9 @@ Before code, provide:
 2. a numbered lifecycle with decisions and terminal outcomes;
 3. the confirmed **No custom UI** or **Custom UI** mode and its reason;
 4. proposed Flow, Step, state, message, timer, RPC, and connector boundaries;
-5. connector capability reuse, public fork/PR, internal-library decision, and
+5. the storage decision matrix and any evidence-backed external-store gap;
+6. connector capability reuse, public fork/PR, internal-library decision, and
    release status;
-6. unresolved tradeoffs.
+7. unresolved tradeoffs.
 
 Ask for explicit confirmation. A casual discussion response is not approval to implement.

@@ -1,6 +1,36 @@
-# Large Attributes and Worker locality
+# Dex-first data storage and Worker locality
 
 Read this guide when a Flow stores large documents, conversation history, model context, or API/MCP results, especially with replicated Workers.
+
+## Dex-first storage decision
+
+For a Dex application, begin with Dex as the durable system of record for every
+fact its Flow model can own. A cohesive process snapshot belongs in typed
+Attributes. Dynamically keyed or independently loaded records belong in
+AttributeMaps using stable instances, bounded chunks, or fixed partitions.
+Use indexed Attributes and Dex search for the lookup paths they support, typed
+RPCs for application reads and mutations, Channels for queued intent, and the
+built-in blob path for large values.
+
+Data shared by several processes does not automatically need a database. Give
+shared facts one stable domain/entity Flow owner and expose typed application
+operations around its Attributes or AttributeMaps. Avoid turning an arbitrary
+process Flow into a global database, but also avoid duplicating the same
+authoritative fact across process Flows.
+
+Do not add a database, cache, ORM, outbox, or shadow read model for hypothetical
+future flexibility. An external store needs a concrete unmet requirement, such
+as complex or ad-hoc secondary indexes, full-text/vector search, high-contention
+reads and writes to one hot record that cannot tolerate Attribute-lock
+serialization, relational joins or transactions across independently owned
+records, or analytics requiring large cross-Flow scans. Record the operation,
+expected scale, consistency/SLO, and the Dex alternative evaluated.
+
+When Dex can remain authoritative and only the query shape is missing, prefer a
+reconcilable Attribute Store projection over application-managed dual writes.
+When the external store must instead own a fact, define that boundary
+explicitly and keep the Flow's Attributes to process state, durable references,
+and recovery facts. One fact must never have two ambiguous authorities.
 
 ## Use the built-in large-value path
 
@@ -79,7 +109,7 @@ An indexed AttributeMap does not create one searchable entry per instance. Every
 
 When data needs relational queries, independent pagination, cross-Flow access, analytics, or a different retention lifecycle, first consider Dex Attribute Store synchronization instead of application-managed dual writes.
 
-Attribute Store synchronization is opt-in for each Attribute or AttributeMap, and a Flow selects one or more Server-configured stores. Dex asynchronously projects latest-state writes and retries transient failures. A projection failure does not roll back the Flow Attribute, and retry exhaustion does not automatically replay or backfill the missed batch. Keep Dex or the application's authoritative database as the source of truth and make important projections reconcilable.
+Attribute Store synchronization is opt-in for each Attribute or AttributeMap, and a Flow selects one or more Server-configured stores. Dex asynchronously projects latest-state writes and retries transient failures. A projection failure does not roll back the Flow Attribute, and retry exhaustion does not automatically replay or backfill the missed batch. Keep Dex authoritative unless the documented storage decision assigns a fact to an external system of record, and make important projections reconcilable.
 
 The built-in Attribute Store targets are currently PostgreSQL and MySQL. They project into columns of an existing table keyed by Flow ID; Dex does not create the table. They are not direct Elasticsearch or vector-store connectors, and synchronization does not generate embeddings or transform documents.
 

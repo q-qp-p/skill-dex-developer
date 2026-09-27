@@ -122,13 +122,17 @@ Begin with discussion, not code. Identify:
 - whether each integration is a public external product or an
   organization-controlled internal service;
 - start triggers, inputs, outputs, deadlines, waits, approvals, retries, recovery, audit, search, and sensitive data;
+- durable facts, their owning business identity, expected read/write paths,
+  cross-Flow reuse, volume, contention, search, and retention requirements;
 - whether Dex Web Run, Work Queue, display/edit fields, and Actions satisfy the complete process-management experience;
 - whether an existing host authenticates users and maps roles to trusted permissions;
 - whether the user needs any custom process UI beyond a non-business application shell.
 
-Produce a compact role/operation/permission matrix, lifecycle proposal, UI
-decision, and connector capability matrix. For every integration, record its
-classification, required Trigger/Query/Mutation/UI capabilities, matching
+Produce a compact role/operation/permission matrix, lifecycle proposal, storage
+decision matrix, UI decision, and connector capability matrix. For every
+durable fact, record its owner, access pattern, scale/contention expectation,
+Dex primitive, and any proven reason an external store is required. For every
+integration, record its classification, required Trigger/Query/Mutation/UI capabilities, matching
 released connector capability, and any contribution or internal-library gap.
 Roles describe people or groups. Permissions describe individual allowed
 operations. Resolve material ambiguity and obtain explicit user confirmation
@@ -186,6 +190,43 @@ Read the sibling [Dex SDK skill](../dex-sdk/SKILL.md) completely, then follow it
 Dex SDK supplies the public SDK guidance. The platform constraints in this skill are stricter and take precedence: use only the Go SDK, keep external effects in `Execute`, keep `WaitFor` free of provider or Dex mutations, and require strict FDG 2.0 rendering.
 
 Read [Dex Web v2](references/dex-web-v2.md) before editing a Flow. State the Flow identity, input/output, Steps, transitions, Attributes, Channels, RPCs, timers, retries, recovery, and connector boundaries before code.
+
+### Dex-first backend storage
+
+Use Dex Flow state as the default durable application store. Read the shared
+[data-handling guidance](../dex-sdk/references/core/data-handling.md) and the Go
+[data-handling](../dex-sdk/references/go/data-handling.md) and
+[entity-state patterns](../dex-sdk/references/go/patterns.md) before choosing a
+database, cache, or ORM.
+
+- Keep cohesive Flow-owned current state in typed Attributes.
+- Use AttributeMaps with exact instance loads for independently accessed
+  records, bounded chunks, partitions, and keyed entities.
+- Use indexed Attributes and Dex search for supported list and lookup paths,
+  typed RPCs for application reads and mutations, Channels for queued intent,
+  and Dex's blob path for large durable values.
+- When several processes need the same durable domain facts, prefer a dedicated
+  stable domain/entity Flow that owns those Attributes or AttributeMaps and
+  exposes typed application operations. Cross-Flow reuse alone is not a reason
+  to introduce a database or duplicate state in each process Flow.
+
+Do not add an external database, cache, ORM, outbox, or shadow read model merely
+because the product has durable domain data or may need more queries later. Add
+external storage only after a concrete confirmed requirement exceeds Dex's
+storage and access model, such as complex or ad-hoc secondary indexes,
+full-text/vector search, high-concurrency reads and writes against one hot
+record that cannot accept Attribute-lock serialization, relational joins or
+transactions across independently owned records, or analytics that require
+large cross-Flow scans.
+
+Before adding application-managed external storage, evaluate
+Attribute/AttributeMap partitioning, bounded chunking, exact loads, indexed
+Attributes, typed RPCs, and—when the state remains Dex-authoritative but needs
+a separate query shape—Dex Attribute Store synchronization. If an external
+store is still required, document the exact unsupported operation and expected
+scale/SLO, assign one authoritative owner for every fact, define projection or
+synchronization and recovery semantics, and test failure and reconciliation.
+“Future flexibility” is not a sufficient reason.
 
 For Custom UI, design the application OpenAPI contract in the same pass as the
 Flow and Connector boundaries. Map each approved wireframe action to an

@@ -187,6 +187,29 @@ def check_sdk(baseline: str) -> None:
                     f"pinned link: {source_path}"
                 )
 
+    skill_content = (SDK / "SKILL.md").read_text()
+    for text in (
+        "### Dex-first state ownership",
+        "Default durable application state to typed Flow Attributes",
+        "ownership-design question",
+        "complex/ad-hoc indexes",
+        "sustained high-contention",
+        "Never create ambiguous dual",
+    ):
+        if text not in skill_content:
+            fail(f"dex-sdk/SKILL.md must contain storage principle: {text}")
+
+    core_data_handling = (SDK_REFERENCES / "core" / "data-handling.md").read_text()
+    for text in (
+        "## Dex-first storage decision",
+        "begin with Dex as the durable system of record",
+        "Data shared by several processes does not automatically need a database",
+        "Do not add a database, cache, ORM, outbox, or shadow read model",
+        "One fact must never have two ambiguous authorities",
+    ):
+        if text not in core_data_handling:
+            fail(f"Core data handling must contain storage principle: {text}")
+
 
 def check_app_builder() -> None:
     references_dir = APP_BUILDER / "references"
@@ -253,6 +276,12 @@ def check_app_builder() -> None:
         "`NewLocalConnection`",
         "external effects in `Execute`",
         "`WaitFor` free of provider or Dex mutations",
+        "### Dex-first backend storage",
+        "Use Dex Flow state as the default durable application store",
+        "Cross-Flow reuse alone is not a reason",
+        "Do not add an external database, cache, ORM, outbox, or shadow read model",
+        "high-concurrency reads and writes",
+        "“Future flexibility”",
     )
     for text in required:
         if text not in content:
@@ -309,6 +338,8 @@ def check_app_builder() -> None:
         "Run real Dex and Connector",
         "before visual polish",
         "generated server interfaces",
+        "storage decision matrix",
+        "Remove an unneeded dependency when Dex meets the requirement",
     ):
         if text not in build_handoff:
             fail(f"build and handoff must contain: {text}")
@@ -340,6 +371,11 @@ def check_app_builder() -> None:
         "canonical published catalog",
         "immutable `connector.yaml`",
         "internal connector library",
+        "## Storage decision",
+        "Default each durable fact to Dex",
+        "cross-Flow reuse alone is not a gap",
+        "projection still introduces an external database",
+        "“We may need it later” is not evidence",
     ):
         if text not in product_discovery:
             fail(f"product discovery must contain: {text}")
