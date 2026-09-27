@@ -1,7 +1,7 @@
 {
   "name": "superdurable-dex",
-  "version": "0.24.0",
-  "description": "Build with Dex SDK, create process products, and contribute official connectors.",
+  "version": "0.24.1",
+  "description": "Build Dex process products in a repository-backed coding workspace.",
   "author": {
     "name": "Super Durable",
     "url": "https://superdurable.io"
@@ -20,8 +20,8 @@
   "skills": "./",
   "interface": {
     "displayName": "Dex",
-    "shortDescription": "Build Dex apps and contribute connectors",
-    "longDescription": "Use Dex SDK for implementation, Dex App Builder for end-to-end process products, or Dex Connector Contributor to build, verify, and upstream official connector operations, Triggers, and configuration UI units.",
+    "shortDescription": "Build Dex apps in a coding workspace",
+    "longDescription": "Developer skills for a coding-agent host with a writable repository or project workspace. Start with Dex App Builder for end-to-end process products; it loads Dex SDK and routes confirmed official connector gaps to Dex Connector Contributor. Without repository and command access, the plugin supports planning and handoff only.",
     "developerName": "Super Durable",
     "category": "Productivity",
     "capabilities": [
@@ -29,9 +29,9 @@
     ],
     "websiteURL": "https://docs.superdurable.io/build-with-ai/dex-developer-skill",
     "defaultPrompt": [
-      "Use $dex-sdk to design a reliable Dex Flow.",
-      "Use $dex-app-builder to design a process application.",
+      "Use $dex-app-builder to discover and design a process application.",
       "Use $dex-app-builder to prototype and build this workflow.",
+      "Use $dex-sdk to design a reliable Dex Flow.",
       "Use $dex-connector-contributor to build and upstream this connector capability."
     ],
     "brandColor": "#78C51C",

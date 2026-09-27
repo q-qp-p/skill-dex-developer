@@ -1,6 +1,6 @@
 ---
 name: dex-sdk
-description: Implement, debug, test, and operate applications with the Superdurable Dex SDK in Python, Go, Java, TypeScript, or Rust. Use for technical work involving Dex Flows, Steps, Attributes, Channels, Streams, RPCs, SubFlows, Workers, Dex Web, or dexcli. Do not activate for end-to-end business product discovery or unrelated uses of the word "dex".
+description: Technical sub-skill for implementing, debugging, testing, and operating applications with the Superdurable Dex SDK in Python, Go, Java, TypeScript, or Rust. Use when the user explicitly invokes $dex-sdk for standalone SDK work or when $dex-app-builder or $dex-connector-contributor loads it. Do not select it as the primary workflow for Dex product, application, or business-process requests.
 ---
 
 # Dex SDK

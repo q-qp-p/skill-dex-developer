@@ -1,6 +1,6 @@
 ---
 name: dex-connector-contributor
-description: Create or modify official Superdurable Dex connectors, operations, Triggers, and configuration UI units in superdurable/dex-connectors-library. Use for connector-library contribution work that must start from documented provider APIs or official SDKs, add a runnable connector-local example, run full validation, and open a review pull request. Do not use merely to consume an already released connector in an application.
+description: Specialist sub-skill for creating or modifying official Superdurable Dex connectors, operations, Triggers, and configuration UI units in superdurable/dex-connectors-library. Use when the user explicitly invokes $dex-connector-contributor for standalone connector-library work or when $dex-app-builder routes a confirmed connector gap to it. Do not select it as the primary workflow for an application that merely consumes connectors.
 ---
 
 # Dex Connector Contributor

@@ -6,14 +6,17 @@ and Cursor. Its only public skills are `dex-sdk`, `dex-app-builder`, and
 
 ## Skill boundaries
 
-- `dex-sdk` is the technical capability layer for implementing, debugging,
-  testing, and operating applications through the public Dex SDK.
-- `dex-app-builder` is the end-to-end product workflow for business discovery,
-  an explicit no-custom-UI or custom-UI decision, Go backend implementation,
-  local testing, and Dex AI Platform handoff.
-- `dex-connector-contributor` creates or modifies official connectors,
-  operations, Triggers, and configuration UI units in
-  `superdurable/dex-connectors-library`.
+- `dex-app-builder` is the primary/default entry point and end-to-end product
+  workflow for business discovery, an explicit no-custom-UI or custom-UI
+  decision, Go backend implementation, local testing, and Dex AI Platform
+  handoff.
+- `dex-sdk` is a specialist sub-skill for implementing, debugging, testing,
+  and operating applications through the public Dex SDK.
+- `dex-connector-contributor` is a specialist sub-skill for creating or
+  modifying official connectors, operations, Triggers, and configuration UI
+  units in `superdurable/dex-connectors-library`.
+- Unless the user explicitly invokes a specialist for standalone work, route
+  Dex product, application, and process requests through `dex-app-builder`.
 - During backend implementation, `dex-app-builder` loads `dex-sdk` and follows
   only its Core and Go guidance. Do not duplicate those references.
 - `dex-connector-contributor` also loads `dex-sdk` Core and Go guidance plus the

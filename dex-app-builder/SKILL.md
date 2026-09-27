@@ -1,11 +1,37 @@
 ---
 name: dex-app-builder
-description: Design and build an end-to-end Dex process product through business discovery, an explicit no-custom-UI or custom-UI decision, Go backend implementation, connector integration, local verification, and platform-ready handoff. Use for new process products or when adapting the basic-process template. Do not use for standalone Dex SDK implementation or debugging.
+description: Primary entry point for designing and building Dex applications and process products. Use by default for Dex product, application, or workflow requests unless the user explicitly invokes $dex-sdk for standalone SDK work or $dex-connector-contributor for official connector-library work. Orchestrates business discovery, the UI decision, Go backend implementation, connector integration, local verification, and platform-ready handoff.
 ---
 
 # Dex App Builder
 
 Build the smallest coherent product that solves the confirmed business process. Keep discovery, the UI decision, backend modeling, and verification as explicit checkpoints.
+
+## Routing priority
+
+Treat this skill as the default coordinator for Dex application, product, and
+workflow requests. Keep end-to-end ownership while loading the specialist
+skills only where their capability is required:
+
+- load sibling `$dex-sdk` during backend design and implementation;
+- load sibling `$dex-connector-contributor` only when an official connector,
+  operation, Trigger, or configuration UI unit must be created or changed.
+
+If the user explicitly invokes either specialist for a standalone task, honor
+that choice and do not expand the work into this product workflow.
+
+## Development workspace gate
+
+Before implementation, confirm that the host provides a writable repository or
+project workspace plus file-editing and command-execution tools. An existing
+repository or a new empty repository both satisfy this requirement.
+
+If no development workspace is available, explain that this plugin supplies
+developer guidance rather than a hosted application builder. Continue business
+discovery, architecture, and the implementation handoff when useful, but do not
+claim to create files, run tests, build artifacts, or deploy the application.
+Recommend continuing the confirmed plan in Codex or another coding-agent host
+connected to the target repository.
 
 ## Fixed product boundary
 

@@ -9,13 +9,26 @@ publisher, while the stable plugin ID remains `superdurable-dex`.
 
 | Skill | Responsibility |
 | --- | --- |
-| `dex-sdk` | Implement, debug, test, and operate Dex applications in Python, Go, Java, TypeScript, or Rust. |
 | `dex-app-builder` | Discover, prototype, implement, and locally verify an end-to-end Dex AI Platform product with a Go backend. |
+| `dex-sdk` | Implement, debug, test, and operate Dex applications in Python, Go, Java, TypeScript, or Rust. |
 | `dex-connector-contributor` | Create, verify, and upstream official connector operations, Triggers, and configuration UI units. |
 
-`dex-app-builder` and `dex-connector-contributor` load the sibling `dex-sdk`
-guidance when backend work begins and follow only its Core and Go references.
-Install the complete plugin so all three skills are present.
+Start with `dex-app-builder` for Dex product, application, and process work. It
+loads the specialist `dex-sdk` and `dex-connector-contributor` skills when the
+confirmed design requires them. Invoke a specialist directly only for a
+standalone SDK or official connector-library task. Install the complete plugin
+so all three skills are present.
+
+## Requires a coding workspace
+
+Dex Skills is a developer plugin, not a hosted application builder. To create
+or modify an application, use it in Codex or another coding-agent host that has
+a writable repository or project workspace plus file-editing and command tools.
+The workspace can be an existing repository or a new empty repository.
+
+Without that workspace, the skills can still help with business discovery,
+architecture, and an implementation handoff. They cannot create project files,
+run tests, build artifacts, or deploy the application from an ordinary chat.
 
 ## Install
 
@@ -26,9 +39,10 @@ codex plugin marketplace add superdurable/dex-skills
 codex plugin add superdurable-dex@superdurable
 ```
 
-Start a new task after installation. Invoke `$dex-sdk` for SDK work,
-`$dex-app-builder` for the product workflow, or
-`$dex-connector-contributor` to contribute to the official connector library.
+Open an existing repository or create an empty one, then start a new task. Use
+`$dex-app-builder` for the primary product workflow. Explicitly invoke
+`$dex-sdk` only for standalone SDK work or `$dex-connector-contributor` only
+for standalone official connector-library contribution.
 
 ### Claude Code
 

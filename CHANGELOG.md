@@ -2,6 +2,14 @@
 
 All notable changes to Dex Skills are documented here.
 
+## 0.24.1 - 2026-09-26
+
+- Make Dex App Builder the primary workflow for Dex product, application, and process requests.
+- Mark Dex SDK and Dex Connector Contributor as explicit-only specialist sub-skills in Codex while preserving App Builder's internal routing to them.
+- Put Dex App Builder first in starter prompts and synchronized skill lists across Codex, Claude Code, and Cursor.
+- Require a repository-backed coding workspace before implementation and limit ordinary chat use to discovery, architecture, and handoff.
+- Synchronize the Codex, Claude Code, and Cursor plugin manifests at version 0.24.1.
+
 ## 0.24.0 - 2026-09-26
 
 - Add sequentially chunked and hash-partitioned AttributeMap patterns across Core and all five language handbooks.

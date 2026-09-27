@@ -200,6 +200,8 @@ def check_app_builder() -> None:
         "../dex-sdk/references/go/go.md",
         "Go SDK",
         "strict FDG 2.0",
+        "writable repository or",
+        "project workspace",
         "### No custom UI",
         "### Custom UI",
         "GetApplicationInfo",
@@ -310,6 +312,20 @@ def check_connector_contributor() -> None:
             fail(f"dex-connector-contributor/agents/openai.yaml must contain: {text}")
 
 
+def check_invocation_policy() -> None:
+    expected = {
+        APP_BUILDER: "true",
+        SDK: "false",
+        CONNECTOR_CONTRIBUTOR: "false",
+    }
+    for skill, allow_implicit in expected.items():
+        agent = skill / "agents" / "openai.yaml"
+        content = agent.read_text()
+        policy = f"allow_implicit_invocation: {allow_implicit}"
+        if policy not in content:
+            fail(f"{agent.relative_to(ROOT)} must contain: {policy}")
+
+
 def check_skills(baseline: str) -> None:
     skills = sorted(path.parent for path in ROOT.glob("*/SKILL.md"))
     expected = sorted((SDK, APP_BUILDER, CONNECTOR_CONTRIBUTOR))
@@ -323,6 +339,7 @@ def check_skills(baseline: str) -> None:
     check_sdk(baseline)
     check_app_builder()
     check_connector_contributor()
+    check_invocation_policy()
 
 
 def check_manifest_common(path: Path, manifest: dict, version: str) -> None:
@@ -355,11 +372,15 @@ def check_manifests(version: str) -> None:
         if interface.get(field) != "./assets/logo.png":
             fail(f"Codex {field} must use ./assets/logo.png")
     prompts = interface.get("defaultPrompt")
-    if not isinstance(prompts, list) or not any("$dex-connector-contributor" in prompt for prompt in prompts):
+    if not isinstance(prompts, list) or not prompts or "$dex-app-builder" not in prompts[0]:
+        fail("Codex default prompts must put $dex-app-builder first")
+    if not any("$dex-sdk" in prompt for prompt in prompts):
+        fail("Codex default prompts must expose $dex-sdk")
+    if not any("$dex-connector-contributor" in prompt for prompt in prompts):
         fail("Codex default prompts must expose $dex-connector-contributor")
 
     cursor = manifests["cursor"]
-    expected_skills = ["./dex-sdk", "./dex-app-builder", "./dex-connector-contributor"]
+    expected_skills = ["./dex-app-builder", "./dex-sdk", "./dex-connector-contributor"]
     if cursor.get("skills") != expected_skills:
         fail("Cursor manifest must expose all three public skills")
     if cursor.get("logo") != "assets/logo.png":
