@@ -36,15 +36,13 @@ Keep Codex, Claude Code, and Cursor manifests synchronized on plugin ID,
 version, repository, skill paths, and display metadata. Do not reintroduce a
 `plugins/` wrapper or an unplanned public skill.
 
-Whenever `VERSION` increases, treat the matching
-`superdurable/dex-template-basic-process` update as a required release
-follow-up. After the corresponding `v<VERSION>` Dex Skills release exists, use
-the template repository's existing dependency-update workflow to advance
-`.agents/skills/dex-app-builder/upstream` to that exact released commit. Open a
-separate template pull request, monitor its required checks, and report its URL
-with the Dex Skills release handoff. Do not consider the version-upgrade work
-complete while that pull request is missing, and never substitute a floating
-branch or an unreleased commit for the release pin.
+The template and this plugin publish independently. The scheduled template
+baseline workflow may advance `TEMPLATE_BASELINE` only to an immutable stable
+template release; that pull request also bumps `VERSION`, changelog, and plugin
+manifests. After the matching Dex Skills release exists, Superverse must advance
+its exact template and skill pins together in one reviewed pull request. The
+template does not vendor Dex Skills, so never add a skill submodule or a floating
+branch reference to an application repository.
 
 Every skill change updates `VERSION` and `CHANGELOG.md`. Validate Dex SDK source
 excerpts against `DEX_BASELINE`, and validate Server, CLI, and the basic-process

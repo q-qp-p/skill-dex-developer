@@ -51,9 +51,10 @@ For an effectively empty repository, initialize the application from
 `https://github.com/superdurable/dex-template-basic-process` at the exact release
 recorded in [TEMPLATE_BASELINE](../TEMPLATE_BASELINE). Materialize the template
 inside the current repository while preserving its `.git` directory and any
-intentional user files. Review collisions before writing, initialize the
-template's pinned submodules, inspect `.superverse/template.json`, and use
-`make bootstrap` as the first dependency/bootstrap command.
+intentional user files. Review collisions before writing, do not initialize or
+read project-local agent-skill submodules, inspect `.superverse/template.json`,
+and use `make bootstrap` as the first dependency/bootstrap command. The
+platform-provided Dex Skills release is the only skill authority.
 
 For a new or effectively empty application, `TEMPLATE_BASELINE` is the
 application stack authority. Before proposing implementation, inspect that

@@ -711,11 +711,11 @@ def check_agent_rules() -> None:
         fail("Cursor rule must contain the same repository instructions")
     normalized_agents = " ".join(agents.split())
     for required in (
-        "Whenever `VERSION` increases",
-        "superdurable/dex-template-basic-process",
-        ".agents/skills/dex-app-builder/upstream",
-        "Open a separate template pull request",
-        "never substitute a floating branch or an unreleased commit",
+        "The template and this plugin publish independently",
+        "`TEMPLATE_BASELINE`",
+        "scheduled template baseline workflow",
+        "Superverse must advance its exact template and skill pins together",
+        "never add a skill submodule or a floating branch reference",
     ):
         if required not in normalized_agents:
             fail(f"release agent rules must contain: {required}")
@@ -724,6 +724,27 @@ def check_agent_rules() -> None:
         fail("pull request template must not require a paired repository")
     if "quick_validate.py" not in pull_request_template:
         fail("pull request template must require skill validation")
+
+    updater = (ROOT / "script" / "update-template-baseline.py").read_text()
+    for required in (
+        "minimumSandboxImageContractRevision",
+        '"dexSkill" in manifest',
+        "update_versioned_manifests",
+        "TEMPLATE_BASELINE",
+    ):
+        if required not in updater:
+            fail(f"template baseline updater must contain: {required}")
+    workflow = (ROOT / ".github" / "workflows" / "update-template-baseline.yml").read_text()
+    for required in (
+        "schedule:",
+        "workflow_dispatch:",
+        "automation/update-template-baseline",
+        "script/update-template-baseline.py",
+        "gh pr create",
+        "gh workflow run validate.yml",
+    ):
+        if required not in workflow:
+            fail(f"template baseline workflow must contain: {required}")
 
 
 def git_output(*arguments: str) -> str:

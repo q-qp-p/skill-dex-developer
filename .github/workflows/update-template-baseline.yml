@@ -1,0 +1,104 @@
+name: Update template baseline
+
+on:
+  schedule:
+    - cron: "29 16 * * *"
+  workflow_dispatch:
+
+permissions:
+  actions: write
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: update-template-baseline
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      GH_TOKEN: ${{ github.token }}
+      UPDATE_BRANCH: automation/update-template-baseline
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Resolve latest stable template release
+        id: release
+        run: |
+          set -euo pipefail
+          template_tag="$(gh release view --repo superdurable/dex-template-basic-process --json tagName --jq .tagName)"
+          if [[ ! "${template_tag}" =~ ^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]]; then
+            echo "Template did not return a stable release tag: ${template_tag}" >&2
+            exit 1
+          fi
+          template_commit="$(git ls-remote https://github.com/superdurable/dex-template-basic-process.git "refs/tags/${template_tag}" "refs/tags/${template_tag}^{}" | awk '$2 ~ /\^\{\}$/ { peeled=$1 } $2 !~ /\^\{\}$/ { direct=$1 } END { print peeled ? peeled : direct }')"
+          [[ "${template_commit}" =~ ^[0-9a-f]{40}$ ]]
+          {
+            echo "tag=${template_tag}"
+            echo "commit=${template_commit}"
+          } >> "${GITHUB_OUTPUT}"
+      - uses: actions/checkout@v4
+        with:
+          repository: superdurable/dex-template-basic-process
+          ref: ${{ steps.release.outputs.tag }}
+          path: upstream-template-candidate
+      - name: Update template baseline and package release
+        id: update
+        env:
+          TEMPLATE_TAG: ${{ steps.release.outputs.tag }}
+          TEMPLATE_COMMIT: ${{ steps.release.outputs.commit }}
+        run: |
+          test "$(git -C upstream-template-candidate rev-parse HEAD)" = "${TEMPLATE_COMMIT}"
+          python3 script/update-template-baseline.py \
+            --template-tag "${TEMPLATE_TAG}" \
+            --template-root upstream-template-candidate
+      - name: Validate package update
+        if: steps.update.outputs.changed == 'true'
+        run: |
+          python3 test/test_update_template_baseline.py
+          python3 script/check-package.py
+          git diff --check
+      - name: Create or update baseline pull request
+        if: steps.update.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          remote_sha="$(git ls-remote --heads origin "${UPDATE_BRANCH}" | awk '{print $1}')"
+          if [[ -n "${remote_sha}" ]]; then
+            git fetch origin "${UPDATE_BRANCH}:refs/remotes/origin/${UPDATE_BRANCH}"
+          fi
+          git switch -C "${UPDATE_BRANCH}"
+          git add \
+            TEMPLATE_BASELINE \
+            VERSION \
+            CHANGELOG.md \
+            .codex-plugin/plugin.json \
+            .claude-plugin/plugin.json \
+            .cursor-plugin/plugin.json \
+            .claude-plugin/marketplace.json \
+            .cursor-plugin/marketplace.json
+          git commit -m "chore: update template baseline"
+          if [[ -n "${remote_sha}" ]]; then
+            git push --force-with-lease="refs/heads/${UPDATE_BRANCH}:${remote_sha}" origin "HEAD:refs/heads/${UPDATE_BRANCH}"
+          else
+            git push --set-upstream origin "${UPDATE_BRANCH}"
+          fi
+          body_file="${RUNNER_TEMP}/template-baseline-update.md"
+          {
+            echo '## Summary'
+            echo
+            echo "- Template: ${{ steps.update.outputs.template_previous }} → ${{ steps.update.outputs.template_latest }}"
+            echo "- Dex Skills: ${{ steps.update.outputs.version_previous }} → ${{ steps.update.outputs.version_latest }}"
+            echo
+            echo 'After this PR merges, the release workflow publishes the matching Dex Skills release. Superverse can then advance both exact pins together.'
+          } > "${body_file}"
+          pr_number="$(gh pr list --state open --head "${UPDATE_BRANCH}" --json number --jq '.[0].number // empty')"
+          if [[ -n "${pr_number}" ]]; then
+            gh pr edit "${pr_number}" --title 'Update template baseline' --body-file "${body_file}"
+          else
+            gh pr create --base main --head "${UPDATE_BRANCH}" --title 'Update template baseline' --body-file "${body_file}"
+          fi
+          gh workflow run validate.yml --ref "${UPDATE_BRANCH}"

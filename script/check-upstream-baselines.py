@@ -3,10 +3,12 @@
 
 import argparse
 import json
+import re
 import subprocess
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+SEMVER = re.compile(r"^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$")
 
 
 def fail(message: str) -> None:
@@ -158,8 +160,9 @@ def main() -> None:
     template_manifest = json.loads(
         (arguments.template_root / ".superverse" / "template.json").read_text()
     )
-    if template_manifest.get("templateVersion") != "1.4.1":
-        fail("template baseline must be version 1.4.1")
+    template_version = template_manifest.get("templateVersion")
+    if not isinstance(template_version, str) or SEMVER.fullmatch(template_version) is None:
+        fail("template baseline must declare a stable templateVersion")
     if template_manifest.get("commands", {}).get("checkFdgV2") != "make check-fdg-v2":
         fail("template baseline must expose checkFdgV2")
     if template_manifest.get("commands", {}).get("mock") != "make mock":
@@ -184,10 +187,13 @@ def main() -> None:
         server_baseline,
         "template Dex Server baseline",
     )
-    require_text(
-        arguments.template_root / "go.mod",
-        "github.com/superdurable/dex/sdk-go v0.11.3",
+    template_go_mod = (arguments.template_root / "go.mod").read_text()
+    template_sdk = re.search(
+        r"(?m)^\s*github\.com/superdurable/dex/sdk-go\s+v([^\s]+)$",
+        template_go_mod,
     )
+    if template_sdk is None or SEMVER.fullmatch(template_sdk.group(1)) is None:
+        fail("template baseline must pin a stable Dex Go SDK")
     require_text(
         arguments.template_root / "internal" / "process" / "flow.go",
         "GetDexSummary",

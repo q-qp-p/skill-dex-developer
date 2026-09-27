@@ -258,9 +258,9 @@ then rerun mock E2E, real E2E, and the production build.
 
 Backend implementation is Go-only, starts from
 `superdurable/dex-template-basic-process`, and must satisfy strict Dex Web v2 /
-FDG 2.0 rendering. The default stack is basic-process release `v0.2.1`
-(template contract `1.4.1`) with the exact Dex Go SDK, Dex Server, Dex CLI,
-Go/Node dependencies, and commands pinned by that release. The independent
+FDG 2.0 rendering. The default stack is the exact release recorded in
+`TEMPLATE_BASELINE`, with the Dex Go SDK, Dex Server, Dex CLI, Go/Node
+dependencies, and commands pinned by that release. The independent
 `DEX_BASELINE`, `DEX_SERVER_BASELINE`, and `DEX_CLI_BASELINE` files validate the
 skill's reference guidance; they do not authorize upgrading a generated
 application. Dex Web v2 is embedded in the template-pinned Server and CLI

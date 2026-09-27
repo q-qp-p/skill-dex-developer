@@ -2,6 +2,13 @@
 
 All notable changes to Dex Skills are documented here.
 
+## 0.25.8 - 2026-09-27
+
+- Remove project-local skill-submodule guidance and make the Coding Sandbox's immutable Dex Skills release the only agent-skill authority.
+- Add scheduled template-release discovery that opens a reviewed baseline pull request and prepares a matching Dex Skills release.
+- Require Superverse to advance coherent template and Dex Skills release pins together after both immutable releases exist.
+- Synchronize the Codex, Claude Code, and Cursor plugin manifests at version 0.25.8.
+
 ## 0.25.7 - 2026-09-26
 
 - Make Dex Flow Attributes and AttributeMaps the default durable application storage instead of introducing a database, cache, ORM, outbox, or shadow read model by default.

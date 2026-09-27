@@ -45,14 +45,14 @@ Show Dex Web early. Once the first Flow graph renders, keep one user-facing `dex
 Do not advance the template pins during ordinary application work. If the user
 explicitly requests a template-stack upgrade, advance these pins together;
 `internal/templatecontract/contract_test.go` hard-codes the template's own
-values (`server/v0.12.0`, `cli-v0.12.0`, `sdk-go v0.11.3`, and the skill
-submodule commit in template `v0.2.1`), so changing only some of them fails
-`make check`:
+release values, so changing only some of them fails `make check`:
 
 - `DEX_SERVER_BASELINE` and `DEX_CLI_BASELINE`;
 - the `github.com/superdurable/dex/sdk-go` requirement in `go.mod`;
-- the `.agents/skills` submodule pin;
 - the expectations in the template contract test.
+
+Do not add or update a project-local skill submodule. The Coding Sandbox owns
+the immutable Dex Skills release independently from the application template.
 
 Template scripts call `dexcli` from `PATH` and do not check its version. Run `dexcli version` first and require at least `v0.13.8`. When upgrading the global CLI would break other projects pinned to older Servers, install a project-local CLI and put its directory first on `PATH` for the template commands; `scripts/check-fdg-v2.sh` also honors `DEXCLI`.
 

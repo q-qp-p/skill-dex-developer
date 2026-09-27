@@ -27,6 +27,12 @@ environments.
 application template. Refresh any baseline deliberately and review all affected
 guidance.
 
+The scheduled **Update template baseline** workflow discovers a newer stable
+template release, validates that it no longer vendors project-local skills,
+bumps the plugin patch version and manifests, and opens a pull request. Its
+merge publishes a matching Dex Skills release; Superverse then advances both
+exact release pins together in its own reviewed pull request.
+
 `CONNECTOR_LIBRARY_BASELINE` pins Connector Contributor source excerpts to one
 immutable released repository snapshot. Its marked Go fences must remain
 contiguous excerpts from allowed connector-library sources.
