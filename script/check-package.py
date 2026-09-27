@@ -222,6 +222,14 @@ def check_app_builder() -> None:
         "infer SDK versions from a neighboring workspace",
         "### No custom UI",
         "### Custom UI",
+        "low-fidelity static wireframe",
+        "must not use application",
+        "page names, purposes, and direct links",
+        "design the application OpenAPI contract in the same pass",
+        "update `openapi/openapi.yaml`",
+        "generated server interfaces",
+        "Do not resume dynamic frontend work",
+        "Only after the real Dex and Connector end-to-end journey passes",
         "GetApplicationInfo",
         "trusted authentication boundary",
         "public external product",
@@ -243,6 +251,61 @@ def check_app_builder() -> None:
     for text in required:
         if text not in content:
             fail(f"dex-app-builder/SKILL.md must contain: {text}")
+
+    stage_markers = (
+        "## Stage 2: establish the confirmed application surface",
+        "## Stage 3: design the Flow, Connectors, and OpenAPI contract",
+        "## Stage 4: integrate the Custom UI, verify, polish, and hand off",
+    )
+    for marker in stage_markers:
+        if marker not in content:
+            fail(f"Dex App Builder must contain stage: {marker}")
+    stage_positions = [content.index(marker) for marker in stage_markers]
+    if stage_positions != sorted(stage_positions):
+        fail("Dex App Builder stages must keep static UI before contract/backend before integration/polish")
+
+    ui_workflow = (references_dir / "ui-workflow.md").read_text()
+    ui_stages = (
+        "### 1. Low-fidelity static checkpoint",
+        "### 2. Contract and backend design",
+        "### 3. Integration and durable verification",
+        "### 4. Visual polish",
+    )
+    for text in (
+        *ui_stages,
+        "no hooks or",
+        "application state",
+        "Use no images",
+        "custom icons, animation, branding",
+        "npm --prefix web run dev",
+        "make generate",
+        "application's business boundary",
+        "generated TypeScript client calls",
+        "real Dex and Connector end-to-end path",
+    ):
+        if text not in ui_workflow:
+            fail(f"UI workflow must contain: {text}")
+    ui_stage_positions = [ui_workflow.index(marker) for marker in ui_stages]
+    if ui_stage_positions != sorted(ui_stage_positions):
+        fail("Custom UI workflow must keep wireframe, contract/backend, integration, and polish in order")
+    for obsolete in (
+        "### Mock checkpoint",
+        "start with `make mock`",
+        "wait for explicit user approval. Do not connect a real Dex backend",
+    ):
+        if obsolete in content or obsolete in ui_workflow:
+            fail(f"Custom UI workflow must not restore the mock-first gate: {obsolete}")
+
+    build_handoff = (references_dir / "build-test-handoff.md").read_text()
+    for text in (
+        "low-fidelity static",
+        "make mock` and `make test-mock-e2e` as fast UI test tools",
+        "Run real Dex and Connector",
+        "before visual polish",
+        "generated server interfaces",
+    ):
+        if text not in build_handoff:
+            fail(f"build and handoff must contain: {text}")
 
     connector_architecture = (references_dir / "connector-architecture.md").read_text()
     for text in (

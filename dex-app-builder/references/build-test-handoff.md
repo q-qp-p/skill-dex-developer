@@ -12,7 +12,20 @@ instruction.
 
 For **No custom UI**, reduce OpenAPI to `GetApplicationInfo` plus confirmed integration ingress, regenerate both clients, and remove process-management routes and mock lifecycle code. Verify the Hello World page through the generated client. Do not run a mock approval checkpoint for an inert shell.
 
-For **Custom UI**, use `make mock` as the interaction-approval loop and run `make test-mock-e2e` after UI behavior changes. Run the narrowest relevant unit or frontend check after each edit batch. Before handoff run the repository's full `make check`, including mock E2E, real Dex integration and E2E, Worker replacement, FDG 2.0 validation, and the production build.
+For **Custom UI**, use `npm --prefix web run dev` for the low-fidelity static
+checkpoint and verify only that each direct page URL and navigation path renders.
+Do not start or extend the mock server, model lifecycle states, generate visual
+assets, or polish the surface before the page inventory is confirmed.
+
+During Flow and Connector design, finalize `openapi/openapi.yaml`, run
+`make generate`, and implement the generated Go server interfaces before wiring
+the generated TypeScript client into the UI. Run real Dex and Connector
+integration and E2E before visual polish. After the contract exists, keep
+`make mock` and `make test-mock-e2e` as fast UI test tools, not as a gate before
+backend implementation. Run the narrowest relevant check after each edit batch.
+Before handoff run the repository's full `make check`, including mock E2E, real
+Dex integration and E2E, Worker replacement, FDG 2.0 validation, and the
+production build. After visual polish, rerun both mock and real E2E.
 
 Treat mock results as HTTP/UI evidence only. They cannot establish Dex durability, Worker replacement, Timer, RPC, retry, or provider semantics.
 
@@ -72,7 +85,14 @@ Ensure:
   recorded;
 - the confirmed UI mode is recorded;
 - a No custom UI shell contains no business controls or management routes;
-- custom UI interactions are approved against the mock server and Mock Controls;
+- a Custom UI has an approved static page inventory, navigation, fields, and
+  actions before backend work, with no early visual-polish artifacts;
+- its OpenAPI contract was designed with the Flow and Connector boundaries,
+  both generated clients are current, and the Go HTTP boundary implements the
+  generated server interfaces;
+- its dynamic UI uses only the generated TypeScript client, mock behavior
+  conforms to the fixed contract, and visual polish followed a passing real
+  Dex and Connector end-to-end journey;
 - secrets are absent from files, logs, generated values, and archives;
 - dependencies and released connector versions are pinned;
 - every connector capability matrix records the canonical published catalog,

@@ -29,34 +29,74 @@ workflow below before connecting it to production.
 
 ## Custom UI
 
-### Interaction design
+### 1. Low-fidelity static checkpoint
 
-Agree on:
+Agree only on the information architecture needed to unblock backend design:
 
-- role-specific entry points and navigation;
-- how authenticated roles become the permissions available to each entry point;
-- list, detail, create, action, and completion experiences;
-- which state is canonical and how stale state is refreshed;
-- action eligibility and confirmation;
-- required inputs, validation, empty states, loading, recoverable errors, and terminal errors;
-- responsive behavior and accessibility;
+- role-specific entry pages and ordinary link navigation;
+- necessary list, detail, create, action, and completion pages;
+- labels, inputs, buttons, and placeholder regions on each page;
 - which Dex Web v2 surfaces remain available to maintainers.
 
-Do not claim application-level UI controls provide platform RBAC. A permission selector filters work; it does not grant permission. Enforce identity-to-permission mapping at the trusted application boundary. Keep credentials and provider secrets server-side.
+Implement those pages as static markup in the template React/Vite frontend.
+React remains the rendering shell, but this checkpoint has no hooks or
+application state, API imports, generated-client calls, local storage, timers,
+mock lifecycle, Mock Controls, or provider behavior. Use no images, generated
+art, custom icons, animation, branding, gradients, or decorative effects. Keep
+CSS neutral and minimal. Inputs and buttons are inert; use ordinary links or
+link-styled buttons only to demonstrate navigation between directly openable
+page URLs.
 
-### Mock checkpoint
+Run `npm --prefix web run dev` on a stable local port and verify that every
+page URL renders. Give the user a page inventory with each name, purpose, and
+direct URL. Ask for explicit confirmation of the page set, navigation, fields,
+and actions. Do not ask the user to approve colors, typography, imagery,
+responsive refinements, dynamic states, or production behavior at this point.
 
-Implement the first pass in the template React TypeScript application and run `make mock`. This starts the Go in-memory mock API and Vite hot reload without a Dex Client or Worker. Use the visible Mock Controls to advance the lifecycle, emit reminders, inject one-time start/refresh/approval failures, retry recoverable errors, and reset state. Browser refresh must preserve mock state until Reset or server restart.
+### 2. Contract and backend design
 
-Drive the primary lifecycle through the mock API. Local typed fixtures remain appropriate for isolated component states, but they do not replace the runnable interaction path. Cover the happy path plus empty, loading, validation, recoverable provider-error, retry, and terminal states. Keep mock controls out of the production build experience.
+After the static checkpoint is confirmed, design the Flow, Connector
+capabilities, and application OpenAPI contract together. Map every approved UI
+action to an application operation backed by a Flow start, typed RPC, query, or
+confirmed ingress. Define authentication and permission enforcement,
+idempotency, asynchronous status, validation, response and error shapes, retry,
+and terminal outcomes.
 
-Run frontend tests, `make test-mock-e2e`, and the production build. Render or open the mock when the environment supports visual inspection. Summarize the observed interactions and wait for explicit user approval.
+OpenAPI describes the application's business boundary. It must not expose Dex
+Steps, Channels, Attributes, connection credentials, or other runtime internals.
+Update `openapi/openapi.yaml` and run `make generate` before implementing HTTP
+handlers. The Go backend implements the generated server interfaces, and the
+browser later consumes the generated TypeScript client. Do not hand-write
+parallel transport types.
 
-Before approval, do not:
+Implement and verify the Go Flows and required Connectors before returning to
+dynamic frontend work. A missing public Connector capability follows the
+Connector Contributor workflow and remains subject to its authorization and
+release requirements.
 
-- treat a provisional mock interaction contract as final;
-- bind components to the real Dex-backed application server;
-- add Dex Client access to the browser;
-- implement backend behavior inferred only from the mock.
+### 3. Integration and durable verification
 
-After approval, finalize OpenAPI as the HTTP contract source, regenerate both server and browser clients, and connect the same approved interactions to the production Go/Dex backend. Browsers call the application API or typed Flow RPC boundary, never raw Dex primitives.
+When the Go application boundary and its real Dex and Connector paths run,
+replace the wireframe's inert controls with generated TypeScript client calls.
+Add the confirmed loading, validation, empty, success, failure, retry, recovery,
+and terminal behavior. The browser calls the application API; it never imports
+a Dex client or accesses raw Dex primitives.
+
+Bring the template mock server into conformance with the now-fixed OpenAPI
+contract and retain Mock Controls only in mock mode. Use local typed fixtures
+for isolated component states and `make test-mock-e2e` for a fast contract-level
+journey, but prove waits, RPCs, retries, Worker replacement, provider effects,
+and terminal behavior with the real Dex and Connector end-to-end path.
+
+Do not claim application-level UI controls provide platform RBAC. A permission
+selector filters work; it does not grant permission. Enforce identity-to-
+permission mapping at the trusted application boundary. Keep credentials and
+provider secrets server-side.
+
+### 4. Visual polish
+
+Only after the real end-to-end journey passes may the UI add imagery, custom
+icons, branding, animation, refined typography, decorative styling, and
+responsive fine-tuning. Preserve the generated client boundary and confirmed
+behavior. Then rerun frontend tests, `make test-mock-e2e`, the real end-to-end
+journey, accessibility checks, and the production build.

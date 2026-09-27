@@ -62,6 +62,10 @@ management backend.
 Choose **Custom UI** only for confirmed requirements such as participant-facing
 journeys, bespoke navigation, branding, domain visualization, or interactions
 Dex Web cannot provide. Record which requirement forces the custom surface.
+The first UI checkpoint confirms only the necessary pages, navigation, fields,
+and actions through a low-fidelity static wireframe. It does not authorize an
+interactive mock, visual system, imagery, animation, or other polish before the
+Flow, Connector, and OpenAPI contract are designed.
 
 ## Connector decision
 

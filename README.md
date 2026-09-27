@@ -218,11 +218,19 @@ It removes approval, display, status, list, detail, Action-proxy, mock-lifecycle
 and other process-management surfaces. A confirmed trigger webhook may remain
 as integration ingress.
 
-For a custom frontend, start with `make mock`. The template runs a Go in-memory
-mock API, Vite hot reload, and visible Mock Controls for lifecycle progression,
-reminders, one-time failures, Retry, and Reset. Approve those interactions
-before connecting the production Go/Dex backend. Run `make test-mock-e2e` for
-the mock journey, then `make check` for real Dex durability and rendering.
+For a custom frontend, first build only low-fidelity static React pages with
+placeholder regions, inputs, buttons, and ordinary navigation links. Run the
+Vite frontend without a mock API, give the user direct links to every page, and
+confirm only the page inventory, fields, actions, and navigation. Do not add
+state, API calls, images, animation, branding, or visual polish at this stage.
+
+After that confirmation, design the Flow, Connector boundaries, and application
+OpenAPI contract together. Generate the Go server interfaces and TypeScript
+client before implementing the Go backend. Wire the static pages through the
+generated client only after the real Dex and Connector paths run, then complete
+real E2E. The template mock server remains a contract-level test double after
+the schema is fixed. Add imagery and visual polish only after real E2E passes,
+then rerun mock E2E, real E2E, and the production build.
 
 Backend implementation is Go-only, starts from
 `superdurable/dex-template-basic-process`, and must satisfy strict Dex Web v2 /

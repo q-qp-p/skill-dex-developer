@@ -135,7 +135,7 @@ before implementation.
 
 If the process begins from Slack, email, a webhook, or another external source, model it as a Connector Trigger. The application decides whether the event starts a Flow or invokes a typed RPC. Read [connector architecture](references/connector-architecture.md) whenever an external integration is involved.
 
-## Stage 2: implement the confirmed UI mode
+## Stage 2: establish the confirmed application surface
 
 Read [UI workflow](references/ui-workflow.md), then use exactly one mode.
 
@@ -160,19 +160,46 @@ Do not run the custom-UI mock approval checkpoint in this mode. If the product l
 
 ### Custom UI
 
-Use the full template. Agree on roles, screens, navigation, state, actions, validation, loading, empty, failure, recovery, accessibility, and responsive behavior. Implement the runnable React TypeScript experience against the template's mock mode.
+Create only a low-fidelity static wireframe in the template React/Vite frontend.
+Represent the necessary pages with headings, labels, placeholder boxes, inputs,
+buttons, and ordinary links. Multiple pages must have stable, directly openable
+local URLs and working link navigation.
 
-Start the template with `make mock`. Use its Go in-memory mock API and visible Mock Controls to exercise the proposed lifecycle, actions, reminders, loading, recovery, and reset behavior without a Dex Server. Extend the mock behavior only for confirmed interactions; keep production Flow code and provider integrations out of that path.
+The wireframe may use React for static markup, but it must not use application
+state or effects, API or generated-client calls, local storage, timers, a mock
+server, Mock Controls, provider integrations, images, custom icons, animation,
+branding, or visual polish. Buttons and inputs remain inert unless a link is
+needed to show the approved navigation path. Use minimal neutral styling and do
+not model loading, validation, success, failure, or recovery behavior yet.
 
-Show or describe the verified mock and wait for explicit user approval. Do not connect a real Dex backend or begin production backend implementation before approval. After approval, keep only APIs required by the approved UI or integration ingress.
+Run only the template's Vite frontend preview, verify that each page URL renders,
+and give the user a compact inventory of page names, purposes, and direct links.
+Ask for explicit confirmation of the page set, field and action placement, and
+navigation. Do not turn this checkpoint into an aesthetic review or iterate on
+visual design.
 
-## Stage 3: design and implement the Flow
+## Stage 3: design the Flow, Connectors, and OpenAPI contract, then implement the backend
 
 Read the sibling [Dex SDK skill](../dex-sdk/SKILL.md) completely, then follow its progressive-disclosure routing with [Go](../dex-sdk/references/go/go.md) as the only language. Load only the Core and Go references required by the approved design.
 
 Dex SDK supplies the public SDK guidance. The platform constraints in this skill are stricter and take precedence: use only the Go SDK, keep external effects in `Execute`, keep `WaitFor` free of provider or Dex mutations, and require strict FDG 2.0 rendering.
 
 Read [Dex Web v2](references/dex-web-v2.md) before editing a Flow. State the Flow identity, input/output, Steps, transitions, Attributes, Channels, RPCs, timers, retries, recovery, and connector boundaries before code.
+
+For Custom UI, design the application OpenAPI contract in the same pass as the
+Flow and Connector boundaries. Map each approved wireframe action to an
+application-level operation backed by a Flow start, typed RPC, query, or
+confirmed integration ingress. Define authentication and permission checks,
+idempotency, asynchronous status, request and response types, validation,
+errors, retry behavior, and terminal outcomes. Keep Dex Steps, Channels,
+Attributes, and other execution internals out of the public HTTP contract.
+
+Before implementing backend handlers, update `openapi/openapi.yaml` as the
+contract source and run the template generation command. Implement the Go HTTP
+boundary through the generated server interfaces and reserve the generated
+TypeScript client for the later UI integration stage. Never hand-write parallel
+request, response, or client types. Do not resume dynamic frontend work while
+the Go Flow, Connector, and application boundary are being implemented.
 
 Start Dex Web as soon as the first Flow graph exists. The moment a Flow source first renders with `dexcli visualize --schema-version 2.0 --json` (even with warnings), and before finishing implementation or tests:
 
@@ -247,11 +274,26 @@ For an RPC target, register the application's bound method with application-owne
 
 Make connector mutations idempotent and reconcile unknown outcomes query-first. A missing connector release blocks production handoff. Never invent an unreleased connector API.
 
-## Stage 4: verify and hand off
+## Stage 4: integrate the Custom UI, verify, polish, and hand off
 
 Read [build, test, and handoff](references/build-test-handoff.md). Run the narrowest tests while iterating, then the template's full supported check. Every Flow must pass FDG 2.0 JSON analysis with `valid: true`.
 
-For No custom UI, verify the Hello World page, `GetApplicationInfo` generated-client call, generated-code checks, production build, absence of management routes, Dex Web actions/display, and any retained webhook. For Custom UI, preserve the approved mock path and run `make test-mock-e2e` before real Dex verification.
+For No custom UI, verify the Hello World page, `GetApplicationInfo` generated-client call, generated-code checks, production build, absence of management routes, Dex Web actions/display, and any retained webhook.
+
+For Custom UI, wait until the Go backend and its real Dex and Connector paths
+run before replacing inert wireframe controls with generated TypeScript client
+calls. Then implement the confirmed loading, validation, empty, success,
+failure, retry, recovery, and terminal behavior and run the real end-to-end
+journey. Update the template mock server only after the OpenAPI contract is
+fixed, and use it as a contract-compatible test double; `make mock` and
+`make test-mock-e2e` are verification tools, not permission to delay backend
+work behind a complete mock application.
+
+Only after the real Dex and Connector end-to-end journey passes may the Custom
+UI add images, custom icons, branding, animation, refined responsive behavior,
+or other visual polish. Rerun frontend tests, mock E2E, real E2E, and the
+production build after polishing. Do not generate or source visual assets
+before this stage.
 
 Use a real Dex Server for waits, RPCs, Channels, retries, Worker replacement, terminal behavior, Work Queue permission history, and connector boundaries. Use deadline-based convergence rather than fixed sleeps.
 

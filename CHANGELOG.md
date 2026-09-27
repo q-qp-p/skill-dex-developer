@@ -2,6 +2,14 @@
 
 All notable changes to Dex Skills are documented here.
 
+## 0.25.4 - 2026-09-26
+
+- Replace the Custom UI mock-first approval gate with a low-fidelity static React wireframe checkpoint limited to pages, fields, actions, and navigation.
+- Require Flow, Connector, and application OpenAPI contracts to be designed together, with generated Go server interfaces and TypeScript clients established before backend handlers.
+- Put real Go/Dex/Connector implementation and end-to-end verification before dynamic UI wiring, mock-server expansion, imagery, branding, animation, or visual polish.
+- Add packaging regressions that enforce the wireframe, contract/backend, integration, and polish sequence.
+- Synchronize the Codex, Claude Code, and Cursor plugin manifests at version 0.25.4.
+
 ## 0.25.3 - 2026-09-26
 
 - Make the pinned basic-process template release the single default technology-stack authority for new or effectively empty Dex applications.
