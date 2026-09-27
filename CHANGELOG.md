@@ -2,6 +2,11 @@
 
 All notable changes to Dex Skills are documented here.
 
+## 0.25.1 - 2026-09-26
+
+- Publish a patch version so installations on 0.25.0 can exercise the once-per-chat newer-version notice against the repository version.
+- Synchronize the Codex, Claude Code, and Cursor plugin manifests at version 0.25.1.
+
 ## 0.25.0 - 2026-09-26
 
 - Add a once-per-chat, best-effort plugin version check to all three Dex skills.
