@@ -17,9 +17,9 @@ and Cursor. Its only public skills are `dex-sdk`, `dex-app-builder`, and
   implementation, local testing, and Dex AI Platform handoff.
 - `dex-sdk` is the specialist for implementing, debugging, testing, and
   operating applications through the public Dex SDK.
-- `dex-connector-contributor` is the specialist for creating or modifying
-  official connectors, operations, Triggers, and configuration UI
-  units in `superdurable/dex-connectors-library`.
+- `dex-connector-contributor` is the thin bootstrap for official
+  connector-library work. It resolves the correct checkout, then defers to that
+  repository's agent rules and documentation.
 - If App Builder receives a standalone SDK or official connector-library
   request, route it to the matching specialist before product discovery. A
   product or application that uses a released connector remains in App Builder.
@@ -27,9 +27,10 @@ and Cursor. Its only public skills are `dex-sdk`, `dex-app-builder`, and
   expand it into the App Builder workflow.
 - During backend implementation, `dex-app-builder` loads `dex-sdk` and follows
   only its Core and Go guidance. Do not duplicate those references.
-- `dex-connector-contributor` also loads `dex-sdk` Core and Go guidance plus the
-  shared Dex Web v2 reference. It owns connector-library contribution workflow,
-  while `dex-app-builder` owns application use of released connectors.
+- `dex-connector-contributor` loads `dex-sdk` Core and Go guidance when needed.
+  The target connector repository owns connector-specific implementation,
+  acceptance, release, and pull-request rules; `dex-app-builder` owns
+  application use of released connectors.
 - Platform constraints are stricter: Go only, strict FDG 2.0, provider effects
   only in `Execute`, and no provider or Dex mutations in `WaitFor`.
 
@@ -55,6 +56,4 @@ branch reference to an application repository.
 Every skill change updates `VERSION` and `CHANGELOG.md`. Validate Dex SDK source
 excerpts against `DEX_BASELINE`, and validate Server, CLI, and the basic-process
 template against `DEX_SERVER_BASELINE`, `DEX_CLI_BASELINE`, and
-`TEMPLATE_BASELINE`. Validate Connector Contributor excerpts against
-`CONNECTOR_LIBRARY_BASELINE`. Dex Web is embedded in the Server and CLI
-releases.
+`TEMPLATE_BASELINE`. Dex Web is embedded in the Server and CLI releases.

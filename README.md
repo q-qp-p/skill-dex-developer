@@ -379,29 +379,18 @@ claim that upload is available today.
 ## Dex Connector Contributor
 
 `dex-connector-contributor` is limited to official work in
-`superdurable/dex-connectors-library`. It starts from a provider's documented
-public API or official SDK, updates `connector.yaml` and generated contracts,
-implements provider behavior, adds Trigger and configuration UI units when
-needed, and includes a runnable connector-local example. It first discovers and
-verifies the user's GitHub fork; when none exists, it asks permission, opens the
-official fork page, and waits for the user to click **Create fork** before
-cloning that fork locally. A maintainer with verified push access may
-explicitly choose an upstream topic branch that follows the repository's branch
-convention instead.
+`superdurable/dex-connectors-library`. It is deliberately thin: it verifies the
+official repository or the user's fork, resolves a safe checkout, and then
+loads that checkout's `AGENTS.md`, documentation, module README, acceptance
+criteria, and pull-request template. Those repository-local sources own
+manifest authoring, generated contracts, configuration guidance, provider
+behavior, examples, testing, release ordering, and upstream contribution
+details.
 
-The workflow loads `dex-sdk` Core and Go semantics plus the shared Dex Web v2
-reference. It validates module-isolated race tests and vet, UI tests/build,
-codegen and catalog drift, real Dex integration, strict FDG 2.0, current Dex
-compatibility, and repository checks. Trigger examples exercise typed Flow/RPC
-routing and replay. Operation-only examples run through Dex Web v2 **Start
-Flow**. It finishes with a clean, ready-for-review PR and monitored CI.
-
-Connector source excerpts are pinned to the repository snapshot in
-`CONNECTOR_LIBRARY_BASELINE`. The reference releases are Connector SDK
-`sdkgo/v0.11.0`, Slack `connectors/slack/v0.11.0`, Gmail
-`connectors/google/gmail/v0.13.0`, and Google Sheets
-`connectors/google/spreadsheet/v0.8.0`. New work still verifies the latest
-published component tag before changing a connector.
+The bootstrap loads `dex-sdk` Core and Go guidance when the connector change
+touches Dex application semantics. It does not carry a snapshot of connector
+implementation rules, so a contribution always follows the target checkout's
+current contract.
 
 ## Releases
 

@@ -30,7 +30,6 @@ jobs:
           echo "server=$(cat DEX_SERVER_BASELINE)" >> "$GITHUB_OUTPUT"
           echo "cli=$(cat DEX_CLI_BASELINE)" >> "$GITHUB_OUTPUT"
           echo "template=$(cat TEMPLATE_BASELINE)" >> "$GITHUB_OUTPUT"
-          echo "connectors=$(cat CONNECTOR_LIBRARY_BASELINE)" >> "$GITHUB_OUTPUT"
       - uses: actions/checkout@v4
         with:
           repository: superdurable/dex
@@ -47,20 +46,12 @@ jobs:
           repository: superdurable/dex-template-basic-process
           ref: ${{ steps.baselines.outputs.template }}
           path: upstream-template
-      - uses: actions/checkout@v4
-        with:
-          repository: superdurable/dex-connectors-library
-          ref: ${{ steps.baselines.outputs.connectors }}
-          path: upstream-connectors
-          fetch-depth: 0
       - name: Validate package and manifests
         run: python3 script/check-package.py
       - name: Test lifecycle version hook
         run: node --test test/version-check.test.mjs
       - name: Validate Dex SDK reference sources
         run: python3 script/check-reference-sources.py --dex-root upstream-dex-sdk
-      - name: Validate Connector reference sources
-        run: python3 script/check-connector-reference-sources.py --connector-root upstream-connectors
       - name: Validate CLI, Server, and template baselines
         run: |
           python3 script/check-upstream-baselines.py \

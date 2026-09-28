@@ -2,6 +2,13 @@
 
 All notable changes to Dex Skills are documented here.
 
+## 0.28.1 - 2026-09-28
+
+- Reduce Dex Connector Contributor to a thin official-repository bootstrap that loads the target checkout's current agent rules, documentation, and acceptance criteria.
+- Move connector implementation, configuration, checked-in example, live-provider verification, release, and pull-request authority to `superdurable/dex-connectors-library` instead of shipping a duplicate snapshot.
+- Remove the Connector Contributor references, connector snapshot baseline, source-excerpt checker, and corresponding CI checkout.
+- Synchronize the Codex, Claude Code, and Cursor plugin manifests at version 0.28.1.
+
 ## 0.28.0 - 2026-09-28
 
 - Require connector contributors to audit every authorization, operation, and Trigger configuration field exposed by every runnable example.

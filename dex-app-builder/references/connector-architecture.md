@@ -146,11 +146,11 @@ writing application-local integration code.
 For a public external product with a documented API or official SDK, a missing
 connector, operation, or Trigger is a connector contribution—not permission to
 call the provider directly from the application. Explain the exact capability
-gap and load the sibling `dex-connector-contributor` skill completely. That skill owns
-fork discovery, manifest-first authoring, generated surfaces, provider tests,
-connector-local examples, real Dex coverage, release ordering, pushing the
-contribution branch (the user's fork by default), and the upstream PR to the
-official repository.
+gap and load the sibling `dex-connector-contributor` skill completely. That
+skill resolves the official repository or user's fork and loads the target
+checkout's current agent rules and documentation. The connector repository then
+owns manifest authoring, generated surfaces, provider tests, examples, real Dex
+coverage, release ordering, and its upstream contribution workflow.
 
 As soon as the local connector module builds, continue application verification
 against its checkout through an uncommitted `go.work` or temporary Go

@@ -6,12 +6,14 @@ This repository publishes one plugin with three root-level skills:
   language references.
 - `dex-app-builder` owns the business-first product workflow and platform-only
   constraints. It links to `dex-sdk` instead of copying SDK references.
-- `dex-connector-contributor` owns official connector-library authoring,
-  verification, and PR workflow. It links to `dex-sdk` Core/Go and the shared
-  Dex Web v2 reference instead of copying them.
+- `dex-connector-contributor` is the thin bootstrap for official
+  connector-library work. It resolves the checkout and then follows that
+  repository's rules, while linking to `dex-sdk` Core/Go when needed.
 
-Keep every reference reachable from its skill entrypoint. Do not add a
-`plugins/` wrapper, a backend companion skill, or duplicated Core/Go handbooks.
+Keep every retained reference reachable from its skill entrypoint. Connector
+Contributor intentionally has no supporting references because the target
+repository owns that guidance. Do not add a `plugins/` wrapper, a backend
+companion skill, or duplicated Core/Go handbooks.
 
 ## Pin source authority
 
@@ -33,10 +35,6 @@ bumps the plugin patch version and manifests, and opens a pull request. Its
 merge publishes a matching Dex Skills release; Superverse then advances both
 exact release pins together in its own reviewed pull request.
 
-`CONNECTOR_LIBRARY_BASELINE` pins Connector Contributor source excerpts to one
-immutable released repository snapshot. Its marked Go fences must remain
-contiguous excerpts from allowed connector-library sources.
-
 ## Validate a change
 
 Run from the repository root:
@@ -44,8 +42,6 @@ Run from the repository root:
 ```bash
 python3 script/check-package.py
 python3 script/check-reference-sources.py --dex-root /path/to/dex-sdk-baseline
-python3 script/check-connector-reference-sources.py \
-  --connector-root /path/to/dex-connectors-library-baseline
 python3 script/check-upstream-baselines.py \
   --dex-root /path/to/dex-cli-baseline \
   --template-root /path/to/dex-template-basic-process
@@ -58,7 +54,8 @@ Also validate the Codex, Claude Code, and Cursor manifests with their current
 client tooling and smoke-test that one plugin install exposes exactly the three
 expected skills. Confirm App Builder and Connector Contributor resolve the
 sibling `dex-sdk` Go handbook without copied references, and that Connector
-Contributor also resolves the shared Dex Web v2 reference.
+Contributor routes implementation and acceptance to the target repository's
+current instructions.
 
 ## Version and release
 

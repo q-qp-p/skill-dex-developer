@@ -23,7 +23,6 @@ BASELINE_FILES = (
     "DEX_SERVER_BASELINE",
     "DEX_CLI_BASELINE",
     "TEMPLATE_BASELINE",
-    "CONNECTOR_LIBRARY_BASELINE",
 )
 VERSION_CHECK_SCRIPT = ROOT / "hooks" / "version-check.mjs"
 HOOK_CONFIGS = {
@@ -77,24 +76,12 @@ APP_BUILDER_REFERENCES = {
     "product-discovery.md",
     "ui-workflow.md",
 }
-CONNECTOR_CONTRIBUTOR_REFERENCES = {
-    "configuration-guidance.md",
-    "repository-workflow.md",
-    "operations.md",
-    "triggers.md",
-    "ui-units.md",
-    "examples-testing-pr.md",
-}
 SEMVER = re.compile(r"^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$")
 PUBLISHED_RELEASE_TAG = re.compile(
     r"^(?:[a-z0-9][a-z0-9-]*/)?v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$"
 )
 PUBLISHED_CLI_RELEASE_TAG = re.compile(
     r"^cli-v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$"
-)
-PUBLISHED_COMPONENT_TAG = re.compile(
-    r"^[a-z0-9][a-z0-9-]*(?:/[a-z0-9][a-z0-9-]*)*/v"
-    r"(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$"
 )
 MARKDOWN_LINK = re.compile(r"\[[^]]+\]\(([^)]+)\)")
 FENCED_BLOCK = re.compile(r"```.*?```", re.DOTALL)
@@ -493,96 +480,44 @@ def check_app_builder() -> None:
 
 def check_connector_contributor() -> None:
     references_dir = CONNECTOR_CONTRIBUTOR / "references"
-    references = sorted(references_dir.rglob("*.md"))
-    actual = {path.name for path in references}
-    if actual != CONNECTOR_CONTRIBUTOR_REFERENCES:
+    if references_dir.exists():
         fail(
-            "Dex Connector Contributor references must be exactly: "
-            f"{', '.join(sorted(CONNECTOR_CONTRIBUTOR_REFERENCES))}"
+            "Dex Connector Contributor must defer to the target repository, "
+            "not ship references"
         )
-    if (references_dir / "core").exists() or (references_dir / "go").exists():
-        fail("Dex Connector Contributor must not vendor Dex SDK Core or Go references")
-    check_reachable_links(CONNECTOR_CONTRIBUTOR, references)
+    check_reachable_links(CONNECTOR_CONTRIBUTOR, [])
 
     content = (CONNECTOR_CONTRIBUTOR / "SKILL.md").read_text()
     required = (
+        "../dex-sdk/references/core/plugin-version-check.md",
         "../dex-sdk/SKILL.md",
         "../dex-sdk/references/go/go.md",
-        "../dex-app-builder/references/dex-web-v2.md",
         "superdurable/dex-connectors-library",
-        "documented public API or official SDK",
         "Add <XYZ> to Dex official connector library",
-        "connector.yaml",
-        "Connector SDK and official connector modules are Go-only",
-        "ask the user to open",
-        "operation-specific",
-        "optional: true",
-        "seven seconds",
-        "Start Flow",
-        "GOWORK=off",
-        "$opr",
-        "user's GitHub fork",
-        "upstream/main",
+        "Git remote identity",
+        "user's verified GitHub fork",
+        "explicit authorization",
+        "`origin`",
+        "`upstream`",
+        "`AGENTS.md`",
+        "files under `docs/`",
+        "sole connector-authoring authority",
+        "stop before connector implementation",
     )
     for text in required:
         if text not in content:
             fail(f"dex-connector-contributor/SKILL.md must contain: {text}")
 
-    examples = (references_dir / "examples-testing-pr.md").read_text()
-    for scenario in (
-        "Operation-only connector",
-        "real Flow start and typed RPC delivery",
-        "Host API 0.2",
-        "SDK PR/release",
-    ):
-        if scenario not in examples:
-            fail(f"Connector Contributor acceptance scenarios must contain: {scenario}")
-
-    workflow = (references_dir / "repository-workflow.md").read_text()
-    normalized_workflow = " ".join(workflow.split())
-    for checkout_contract in (
-        "current working directory does not determine the target repository",
-        "Git remote identity",
-        "accessible project or workspace roots",
-        "secondary project folders",
-        "isolated managed worktree",
-        "report the exact target checkout path",
-        "read the target checkout's `AGENTS.md`",
-        "Do not repoint `origin` on an in-use clone",
-        "A Git worktree shares remotes",
-    ):
-        if checkout_contract not in normalized_workflow:
-            fail(f"Connector Contributor checkout workflow must contain: {checkout_contract}")
-    for fork_contract in (
-        "https://github.com/superdurable/dex-connectors-library/fork",
-        "click **Create fork**",
-        "Do not click the creation button for the user",
-        "`origin` is the user's verified fork",
-        "Push only to the user's fork",
-    ):
-        if fork_contract not in workflow:
-            fail(f"Connector Contributor fork workflow must contain: {fork_contract}")
-    guidance = (references_dir / "configuration-guidance.md").read_text()
-    for guidance_contract in (
-        "Audit the complete rendered surface",
-        "Derive values before explaining them",
-        "spec.auth.guide.startURL",
-        "Every remaining field",
-        "provider HTTPS URL where the user starts",
-        "parenthesized defaults",
-        "every runnable example",
-    ):
-        if guidance_contract not in guidance:
-            fail(f"Connector configuration guidance must contain: {guidance_contract}")
-
-    for release in (
-        "sdkgo/v0.11.0",
-        "connectors/slack/v0.11.0",
-        "connectors/google/gmail/v0.13.0",
-        "connectors/google/spreadsheet/v0.8.0",
-    ):
-        if release not in workflow:
-            fail(f"Connector Contributor reference releases must contain: {release}")
+    forbidden = (
+        "../dex-app-builder/references/dex-web-v2.md",
+        "<!-- connector-source:",
+        "## Non-negotiable boundaries",
+        "## Example gate",
+        "## Handoff gate",
+    )
+    for text in forbidden:
+        if text in content:
+            fail(f"Dex Connector Contributor must not duplicate target-repository guidance: {text}")
 
     agent = CONNECTOR_CONTRIBUTOR / "agents" / "openai.yaml"
     if not agent.is_file():
@@ -1003,10 +938,6 @@ def main() -> None:
     template_baseline = (ROOT / "TEMPLATE_BASELINE").read_text().strip()
     if PUBLISHED_RELEASE_TAG.fullmatch(template_baseline) is None:
         fail("TEMPLATE_BASELINE must contain a published template release tag")
-    connector_baseline = (ROOT / "CONNECTOR_LIBRARY_BASELINE").read_text().strip()
-    if PUBLISHED_COMPONENT_TAG.fullmatch(connector_baseline) is None:
-        fail("CONNECTOR_LIBRARY_BASELINE must contain a published component tag")
-
     check_skills(baseline)
     check_standalone_bundle(current_version)
     check_manifests(current_version)

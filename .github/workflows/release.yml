@@ -34,7 +34,6 @@ jobs:
           echo "server=$(cat DEX_SERVER_BASELINE)" >> "$GITHUB_OUTPUT"
           echo "cli=$(cat DEX_CLI_BASELINE)" >> "$GITHUB_OUTPUT"
           echo "template=$(cat TEMPLATE_BASELINE)" >> "$GITHUB_OUTPUT"
-          echo "connectors=$(cat CONNECTOR_LIBRARY_BASELINE)" >> "$GITHUB_OUTPUT"
       - uses: actions/checkout@v4
         with:
           repository: superdurable/dex
@@ -51,17 +50,10 @@ jobs:
           repository: superdurable/dex-template-basic-process
           ref: ${{ steps.metadata.outputs.template }}
           path: upstream-template
-      - uses: actions/checkout@v4
-        with:
-          repository: superdurable/dex-connectors-library
-          ref: ${{ steps.metadata.outputs.connectors }}
-          path: upstream-connectors
-          fetch-depth: 0
       - name: Validate release package
         run: |
           python3 script/check-package.py
           python3 script/check-reference-sources.py --dex-root upstream-dex-sdk
-          python3 script/check-connector-reference-sources.py --connector-root upstream-connectors
           python3 script/check-upstream-baselines.py \
             --dex-root upstream-dex-cli \
             --template-root upstream-template
