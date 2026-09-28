@@ -79,7 +79,9 @@ jobs:
             .claude-plugin/plugin.json \
             .cursor-plugin/plugin.json \
             .claude-plugin/marketplace.json \
-            .cursor-plugin/marketplace.json
+            .cursor-plugin/marketplace.json \
+            dex-sdk/VERSION \
+            dex-sdk/references/core/bundle-baselines.md
           git commit -m "chore: update template baseline"
           if [[ -n "${remote_sha}" ]]; then
             git push --force-with-lease="refs/heads/${UPDATE_BRANCH}:${remote_sha}" origin "HEAD:refs/heads/${UPDATE_BRANCH}"

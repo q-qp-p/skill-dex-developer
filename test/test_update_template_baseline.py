@@ -18,6 +18,13 @@ class UpdateTemplateBaselineTest(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual((root / "TEMPLATE_BASELINE").read_text(), "v1.6.0\n")
         self.assertEqual((root / "VERSION").read_text(), "0.25.9\n")
+        self.assertEqual((root / "dex-sdk" / "VERSION").read_text(), "0.25.9\n")
+        self.assertIn(
+            "TEMPLATE_BASELINE=v1.6.0",
+            (
+                root / "dex-sdk" / "references" / "core" / "bundle-baselines.md"
+            ).read_text(),
+        )
         self.assertIn("## 0.25.9 - 2026-09-27", (root / "CHANGELOG.md").read_text())
         for manifest in self.versioned_manifests(root):
             self.assertIn('"version": "0.25.9"', manifest.read_text())
@@ -54,6 +61,11 @@ class UpdateTemplateBaselineTest(unittest.TestCase):
         script.write_bytes(SCRIPT.read_bytes())
         (root / "VERSION").write_text("0.25.8\n")
         (root / "TEMPLATE_BASELINE").write_text("v0.2.1\n")
+        (root / "dex-sdk" / "references" / "core").mkdir(parents=True)
+        (root / "dex-sdk" / "VERSION").write_text("0.25.8\n")
+        (root / "dex-sdk" / "references" / "core" / "bundle-baselines.md").write_text(
+            "TEMPLATE_BASELINE=v0.2.1\n"
+        )
         (root / "CHANGELOG.md").write_text(
             "# Changelog\n\nAll notable changes to Dex Skills are documented here.\n\n"
         )

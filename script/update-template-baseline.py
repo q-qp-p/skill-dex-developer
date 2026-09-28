@@ -21,6 +21,8 @@ MARKETPLACE_MANIFESTS = (
     ".claude-plugin/marketplace.json",
     ".cursor-plugin/marketplace.json",
 )
+BUNDLE_VERSION = "dex-sdk/VERSION"
+BUNDLE_BASELINES = "dex-sdk/references/core/bundle-baselines.md"
 
 
 def fail(message: str) -> None:
@@ -79,6 +81,27 @@ def update_versioned_manifests(root: Path, next_version: str) -> None:
         write_json(path, marketplace)
 
 
+def update_standalone_bundle(
+    root: Path,
+    next_version: str,
+    previous_template: str,
+    latest_template: str,
+) -> None:
+    baselines_path = root / BUNDLE_BASELINES
+    baselines = baselines_path.read_text()
+    previous_line = f"TEMPLATE_BASELINE={previous_template}"
+    if previous_line not in baselines:
+        fail(f"{BUNDLE_BASELINES} does not mirror {previous_line}")
+    (root / BUNDLE_VERSION).write_text(next_version + "\n")
+    baselines_path.write_text(
+        baselines.replace(
+            previous_line,
+            f"TEMPLATE_BASELINE={latest_template}",
+            1,
+        )
+    )
+
+
 def add_changelog(root: Path, next_version: str, release_date: str, previous: str, latest: str) -> None:
     changelog_path = root / "CHANGELOG.md"
     changelog = changelog_path.read_text()
@@ -127,6 +150,12 @@ def main() -> None:
         (ROOT / "TEMPLATE_BASELINE").write_text(arguments.template_tag + "\n")
         (ROOT / "VERSION").write_text(next_version + "\n")
         update_versioned_manifests(ROOT, next_version)
+        update_standalone_bundle(
+            ROOT,
+            next_version,
+            current_tag,
+            arguments.template_tag,
+        )
         add_changelog(
             ROOT,
             next_version,
