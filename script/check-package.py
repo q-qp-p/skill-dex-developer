@@ -190,6 +190,11 @@ def check_sdk(baseline: str) -> None:
 
     skill_content = (SDK / "SKILL.md").read_text()
     for text in (
+        "### Flow boundary default",
+        "Default a new design to no SubFlows",
+        "A separate top-level Flow is not a SubFlow",
+        "200-concurrent-Step architecture-review threshold",
+        "Code reuse, provider",
         "### Dex-first state ownership",
         "Default durable application state to typed Flow Attributes",
         "ownership-design question",
@@ -199,6 +204,46 @@ def check_sdk(baseline: str) -> None:
     ):
         if text not in skill_content:
             fail(f"dex-sdk/SKILL.md must contain storage principle: {text}")
+
+    core_modeling = (SDK_REFERENCES / "core" / "modeling.md").read_text()
+    for text in (
+        "different authoritative owner and retention or cleanup",
+        "independent top-level Flow",
+        "state must not pollute the authoritative store",
+        "## Start with parallel Steps",
+        "## Gate SubFlows as an evolution",
+        "more than 200 concurrent Step executions",
+        "architecture-review threshold",
+        "not a Dex Server",
+        "the user explicitly confirms the SubFlow design",
+    ):
+        if text not in core_modeling:
+            fail(f"Core modeling must contain Flow-boundary principle: {text}")
+    if "Prefer a SubFlow when work needs its own identity" in core_modeling:
+        fail("Core modeling must not present SubFlow as an initial-design preference")
+
+    core_patterns = (SDK_REFERENCES / "core" / "patterns.md").read_text()
+    for text in (
+        "Parallel Steps are the default",
+        "Do not introduce SubFlows in an initial design",
+        "200-concurrent-Step",
+        "obtain explicit user confirmation",
+        "does not automatically select a",
+        "alone is insufficient",
+    ):
+        if text not in core_patterns:
+            fail(f"Core patterns must contain SubFlow gate: {text}")
+    if "Choose SubFlows for independent retry, scaling, ownership, or identity" in core_patterns:
+        fail("Core patterns must not allow one-factor SubFlow selection")
+
+    go_patterns = (SDK_REFERENCES / "go" / "patterns.md").read_text()
+    for text in (
+        "Apply the Core SubFlow evolution gate",
+        "do not make SubFlows the",
+        "default for new designs or for ordinary parallel work",
+    ):
+        if text not in go_patterns:
+            fail(f"Go patterns must route through the SubFlow gate: {text}")
 
     core_data_handling = (SDK_REFERENCES / "core" / "data-handling.md").read_text()
     for text in (
@@ -317,6 +362,12 @@ def check_app_builder() -> None:
         "`NewLocalConnection`",
         "external effects in `Execute`",
         "`WaitFor` free of provider or Dex mutations",
+        "one `admin` role by default",
+        "data-lifecycle and execution-shape boundary matrices",
+        "parallel-Step alternatives",
+        "greater-than-200 concurrent-Step requirement",
+        "New applications default to no",
+        "explicitly confirms it",
         "### Dex-first backend storage",
         "Use Dex Flow state as the default durable application store",
         "Cross-Flow reuse alone is not a reason",
@@ -446,6 +497,20 @@ def check_app_builder() -> None:
         "cross-Flow reuse alone is not a gap",
         "projection still introduces an external database",
         "“We may need it later” is not evidence",
+        "## Actor, role, operation, and permission matrix",
+        "one `admin` role for the trusted",
+        "justify every non-`admin`",
+        "## Flow-boundary decisions",
+        "parallel Steps share one Flow identity and lifecycle",
+        "independent top-level Flows start separately",
+        "SubFlows have an explicit parent-child lifecycle",
+        "different authoritative owner and a different",
+        "own waits, Timers, and terminal outcomes",
+        "state must not pollute the authoritative store",
+        "New applications default to no SubFlows",
+        "more than 200 concurrent Step executions",
+        "architecture-review threshold, not a claimed Dex",
+        "user explicitly confirms the SubFlow design",
         "## Management UI capability mapping",
         "Model each record as a Run",
         "Summary RPC",
@@ -462,6 +527,11 @@ def check_app_builder() -> None:
             fail(f"product discovery must contain: {text}")
     management_mapping_position = product_discovery.index("## Management UI capability mapping")
     ui_decision_position = product_discovery.index("## UI-mode decision")
+    role_position = product_discovery.index("## Actor, role, operation, and permission matrix")
+    flow_boundary_position = product_discovery.index("## Flow-boundary decisions")
+    storage_position = product_discovery.index("## Storage decision")
+    if not role_position < flow_boundary_position < storage_position:
+        fail("product discovery must derive roles, then Flow boundaries, then storage")
     if management_mapping_position > ui_decision_position:
         fail("product discovery must map Dex Web management capabilities before the UI-mode decision")
 

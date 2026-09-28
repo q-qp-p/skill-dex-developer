@@ -4,9 +4,61 @@ Use this guide before implementing a non-trivial Flow or when a Flow has become 
 
 ## Find the Flow boundary
 
-A Flow should represent one durable business execution with a stable identity and lifecycle, such as an order, subscription, transfer, approval, or processing job.
+A Flow should represent one durable business execution with a stable identity
+and lifecycle, such as an order, subscription, transfer, approval, or
+processing job. Do not conflate parallel Steps, independent top-level Flows,
+and parent-child SubFlows.
 
-Prefer a SubFlow when work needs its own identity, lifecycle, retry boundary, independent scaling, or bounded fan-out. Prefer another Step when the work is only the next state in the same business execution.
+For each candidate data set or process, ask:
+
+1. Does it have a different authoritative owner and retention or cleanup
+   lifecycle?
+2. Does it have independent waits, Timers, and terminal outcomes?
+3. Would putting it in an existing Flow force that Flow to retain, clean up, or
+   coordinate state unrelated to its primary lifecycle?
+
+When the answers are collectively yes, use an independent top-level Flow.
+Start it independently and coordinate through typed RPCs or Channels; it does
+not become a SubFlow merely because another Flow consumes its result. Otherwise
+prefer Steps, Attributes, or AttributeMaps in the existing Flow. Field count,
+source size, number of phases, retry policy, code reuse, provider neutrality,
+or ordinary parallelism does not establish a new Flow boundary.
+
+Keep long-lived authoritative facts in their stable owner. A temporary Flow
+stores only the validation or coordination state its own wait requires and
+cleans it up according to its own retention policy. Failed, expired, or
+otherwise temporary state must not pollute the authoritative store.
+
+## Start with parallel Steps
+
+New designs default to no SubFlows. Emit static or dynamic parallel Steps when
+branches share one Flow identity and lifecycle. Workers can execute those Step
+executions concurrently; use Channels for joins or quorum and batching when the
+runtime-sized fan-out needs a bound. Use ordinary language helpers or
+interfaces for code and provider abstraction.
+
+Provider-neutral adapters, research phases, model calls, an independent retry
+policy, or ordinary bounded fan-out do not justify a SubFlow. Prefer another
+Step when work is the next state or a parallel branch of the same business
+execution.
+
+## Gate SubFlows as an evolution
+
+Propose a SubFlow only after all of these are true:
+
+1. an existing single-Flow design or running system provides evidence, rather
+   than a concern that it may become complex later;
+2. the main graph is already impractical to review, evolve, or operate, or one
+   fan-out genuinely requires more than 200 concurrent Step executions;
+3. parallel Steps, batching, Channel coordination, RPCs, and ordinary code
+   abstraction have been evaluated and rejected with reasons;
+4. child identity, input/output, parent completion, cancellation, failure,
+   retry, duplicate submission, and concurrency semantics are defined; and
+5. the user explicitly confirms the SubFlow design.
+
+The 200-Step value is an architecture-review threshold, not a Dex Server
+limit. Crossing it permits a SubFlow proposal; it does not select one
+automatically.
 
 ## Turn the business process into a Step graph
 
@@ -37,7 +89,11 @@ Treat StepOptions as part of the graph design, not tuning added after implementa
 
 Use Attributes for state that later Steps, RPCs, application RPC responses, search, or recovery need. Large size alone does not require a separate application store: Dex can keep large values as blobs and hydrate them through the SDK BlobCache. Read [data-handling.md](data-handling.md) before designing another blob or cache layer.
 
-Keep authoritative long-lived business records in the application's database when their lifetime exceeds the Flow or they need relational querying, independent pagination, cross-Flow access, analytics, or retention policies that differ from the Flow.
+Keep authoritative long-lived business records in a stable owner Flow's typed
+Attributes or AttributeMaps when Dex can satisfy their access and retention
+requirements. Consider an external store only for a confirmed query,
+contention, transaction, analytics, or retention requirement that Dex cannot
+reasonably satisfy.
 
 Use Indexed Attributes for bounded lookup and operational search. Use Attribute Store sync when an application-owned database needs a durable projection.
 
@@ -76,4 +132,7 @@ Use a new routing flag or Attribute so only new executions enter an incompatible
 - Does each Channel have one clear producer/consumer contract?
 - Are shared state changes protected when concurrent Steps or RPCs can race?
 - Is fan-out bounded?
+- Is every top-level Flow justified by owner, retention/cleanup, wait, and
+  terminal-lifecycle differences?
+- Did every SubFlow pass the evolution gate and receive explicit confirmation?
 - Can an operator identify the current business state from Dex Web or dexcli?

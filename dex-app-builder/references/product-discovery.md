@@ -17,18 +17,26 @@ Platform, strict FDG 2.0, and the current Connector SDK use the template's Go
 backend. A requested non-Go backend becomes a standalone `dex-sdk` project
 without Connector SDK support, not a modified App Builder default.
 
-## Role, operation, and permission matrix
+## Actor, role, operation, and permission matrix
 
-Capture at least:
+Inventory actors first, then derive the minimum authorization model. Start
+with one `admin` role for the trusted maintainers and operators. A requester,
+subscriber, participant, or external system is an actor, not automatically a
+platform role.
 
-| Actor | Goal | Can start | Can view | Actions and permissions | Can maintain |
+| Actor | Authentication boundary | Goal and visibility | Actions and permissions | Platform role | Evidence for another role |
 | --- | --- | --- | --- | --- | --- |
-| Process maintainer | Own process definition and policy | product-specific | all required operational state | recovery/configuration Actions with explicit permissions | definitions and integrations |
-| Manager or operator | Review and resolve work | optional | assigned or scoped runs | approve, reject, edit, retry, or escalate with one permission per Action | no code by default |
-| Terminal user | Request or participate | usually their request | their relevant status | supply requested information with an explicit permission when exposed as an Action | no |
-| External system | Trigger or exchange data | Trigger capability | query only when required | typed integration Action or event | no |
+| Trusted maintainer or operator | authenticated host or reverse proxy | all required operational state | granular approval, edit, recovery, and configuration permissions | `admin` | none by default |
+| Requester or participant | product-specific | only confirmed participant-facing state | typed start, response, or Action when required | none by default | a distinct authenticated membership boundary plus different visibility or allowed operations |
+| External system | Connector or integration identity | only the required exchange | typed Trigger, RPC, or event | none | never derive a human role from an integration identity |
 
-Replace generic labels with domain names. Record which operations require authentication, authorization, audit, or a reason. Keep roles and permissions separate: a role can hold several permissions, and several roles can share one permission.
+Add another role only when a confirmed, separately authenticated group needs a
+different view or a different set of allowed operations. Do not create one role
+per actor, lifecycle stage, Action, or permission. Keep Action permissions
+granular even when `admin` initially holds all of them. Record authentication,
+authorization, audit, and reason requirements, and justify every non-`admin`
+role in the confirmation artifact; collapse an unjustified role back into
+`admin`.
 
 ## Lifecycle questions
 
@@ -45,16 +53,76 @@ Confirm:
 - searchable/indexed fields and detailed display fields;
 - sensitive data that must not enter IDs, logs, Streams, or generated artifacts.
 
+## Flow-boundary decisions
+
+Treat three shapes as distinct decisions:
+
+- parallel Steps share one Flow identity and lifecycle;
+- independent top-level Flows start separately and coordinate through typed
+  RPCs or Channels;
+- SubFlows have an explicit parent-child lifecycle.
+
+First capture the data-lifecycle boundary:
+
+| Candidate data or process | Authoritative owner | Retention and cleanup | Independent waits, Timers, and terminal outcomes | Pollution if kept in the existing Flow | Top-level Flow decision |
+| --- | --- | --- | --- | --- | --- |
+| Product-specific | stable business owner | product-specific | product-specific | unrelated state the existing Flow would retain or coordinate | keep or split, with evidence |
+
+Use these questions together:
+
+1. Does the data have a different authoritative owner and a different
+   retention or cleanup lifecycle?
+2. Does the process have its own waits, Timers, and terminal outcomes such as
+   `verified`, `expired`, or `cancelled`?
+3. Would putting it in an existing Flow force that Flow to retain, clean up, or
+   coordinate state unrelated to its primary lifecycle?
+
+When the answers are collectively yes, create an independent top-level Flow.
+Otherwise keep the work in the existing Flow's Steps, Attributes, or
+AttributeMaps. Field count, source size, number of stages, retry policy, code
+reuse, provider neutrality, or ordinary parallelism do not establish a new
+top-level Flow. Keep long-lived authoritative facts in their stable owner and
+temporary validation or failure state in its short-lived owner; temporary
+state must not pollute the authoritative store.
+
+Then capture the execution-shape decision:
+
+| Candidate work | Same business lifecycle | Parallel-Step or batching option | Observed complexity or more than 200 concurrent Step executions | Explicit SubFlow confirmation | Decision and rejected alternatives |
+| --- | --- | --- | --- | --- | --- |
+| Product-specific | yes or no | concrete option | measured requirement, not speculation | required before SubFlow implementation | Step, independent top-level Flow, or confirmed SubFlow |
+
+New applications default to no SubFlows. Use static or dynamic parallel Steps,
+Channels for joins or quorum, batching, typed RPCs, and ordinary language
+helpers or interfaces first. Provider abstraction, research stages, model
+calls, code reuse, an independent retry policy, or ordinary bounded fan-out do
+not justify a SubFlow.
+
+Propose a SubFlow only after all of these are true:
+
+1. an existing single-Flow design or running system provides evidence, rather
+   than a concern that it may become complex later;
+2. the main graph is already impractical to review, evolve, or operate, or one
+   fan-out genuinely requires more than 200 concurrent Step executions;
+3. parallel Steps, batching, Channel coordination, RPCs, and ordinary code
+   abstraction have been evaluated and rejected with reasons;
+4. child identity, input/output, parent completion, cancellation, failure,
+   retry, duplicate submission, and concurrency semantics are defined; and
+5. the user explicitly confirms the SubFlow design.
+
+The 200-Step value is an architecture-review threshold, not a claimed Dex
+Server limit. Crossing it permits a SubFlow proposal; it never selects one
+automatically.
+
 ## Storage decision
 
 Default each durable fact to Dex before proposing an external dependency.
 Capture a storage decision matrix:
 
-| Fact or collection | Owning Flow/business identity | Reads and writes | Volume/contention | Dex primitive and access path | Proven external-store gap |
-| --- | --- | --- | --- | --- | --- |
-| Process state | Process Flow ID | Step and Action updates, status/detail reads | product-specific | typed Attribute plus RPC/index when needed | normally none |
-| Keyed or growing records | Stable domain/entity owner | exact lookup, bounded page, independent mutation | product-specific | partitioned or chunked AttributeMap with exact loads and locks | only a confirmed query or contention limit |
-| Shared domain facts | Stable domain/entity Flow | reused by several process/API paths | product-specific | one owner with typed application operations | cross-Flow reuse alone is not a gap |
+| Fact or collection | Owning Flow/business identity | Retention and cleanup | Reads and writes | Volume/contention | Dex primitive and access path | Proven external-store gap |
+| --- | --- | --- | --- | --- | --- | --- |
+| Process state | Process Flow ID | follows the process lifecycle | Step and Action updates, status/detail reads | product-specific | typed Attribute plus RPC/index when needed | normally none |
+| Keyed or growing records | Stable domain/entity owner | explicit record retention and deletion | exact lookup, bounded page, independent mutation | product-specific | partitioned or chunked AttributeMap with exact loads and locks | only a confirmed query or contention limit |
+| Shared domain facts | Stable domain/entity Flow | owned independently of callers | reused by several process/API paths | product-specific | one owner with typed application operations | cross-Flow reuse alone is not a gap |
 
 Do not select PostgreSQL, another database, a cache, an ORM, or a shadow read
 model merely because data must persist. Dex already provides durable
@@ -143,16 +211,19 @@ does not choose a reusable internal connector capability.
 
 Before code, provide:
 
-1. the role/operation/permission matrix;
+1. the actor-to-role-to-permission matrix, with every non-`admin` role justified;
 2. a numbered lifecycle with decisions and terminal outcomes;
-3. the management UI capability mapping, including proposed Summary, Display,
+3. the data-lifecycle and execution-shape boundary matrices, including every
+   independent top-level Flow, every candidate collapsed into a Step, RPC, or
+   helper, and the complete gate for any proposed SubFlow;
+4. the management UI capability mapping, including proposed Summary, Display,
    Action, Indexed Attribute, Work Queue, and permission contracts;
-4. the confirmed **No custom UI** or **Custom UI** mode and any recorded Dex Web
+5. the confirmed **No custom UI** or **Custom UI** mode and any recorded Dex Web
    v2 capability gap;
-5. proposed Flow, Step, state, message, timer, RPC, and connector boundaries;
-6. the storage decision matrix and any evidence-backed external-store gap;
-7. connector capability reuse, public fork/PR, internal-library decision, and
+6. proposed Flow, Step, state, message, timer, RPC, and connector boundaries;
+7. the storage decision matrix and any evidence-backed external-store gap;
+8. connector capability reuse, public fork/PR, internal-library decision, and
    release status;
-8. unresolved tradeoffs.
+9. unresolved tradeoffs.
 
 Ask for explicit confirmation. A casual discussion response is not approval to implement.

@@ -15,9 +15,20 @@ Do not create a separate database table, row, outbox, lease, lock, cache, or adm
 - **Await all**: every branch matters. Decide whether one exhausted branch fails the whole operation or routes to recovery while the join waits for the remaining branches.
 - **First win**: one acceptable result is enough. Make the winner durable and define cancellation or harmless completion for losers.
 
-Use Steps when branches share one Flow identity and lifecycle. Do not turn a fixed graph into runtime fan-out solely to reduce source code.
+Parallel Steps are the default when branches share one Flow identity and
+lifecycle. Do not turn a fixed graph into runtime fan-out solely to reduce
+source code.
 
 ## Parallel SubFlows
+
+Do not introduce SubFlows in an initial design. These patterns are evolution
+tools for an existing Flow whose graph is already impractical to review,
+evolve, or operate, or whose fan-out genuinely exceeds the 200-concurrent-Step
+architecture-review threshold. First reject parallel Steps, batching, Channel
+coordination, RPCs, and ordinary code abstraction with concrete reasons, define
+the complete parent-child lifecycle, and obtain explicit user confirmation.
+The threshold is not a Dex Server limit and does not automatically select a
+SubFlow.
 
 - **Basic**: child work needs its own identity or lifecycle; the parent waits for every child.
 - **Short-lived parent**: drain the admitted batch and complete only when the active-child count is zero and the request Channel is atomically empty.
@@ -26,7 +37,10 @@ Use Steps when branches share one Flow identity and lifecycle. Do not turn a fix
 - **Partitioning**: route work by a stable partition key so each parent owns a bounded subset.
 - **Back pressure**: cap buffered requests, reject admission when full, and let a durable submitter retry with backoff.
 
-Choose SubFlows for independent retry, scaling, ownership, or identity. State parent-completion, child reuse, cancellation, duplicate-submission, and concurrency semantics explicitly.
+The examples below apply only after that gate. Independent retry, scaling,
+ownership, or identity alone is insufficient. State parent completion, child
+reuse, cancellation, duplicate submission, and concurrency semantics
+explicitly.
 
 ## Polling
 

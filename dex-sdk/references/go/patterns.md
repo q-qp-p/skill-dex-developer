@@ -19,6 +19,10 @@ func (staticInit) Execute(_ dex.Context, input string) (*dex.StepDecision, error
 
 ## Parallel SubFlows
 
+Apply the Core SubFlow evolution gate before using these APIs. The runnable
+examples document confirmed parent-child shapes; they do not make SubFlows the
+default for new designs or for ordinary parallel work.
+
 - **Basic:** turn each request into `dex.SubFlow` and wait with `AllOf`; use only when one parent can hold the batch. [Runnable](https://github.com/superdurable/dex/blob/sdk-go/v0.13.1/examples/go/patterns/parallel-subflows/basic_parent_flow.go).
 - **Long-lived parent:** RPC checks queue size and publishes; a loop drains into children. Complete only after stop plus drain invariants. [Runnable](https://github.com/superdurable/dex/blob/sdk-go/v0.13.1/examples/go/patterns/parallel-subflows/advanced_long_live_parent_flow.go).
 - **Short-lived parent:** process a bounded batch and atomically complete only when Channels are empty. A later run uses explicit ID reuse. [Runnable](https://github.com/superdurable/dex/blob/sdk-go/v0.13.1/examples/go/patterns/parallel-subflows/advanced_short_live_parent_flow.go).

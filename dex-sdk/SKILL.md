@@ -82,6 +82,21 @@ Treat each WaitFor, Execute, and RPC invocation as a separate commit boundary. S
 
 For a product mutation that entails multiple actions, cross-service calls, durable waits, retries, reconciliation, or cleanup, prefer starting one domain-named Dex Flow directly at the API boundary. Let that Flow own admission, orchestration, recovery, completion, and the durable process state that Dex can model. Do not introduce a database outbox plus dispatcher, polling command queue, or generic event-driven coordinator solely to start or sequence the Flow. A single bounded local operation can remain synchronous, and independently owned external integrations may still require explicit events.
 
+### Flow boundary default
+
+Default a new design to no SubFlows. Use parallel Steps when work shares one
+Flow identity and lifecycle. Create another top-level Flow only for a distinct
+data owner and retention/cleanup lifecycle with its own waits, Timers, and
+terminal outcomes; start it independently and coordinate through typed RPCs or
+Channels. A separate top-level Flow is not a SubFlow.
+
+Before proposing any SubFlow, read [Flow
+modeling](references/core/modeling.md) and [pattern
+selection](references/core/patterns.md). SubFlows are an explicitly confirmed
+evolution after concrete single-Flow complexity or a fan-out beyond the
+200-concurrent-Step architecture-review threshold. Code reuse, provider
+abstraction, retry policy, or ordinary parallelism is not sufficient.
+
 ### Dex-first state ownership
 
 Default durable application state to typed Flow Attributes and AttributeMaps,

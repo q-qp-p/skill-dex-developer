@@ -139,22 +139,33 @@ Read [product discovery](references/product-discovery.md) before proposing archi
 Begin with discussion, not code. Identify:
 
 - process maintainer;
-- managers, operators, approvers, terminal users, and participants;
-- each role's allowed operations and the stable permission required by each human Action;
+- managers, operators, approvers, terminal users, participants, and external
+  systems as actors before deriving roles;
+- one `admin` role by default, every actor's authentication boundary, and the
+  distinct membership, visibility, or operation difference that would justify
+  any additional role;
+- each human Action's stable permission, kept granular even when `admin`
+  initially holds every permission;
 - external systems that trigger or participate in the process;
 - whether each integration is a public external product or an
   organization-controlled internal service;
 - start triggers, inputs, outputs, deadlines, waits, approvals, retries, recovery, audit, search, and sensitive data;
 - durable facts, their owning business identity, expected read/write paths,
-  cross-Flow reuse, volume, contention, search, and retention requirements;
+  cross-Flow reuse, volume, contention, search, retention, and cleanup;
+- candidate top-level Flows, their independent waits, Timers, and terminal
+  outcomes, and whether embedding their temporary state would pollute a
+  longer-lived owner;
+- parallel-Step alternatives for every proposed SubFlow and the observed
+  complexity or greater-than-200 concurrent-Step requirement behind it;
 - every management list, detail, action, assignment, edit, progress, and
   recovery need;
 - whether an existing host authenticates users and maps roles to trusted permissions;
 - whether the user needs any custom process UI beyond a non-business application shell.
 
-Produce a compact role/operation/permission matrix, lifecycle proposal, storage
-decision matrix, management UI capability mapping, UI decision, and connector
-capability matrix. Complete the management UI capability mapping before making
+Produce a compact actor/role/operation/permission matrix, lifecycle proposal,
+data-lifecycle and execution-shape boundary matrices, storage decision matrix,
+management UI capability mapping, UI decision, and connector capability
+matrix. Complete the management UI capability mapping before making
 the UI decision. First design the Indexed Attributes, Summary RPC, Display RPC,
 Action RPC metadata and inputs, and permissions that each management operation
 would require. Then map each operation to Run search/list, run detail, Actions,
@@ -163,9 +174,12 @@ durable fact, record its owner, access pattern, scale/contention expectation,
 Dex primitive, and any proven reason an external store is required. For every
 integration, record its classification, required Trigger/Query/Mutation/UI capabilities, matching
 released connector capability, and any contribution or internal-library gap.
-Roles describe people or groups. Permissions describe individual allowed
-operations. Resolve material ambiguity and obtain explicit user confirmation
-before implementation.
+Actors describe participants; roles group authenticated people with the same
+visibility and allowed operations; permissions describe individual Actions.
+Default to `admin`, justify every additional role, and obtain explicit user
+confirmation before implementation. The boundary matrices must distinguish
+parallel Steps, independently started top-level Flows that communicate through
+typed RPCs or Channels, and explicitly confirmed parent-child SubFlows.
 
 If the process begins from Slack, email, a webhook, or another external source, model it as a Connector Trigger. The application decides whether the event starts a Flow or invokes a typed RPC. Read [connector architecture](references/connector-architecture.md) whenever an external integration is involved.
 
@@ -230,7 +244,15 @@ Read the sibling [Dex SDK skill](../dex-sdk/SKILL.md) completely, then follow it
 
 Dex SDK supplies the public SDK guidance. The platform constraints in this skill are stricter and take precedence: use only the Go SDK, keep external effects in `Execute`, keep `WaitFor` free of provider or Dex mutations, and require strict FDG 2.0 rendering.
 
-Read [Dex Web v2](references/dex-web-v2.md) before editing a Flow. State the Flow identity, input/output, Steps, transitions, Attributes, Channels, RPCs, timers, retries, recovery, and connector boundaries before code.
+Read [Flow modeling](../dex-sdk/references/core/modeling.md), [pattern
+selection](../dex-sdk/references/core/patterns.md), and [Dex Web
+v2](references/dex-web-v2.md) before editing a Flow. State the Flow identity,
+input/output, Steps, transitions, Attributes, Channels, RPCs, timers, retries,
+recovery, and connector boundaries before code. New applications default to no
+SubFlows: use parallel Steps inside one lifecycle, and use independently
+started top-level Flows plus typed RPCs or Channels when the confirmed data
+lifecycle requires another owner. Implement a SubFlow only after the Core gate
+is satisfied and the user explicitly confirms it.
 
 ### Dex-first backend storage
 

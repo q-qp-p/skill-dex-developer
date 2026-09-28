@@ -11,6 +11,13 @@ and Cursor. Its only public skills are `dex-sdk`, `dex-app-builder`, and
 
 ## Skill boundaries
 
+- Public Skills contain reusable decision rules and platform guidance, not
+  application-specific scenarios, product names, or named regression examples.
+  When a real application exposes a modeling failure, extract the general
+  decision criteria and validate those invariants generically. Keep
+  application-specific architecture and regression fixtures in that
+  application's repository or its issue/PR context, not in the published
+  Skills.
 - All three Skills may be selected by matching natural-language descriptions.
 - `dex-app-builder` is the default end-to-end product workflow for business
   discovery, an explicit no-custom-UI or custom-UI decision, Go backend

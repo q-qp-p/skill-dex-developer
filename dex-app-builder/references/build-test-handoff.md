@@ -117,6 +117,16 @@ Ensure:
 - application dependencies, runtime baselines, lockfiles, and commands still
   match the pinned template unless an explicit user-approved deviation is
   recorded;
+- every top-level Flow is justified by its authoritative owner,
+  retention/cleanup, independent waits or Timers, and terminal lifecycle;
+- parallel work remains in Steps by default, and every SubFlow has concrete
+  evolution evidence, rejected Step/batching/RPC alternatives, a defined
+  parent-child lifecycle, and explicit user confirmation;
+- temporary validation, failure, and expiry state cannot pollute a long-lived
+  authoritative Attribute or AttributeMap owner;
+- the authorization model starts with `admin`, keeps Action permissions
+  granular, and justifies every additional role with a distinct authenticated
+  membership and visibility or operation boundary;
 - the confirmed UI mode is recorded;
 - the management UI capability mapping was completed before the UI-mode
   decision and designs Summary, Display, Action, Indexed Attribute, Work Queue,
