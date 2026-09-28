@@ -73,6 +73,14 @@ def main() -> None:
         "RPCOptions.Action",
         "ActionRequiresPermission",
         '"ui-slot"',
+        '"capture"',
+        '"qr-code"',
+        "capture requires a source:user string input field",
+    )
+    require_text(
+        arguments.dex_root / "cli" / "schema" / "flow-definition-graph.v2.schema.json",
+        '"capture"',
+        '"qr-code"',
     )
     require_text(
         arguments.dex_root / "cli" / "README.md",
@@ -84,6 +92,13 @@ def main() -> None:
         "V2PermissionModeTrustedHeader",
         "V2WorkQueuePermissionsHeader",
         "Action permission denied",
+        'json:"capture,omitempty"',
+    )
+    require_text(
+        arguments.dex_root / "web" / "app" / "v2" / "workspace" / "qrScanner.ts",
+        "await import('@zxing/browser')",
+        "facingMode: { ideal: 'environment' }",
+        "for (const track of stream.getTracks()) track.stop()",
     )
     require_text(
         arguments.dex_root / "sdk-go" / "README.md",

@@ -12,6 +12,15 @@ The official example layout separates `products/`, `patterns/`, `primitives/`, a
 
 The Connector local JSON loader and generated `NewLocalConnection` API are Go-only. Do not invent a Java loader or deserialize Dex Web's credential file into Flow state. For a Java application, keep provider credentials behind an application-owned secret/runtime adapter until an official Java Connector SDK exposes the same contract.
 
+## Dex Web v2 management metadata
+
+The current FDG 2.0 management-interface analyzer reads Go source only. A Java
+Flow cannot currently publish the Summary, Display, Action, Indexed Attribute,
+group, explanation, or Action input capture metadata that drives the full Dex
+Web v2 management interface. Java applications can still operate Flows and use
+their supported Client and CLI surfaces; do not invent Java annotations for the
+Go-only analyzer contract.
+
 ## Minimal Flow
 
 [Pinned runnable source](https://github.com/superdurable/dex/blob/sdk-go/v0.13.1/examples/java/src/main/java/io/superdurable/dex/primitives/flow/ExampleFlow.java)

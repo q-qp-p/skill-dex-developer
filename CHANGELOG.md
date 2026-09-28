@@ -2,6 +2,17 @@
 
 All notable changes to Dex Skills are documented here.
 
+## 0.26.0 - 2026-09-27
+
+- Require App Builder discovery to map every management operation to Dex Web v2 before choosing a custom UI.
+- Define Runs, Indexed Attributes, Summary RPCs, Display RPCs, Action metadata, Work Queue, editable scalars, timeline, and graph views as the native management surface.
+- Require every Custom UI decision to record a specific Dex Web v2 capability gap instead of treating the need for an admin backend as sufficient.
+- Document optional QR capture for user-sourced string Action inputs, including manual fallback, secure-context and embedding policy, resource cleanup, and unchanged authorization and submission semantics.
+- Clarify across Core and all five language handbooks that the current FDG 2.0 management-interface analyzer reads Go source.
+- Advance the Dex Server baseline to `server/v0.14.0`, Dex CLI baseline to `cli-v0.14.0`, and basic-process template baseline to `v1.6.2`.
+- Add package and upstream regressions for the management-interface decision order and QR capture contract.
+- Synchronize the Codex, Claude Code, and Cursor plugin manifests at version 0.26.0.
+
 ## 0.25.12 - 2026-09-27
 
 - Allow all three Dex Skills to route from precise natural-language descriptions while keeping App Builder the product-workflow default.

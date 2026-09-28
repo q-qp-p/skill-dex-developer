@@ -23,6 +23,15 @@ Defaults use Dex `localhost:8801`, Worker `127.0.0.1:8803`, and HTTP `127.0.0.1:
 
 The Connector local JSON loader and generated `NewLocalConnection` API are Go-only. Do not invent a Python loader or deserialize Dex Web's credential file into Flow state. For a Python application, keep provider credentials behind an application-owned secret/runtime adapter until an official Python Connector SDK exposes the same contract.
 
+## Dex Web v2 management metadata
+
+The current FDG 2.0 management-interface analyzer reads Go source only. A
+Python Flow cannot currently publish the Summary, Display, Action, Indexed
+Attribute, group, explanation, or Action input capture metadata that drives the
+full Dex Web v2 management interface. Python applications can still operate
+Flows and use their supported Client and CLI surfaces; do not invent Python
+decorators for the Go-only analyzer contract.
+
 ## Minimal Flow
 
 [Pinned runnable source](https://github.com/superdurable/dex/blob/sdk-go/v0.13.1/examples/python/dex_examples/primitives/flow/example_flow.py)

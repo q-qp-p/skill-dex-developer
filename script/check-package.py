@@ -223,6 +223,24 @@ def check_sdk(baseline: str) -> None:
         if text not in core_data_handling:
             fail(f"Core data handling must contain storage principle: {text}")
 
+    operations = (SDK_REFERENCES / "core" / "operations.md").read_text()
+    for text in (
+        "## FDG 2.0 management metadata",
+        "generated only by the Go analyzer",
+        "Action input capture hints",
+    ):
+        if text not in operations:
+            fail(f"Core operations must contain FDG language boundary: {text}")
+
+    for language in LANGUAGES:
+        handbook = (SDK_REFERENCES / language / f"{language}.md").read_text()
+        for text in (
+            "## Dex Web v2 management metadata",
+            "FDG 2.0 management-interface analyzer",
+        ):
+            if text not in handbook:
+                fail(f"{language} handbook must contain FDG language boundary: {text}")
+
 
 def check_app_builder() -> None:
     references_dir = APP_BUILDER / "references"
@@ -273,6 +291,13 @@ def check_app_builder() -> None:
         "infer SDK versions from a neighboring workspace",
         "### No custom UI",
         "### Custom UI",
+        "management UI capability mapping",
+        "Complete the management UI capability mapping before making",
+        "Summary RPC",
+        "Display RPC",
+        "Action RPC metadata",
+        "A request for an admin portal, dashboard, or management backend",
+        "specific interaction Dex Web v2 cannot provide",
         "low-fidelity static wireframe",
         "must not use application",
         "page names, purposes, and direct links",
@@ -320,6 +345,8 @@ def check_app_builder() -> None:
     stage_positions = [content.index(marker) for marker in stage_markers]
     if stage_positions != sorted(stage_positions):
         fail("Dex App Builder stages must keep static UI before contract/backend before integration/polish")
+    if content.index("Complete the management UI capability mapping before making") > content.index(stage_markers[0]):
+        fail("Dex App Builder must complete management UI mapping before selecting a UI mode")
 
     ui_workflow = (references_dir / "ui-workflow.md").read_text()
     ui_stages = (
@@ -339,6 +366,9 @@ def check_app_builder() -> None:
         "application's business boundary",
         "generated TypeScript client calls",
         "real Dex and Connector end-to-end path",
+        "Use this only after discovery completes the management UI capability mapping",
+        "requires a recorded",
+        "Dex Web v2 capability gap",
     ):
         if text not in ui_workflow:
             fail(f"UI workflow must contain: {text}")
@@ -362,6 +392,8 @@ def check_app_builder() -> None:
         "generated server interfaces",
         "storage decision matrix",
         "Remove an unneeded dependency when Dex meets the requirement",
+        "approved discovery artifact must name the Dex Web v2 capability gap",
+        "management UI capability mapping was completed before the UI-mode",
     ):
         if text not in build_handoff:
             fail(f"build and handoff must contain: {text}")
@@ -398,9 +430,36 @@ def check_app_builder() -> None:
         "cross-Flow reuse alone is not a gap",
         "projection still introduces an external database",
         "“We may need it later” is not evidence",
+        "## Management UI capability mapping",
+        "Model each record as a Run",
+        "Summary RPC",
+        "Display RPC",
+        "Action metadata",
+        "Work Queue permission history",
+        "editable scalar Attributes",
+        "Run timeline, Step graph",
+        "## UI-mode decision",
+        "only after completing the management UI capability",
+        "recorded Dex Web v2 capability gap",
     ):
         if text not in product_discovery:
             fail(f"product discovery must contain: {text}")
+    management_mapping_position = product_discovery.index("## Management UI capability mapping")
+    ui_decision_position = product_discovery.index("## UI-mode decision")
+    if management_mapping_position > ui_decision_position:
+        fail("product discovery must map Dex Web management capabilities before the UI-mode decision")
+
+    dex_web = (references_dir / "dex-web-v2.md").read_text()
+    for text in (
+        "## Management UI design",
+        "Design those contracts before proposing a custom management backend or UI",
+        "### QR capture hint",
+        "capture:qr-code",
+        "without submitting the Action",
+        "Superverse remains responsible for identity",
+    ):
+        if text not in dex_web:
+            fail(f"Dex Web v2 reference must contain: {text}")
 
 
 def check_connector_contributor() -> None:

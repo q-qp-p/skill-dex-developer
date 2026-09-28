@@ -50,6 +50,17 @@ Treat this as a local development constraint, not an application schema limit. D
 
 Production capacity is determined by its Temporal visibility backend. Elasticsearch-backed deployments do not have SQLite's fixed per-type slot pool, although Elasticsearch mapping limits can still apply. Temporal Cloud and self-hosted SQL visibility stores have their own limits. Verify the target environment against [Temporal's current Search Attribute limits](https://docs.temporal.io/search-attribute#custom-search-attribute-limits).
 
+## FDG 2.0 management metadata
+
+Dex Web can inspect Runs created by every SDK, but the current FDG 2.0
+management-interface metadata is generated only by the Go analyzer. This
+includes Indexed Attribute presentation, Summary and Display RPC fields, Action
+forms and permissions, groups and explanations, and Action input capture hints.
+Do not claim that Java, Python, TypeScript, or Rust source can publish this
+metadata today. Those SDKs can operate Flows and use the supported Client and
+CLI surfaces, while a Dex Web v2 management experience that depends on this
+metadata currently requires a Go Flow definition.
+
 ## Local Connector credentials
 
 Dex Web v2 can configure exact released official Connector modules for Go Flows during loopback **dexcli dev**. The Flow must use operation-specific factories, a static connection name, and static names for any Trigger bindings. Generic factories, local replacements, unreleased module versions, or version conflicts remain visible but are not configurable.

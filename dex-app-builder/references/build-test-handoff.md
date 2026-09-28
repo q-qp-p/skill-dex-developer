@@ -16,6 +16,10 @@ For **Custom UI**, use `npm --prefix web run dev` for the low-fidelity static
 checkpoint and verify only that each direct page URL and navigation path renders.
 Do not start or extend the mock server, model lifecycle states, generate visual
 assets, or polish the surface before the page inventory is confirmed.
+The approved discovery artifact must name the Dex Web v2 capability gap that
+requires each custom management surface. Keep management operations covered by
+Summary RPC, Display RPC, Action RPC, Indexed Attributes, Work Queue, editable
+fields, timeline, or graph inspection out of the custom backend and UI.
 
 During Flow and Connector design, finalize `openapi/openapi.yaml`, run
 `make generate`, and implement the generated Go server interfaces before wiring
@@ -94,6 +98,10 @@ Ensure:
   match the pinned template unless an explicit user-approved deviation is
   recorded;
 - the confirmed UI mode is recorded;
+- the management UI capability mapping was completed before the UI-mode
+  decision and designs Summary, Display, Action, Indexed Attribute, Work Queue,
+  and permission coverage;
+- every Custom UI surface names a specific remaining Dex Web v2 capability gap;
 - a No custom UI shell contains no business controls or management routes;
 - a Custom UI has an approved static page inventory, navigation, fields, and
   actions before backend work, with no early visual-polish artifacts;

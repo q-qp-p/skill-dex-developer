@@ -1,7 +1,10 @@
 # Application surface workflow
 
-Use this after discovery identifies whether the application needs custom
-process UI.
+Use this only after discovery completes the management UI capability mapping.
+Design Summary RPC, Display RPC, Action RPC, Indexed Attribute, Work Queue, and
+permission coverage before selecting a mode. Needing an admin or management
+interface does not by itself justify Custom UI; that mode requires a recorded
+Dex Web v2 capability gap.
 
 ## No custom UI
 
@@ -28,6 +31,11 @@ management route remains. If custom behavior is requested later, follow the
 workflow below before connecting it to production.
 
 ## Custom UI
+
+Enter this mode only for the unsupported interaction named in the confirmed
+management UI capability mapping. Keep operations already covered by Dex Web v2
+on its native Run, Work Queue, detail, Action, edit, timeline, and graph
+surfaces.
 
 ### 1. Low-fidelity static checkpoint
 

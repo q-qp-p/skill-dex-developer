@@ -147,12 +147,18 @@ Begin with discussion, not code. Identify:
 - start triggers, inputs, outputs, deadlines, waits, approvals, retries, recovery, audit, search, and sensitive data;
 - durable facts, their owning business identity, expected read/write paths,
   cross-Flow reuse, volume, contention, search, and retention requirements;
-- whether Dex Web Run, Work Queue, display/edit fields, and Actions satisfy the complete process-management experience;
+- every management list, detail, action, assignment, edit, progress, and
+  recovery need;
 - whether an existing host authenticates users and maps roles to trusted permissions;
 - whether the user needs any custom process UI beyond a non-business application shell.
 
 Produce a compact role/operation/permission matrix, lifecycle proposal, storage
-decision matrix, UI decision, and connector capability matrix. For every
+decision matrix, management UI capability mapping, UI decision, and connector
+capability matrix. Complete the management UI capability mapping before making
+the UI decision. First design the Indexed Attributes, Summary RPC, Display RPC,
+Action RPC metadata and inputs, and permissions that each management operation
+would require. Then map each operation to Run search/list, run detail, Actions,
+Work Queue, editable display fields, or timeline and graph inspection. For every
 durable fact, record its owner, access pattern, scale/contention expectation,
 Dex primitive, and any proven reason an external store is required. For every
 integration, record its classification, required Trigger/Query/Mutation/UI capabilities, matching
@@ -166,10 +172,16 @@ If the process begins from Slack, email, a webhook, or another external source, 
 ## Stage 2: establish the confirmed application surface
 
 Read [UI workflow](references/ui-workflow.md), then use exactly one mode.
+A request for an admin portal, dashboard, or management backend is not itself a
+reason to select Custom UI. Select it only when the completed management UI
+capability mapping records a specific interaction Dex Web v2 cannot provide.
 
 ### No custom UI
 
-Use Dex Web v2 as the only process-management experience. Define indexed Attributes, summary/display fields, editable fields, human-action Steps, and Action RPCs so Run and Work Queue modes cover the confirmed process.
+Use Dex Web v2 as the only process-management experience. Define indexed
+Attributes, `GetDexSummary`, `GetDexDisplay`, editable fields, human-action
+Steps, and Action RPCs with conditions and permissions so Run and Work Queue
+modes cover the confirmed process.
 
 Adapt the template to retain only its future-ready architecture:
 
@@ -187,6 +199,12 @@ When the process needs a trigger webhook, retain only that OpenAPI operation and
 Do not run the custom-UI mock approval checkpoint in this mode. If the product later needs custom UI behavior, reuse the retained architecture and enter the custom-UI workflow before implementing it.
 
 ### Custom UI
+
+Require the confirmed management UI capability mapping to name the unsupported
+interaction and keep all covered management operations in Dex Web v2. Valid
+gaps include a participant portal, a fundamentally different navigation model,
+or a complex interaction the platform does not provide. “The project needs a
+backend” is not a capability gap.
 
 Create only a low-fidelity static wireframe in the template React/Vite frontend.
 Represent the necessary pages with headings, labels, placeholder boxes, inputs,

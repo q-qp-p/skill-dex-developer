@@ -69,12 +69,34 @@ multi-record transactions, or large analytical scans. Record the exact
 operation, expected scale/SLO, authority, synchronization, failure, and
 reconciliation design. “We may need it later” is not evidence.
 
+## Management UI capability mapping
+
+Business process products commonly need a management interface. Design that
+interface through Dex Web v2 first. For each management operation, define its
+Indexed Attributes, Summary RPC fields, Display RPC fields, Action RPC input and
+metadata, condition, and permission before deciding that a custom surface is
+necessary.
+
+| Management need | Dex Web v2 capability |
+| --- | --- |
+| List and filter business records | Model each record as a Run, expose supported search criteria as Indexed Attributes, and return additional list fields from the Summary RPC. |
+| Inspect one record | Return detail fields and UI slots from the Display RPC. |
+| Perform a business operation | Register an RPC with Action metadata, a typed input form, current-state condition, and one required permission. |
+| Find assigned or actionable work | Use Work Queue permission history for discovery; opening a Run rechecks current Action eligibility. |
+| Change simple business fields | Declare editable scalar Attributes in the Display RPC. |
+| Inspect progress and failures | Use the Run timeline, Step graph, execution details, and recovery information. |
+
+Record this mapping as a discovery artifact. If a need is fully covered, keep
+it in Dex Web v2 even when another need requires Custom UI. If it is not
+covered, name the exact missing interaction and its user. A general desire for
+an admin portal, dashboard, management backend, or branded shell is not a
+capability gap.
+
 ## UI-mode decision
 
-Ask directly whether the product needs a custom process UI. Evaluate Dex Web
-first: Run and Work Queue already provide Flow search, indexed columns, summary
-and display fields, editable scalar fields, Action forms, and permission-based
-work discovery.
+Make the UI-mode decision only after completing the management UI capability
+mapping and designing the Summary RPC, Display RPC, Action RPCs, Indexed
+Attributes, and permissions.
 
 Choose **No custom UI** when those surfaces satisfy operators and maintainers.
 Keep only the template's non-business Hello World/OpenAPI architecture for
@@ -83,9 +105,10 @@ role-to-permission mapping, project/tenant isolation, and a trusted reverse
 proxy. Those controls may still be required, but they are not a second process
 management backend.
 
-Choose **Custom UI** only for confirmed requirements such as participant-facing
-journeys, bespoke navigation, branding, domain visualization, or interactions
-Dex Web cannot provide. Record which requirement forces the custom surface.
+Choose **Custom UI** only for a recorded Dex Web v2 capability gap, such as a
+participant-facing journey, a fundamentally different navigation model, domain
+visualization, or a complex interaction the platform does not provide. Record
+which requirement forces the custom surface.
 The first UI checkpoint confirms only the necessary pages, navigation, fields,
 and actions through a low-fidelity static wireframe. It does not authorize an
 interactive mock, visual system, imagery, animation, or other polish before the
@@ -122,11 +145,14 @@ Before code, provide:
 
 1. the role/operation/permission matrix;
 2. a numbered lifecycle with decisions and terminal outcomes;
-3. the confirmed **No custom UI** or **Custom UI** mode and its reason;
-4. proposed Flow, Step, state, message, timer, RPC, and connector boundaries;
-5. the storage decision matrix and any evidence-backed external-store gap;
-6. connector capability reuse, public fork/PR, internal-library decision, and
+3. the management UI capability mapping, including proposed Summary, Display,
+   Action, Indexed Attribute, Work Queue, and permission contracts;
+4. the confirmed **No custom UI** or **Custom UI** mode and any recorded Dex Web
+   v2 capability gap;
+5. proposed Flow, Step, state, message, timer, RPC, and connector boundaries;
+6. the storage decision matrix and any evidence-backed external-store gap;
+7. connector capability reuse, public fork/PR, internal-library decision, and
    release status;
-7. unresolved tradeoffs.
+8. unresolved tradeoffs.
 
 Ask for explicit confirmation. A casual discussion response is not approval to implement.

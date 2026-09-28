@@ -288,7 +288,13 @@ The project dependency and lockfile remain authoritative when versions differ.
 
 `dex-app-builder` starts with business discovery: process maintainers, managers,
 terminal users, permissions, triggers, actions, waits, approvals, recovery, and
-audit requirements. It then confirms **No custom UI** or **Custom UI**.
+audit requirements. It maps management needs to Dex Web v2 before confirming
+**No custom UI** or **Custom UI**. Runs and Indexed Attributes cover list and
+search, Summary RPCs provide list fields, Display RPCs provide details and
+editable scalars, Action RPC metadata provides forms and permission-gated
+operations, Work Queue discovers actionable Runs, and timeline/graph views show
+progress and failures. A request for an admin backend is not itself a reason for
+Custom UI; discovery must record a specific Dex Web v2 capability gap.
 
 When the target repository is empty or contains only placeholders such as a
 README, App Builder first initializes it from the pinned

@@ -1,6 +1,6 @@
 # Dex Web v2 and FDG 2.0
 
-Reference capability baselines: Dex Server `v0.13.2`, Dex CLI `v0.13.8`, and
+Reference capability baselines: Dex Server `v0.14.0`, Dex CLI `v0.14.0`, and
 Dex Go SDK `v0.13.1`. These validate this skill's guidance; they are not an
 instruction to upgrade an application. A generated application uses the exact
 Server, CLI, and Go SDK versions pinned by its `TEMPLATE_BASELINE` release unless
@@ -24,6 +24,22 @@ Dex Web derives its experience from:
 - Step groups and explanations for the run timeline;
 - waits on Channels/ChannelMaps for actionable human work;
 - eligible Action RPCs for operator operations.
+
+## Management UI design
+
+Treat Dex Web v2 as the first management interface, not merely a Flow
+inspector. Model one business record as one Run. Use Indexed Attributes for
+supported filters, the Summary RPC for additional list fields, the Display RPC
+for detail fields and UI slots, and RPC Action metadata for buttons, typed input
+forms, current-state conditions, and permissions. Use editable scalar Display
+Attributes for simple updates. Work Queue discovers Runs from cumulative Action
+permission history, then the opened Run rechecks current Action eligibility.
+Timeline, Step graph, execution details, and recovery information cover process
+progress and failures.
+
+Design those contracts before proposing a custom management backend or UI. A
+custom surface requires a recorded interaction Dex Web v2 cannot provide; the
+fact that a product needs administration does not establish such a gap.
 
 In development `local-selector` mode, **Working as** selects one declared Action permission and filters Work Queue candidates. It does not authenticate a user or grant permission.
 
@@ -176,6 +192,27 @@ dex.DefineRPC(flow.ApproveRequest, &dex.RPCOptions{
 The analyzer reads this typed registration. Do not add `dex:action` or `dex:when` directives; they are rejected. An Action RPC re-checks current state before its durable mutation or Channel effect. Lock only the business state and effect that must commit atomically.
 
 An Action without input uses `dex.None`. Otherwise every exported JSON field in a named same-file input struct has one `dex:input`. User-sourced inputs omit `attribute-key`; attribute-sourced inputs require a matching scalar Attribute.
+
+### QR capture hint
+
+A user-sourced string Action input may add `capture:qr-code` to its `dex:input`
+directive. FDG 2.0 emits `capture: "qr-code"`. No other capture value is
+supported, and Attribute-sourced or non-string fields fail analysis. Omitting
+the hint preserves the ordinary text input.
+
+Dex Web keeps that text input and adds **Scan QR code**. The scanner loads only
+after a user opens it, prefers the rear camera, and copies the decoded text into
+the field without submitting the Action. Pasting, a keyboard-style scanner, and
+manual input remain available. Success, cancellation, errors, Run changes, and
+unmounting release the camera tracks.
+
+Camera access requires HTTPS or localhost. An embedding host must allow camera
+access in its Permissions Policy. A denied permission, missing camera, or
+insecure context leaves manual input available. Scanning does not authenticate
+the operator, grant a permission, satisfy an Action condition, validate the
+business value, or bypass the RPC. Superverse remains responsible for identity,
+role-to-permission mapping, trusted-header injection, and the embedding camera
+policy.
 
 ## Permission projection
 

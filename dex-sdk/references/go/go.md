@@ -37,6 +37,15 @@ For RPC delivery, register the application's bound method with application-owned
 
 Use the released [Slack example](https://github.com/superdurable/dex-connectors-library/tree/connectors/slack/v0.9.0/connectors/slack/examples/thread-approval) and [Gmail example](https://github.com/superdurable/dex-connectors-library/tree/connectors/google/gmail/v0.10.0/connectors/google/gmail/examples/thread-reply) as the exact integration references. Both use Connector SDK `sdkgo/v0.8.0`.
 
+## Dex Web v2 management metadata
+
+The current FDG 2.0 management-interface analyzer reads Go source. Go Flow
+definitions can publish Indexed Attribute presentation, Summary and Display RPC
+fields, Action metadata, typed Action forms, conditions, permissions, groups,
+explanations, and user-string `capture:qr-code` hints. Validate that metadata
+with the v2 analyzer. This source-analysis capability is not currently available
+for Java, Python, TypeScript, or Rust Flow definitions.
+
 ## Minimal Flow
 
 Declare schema at package scope, embed defaults, register Step types, and return a decision from every Execute method.
