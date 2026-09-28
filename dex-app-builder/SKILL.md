@@ -1,6 +1,6 @@
 ---
 name: dex-app-builder
-description: Primary and only implicit entry point for Dex requests. Designs and builds applications and process products with the pinned basic-process template stack, routes standalone SDK work to dex-sdk, and routes official connector-library creation or modification to dex-connector-contributor. Orchestrates business discovery, the UI decision, Go backend implementation, connector integration, local verification, and platform-ready handoff.
+description: Primary entry point for designing and building Dex applications and process products with the pinned basic-process template stack. Use for Dex product, application, or workflow requests, but not standalone SDK or official connector-library work. Orchestrates business discovery, the UI decision, Go backend implementation, connector integration, local verification, and platform-ready handoff.
 ---
 
 # Dex App Builder
@@ -16,8 +16,9 @@ lifecycle hook status; run the Skill fallback only when that status is
 
 ## Routing priority
 
-This is the only implicitly invoked Dex skill. Classify the initial request
-before product discovery, repository bootstrap, or any other App Builder work:
+Treat this skill as the default coordinator for Dex application, product, and
+workflow requests. If App Builder receives a standalone specialist request,
+classify it before product discovery, repository bootstrap, or other work:
 
 - For standalone official connector-library creation or modification—including
   a connector, operation, Trigger, or configuration UI unit—read the sibling

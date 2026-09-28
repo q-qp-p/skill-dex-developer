@@ -3,4 +3,4 @@ interface:
   short_description: "Build and contribute official Dex connectors"
   default_prompt: "Use $dex-connector-contributor to build, verify, and upstream this Dex connector capability."
 policy:
-  allow_implicit_invocation: false
+  allow_implicit_invocation: true

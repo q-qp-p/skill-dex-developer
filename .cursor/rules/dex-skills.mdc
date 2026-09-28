@@ -11,19 +11,18 @@ and Cursor. Its only public skills are `dex-sdk`, `dex-app-builder`, and
 
 ## Skill boundaries
 
-- `dex-app-builder` is the only implicitly invoked skill and the end-to-end
-  product workflow for business discovery, an explicit no-custom-UI or
-  custom-UI decision, Go backend implementation, local testing, and Dex AI
-  Platform handoff.
-- `dex-sdk` is an explicit specialist sub-skill for implementing, debugging,
-  testing, and operating applications through the public Dex SDK.
-- `dex-connector-contributor` is an explicit specialist sub-skill for creating
-  or modifying official connectors, operations, Triggers, and configuration UI
+- All three Skills may be selected by matching natural-language descriptions.
+- `dex-app-builder` is the default end-to-end product workflow for business
+  discovery, an explicit no-custom-UI or custom-UI decision, Go backend
+  implementation, local testing, and Dex AI Platform handoff.
+- `dex-sdk` is the specialist for implementing, debugging, testing, and
+  operating applications through the public Dex SDK.
+- `dex-connector-contributor` is the specialist for creating or modifying
+  official connectors, operations, Triggers, and configuration UI
   units in `superdurable/dex-connectors-library`.
-- App Builder routes a standalone SDK request to `dex-sdk` and a standalone
-  official connector-library request to `dex-connector-contributor` before
-  product discovery. A product or application that uses a released connector
-  remains in App Builder.
+- If App Builder receives a standalone SDK or official connector-library
+  request, route it to the matching specialist before product discovery. A
+  product or application that uses a released connector remains in App Builder.
 - If the user explicitly invokes a specialist, honor that choice and do not
   expand it into the App Builder workflow.
 - During backend implementation, `dex-app-builder` loads `dex-sdk` and follows

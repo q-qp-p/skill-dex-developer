@@ -13,12 +13,11 @@ publisher, while the stable plugin ID remains `superdurable-dex`.
 | `dex-sdk` | Implement, debug, test, and operate Dex applications in Python, Go, Java, TypeScript, or Rust. |
 | `dex-connector-contributor` | Create, verify, and upstream official connector operations, Triggers, and configuration UI units. |
 
-`dex-app-builder` is the plugin's only implicit entry point. It keeps Dex
-product, application, and process work, but routes a standalone SDK request to
-`dex-sdk` and a standalone official connector-library request to
-`dex-connector-contributor` before product discovery. Invoke a specialist
-directly for deterministic standalone work. Install the complete plugin so all
-three skills and their sibling links are present.
+Start with `dex-app-builder` for Dex product, application, and process work.
+The three Skills can each be selected from a matching natural-language request;
+their descriptions keep standalone SDK and official connector-library work in
+the appropriate specialist. Install the complete plugin so all three skills
+and their sibling links are present.
 
 ## Requires a coding workspace
 
@@ -59,11 +58,9 @@ Add the marketplace, open **Super Durable**, and install **Dex**. This route
 does not require the separate Codex CLI.
 
 To use the Plugin, type `@`, select **Dex** from the picker, then enter a
-natural-language request. App Builder receives unqualified requests and routes
-standalone SDK or official connector-library work before starting its product
-workflow. The Plugin's SDK and Connector starter prompts explicitly invoke the
-matching specialist. Typing the plain text `@Dex` without selecting the picker
-item does not create the Plugin binding.
+natural-language request. The selected Plugin routes the request using the
+three Skill descriptions. Typing the plain text `@Dex` without selecting the
+picker item does not create the Plugin binding.
 
 ### Codex CLI
 
@@ -75,18 +72,16 @@ codex plugin add superdurable-dex@superdurable
 ```
 
 Open an existing repository or create an empty one, then start a new task.
-Type `@`, select **Dex**, and choose the Connector starter prompt or explicitly
-invoke the specialist. For example:
+Type `@`, select **Dex**, and enter the request. For example:
 
 ```text
-Use $dex-connector-contributor to add <XYZ> to Dex official connector library.
+Add <XYZ> to Dex official connector library
 ```
 
 Raw `@Dex` text in the initial `codex` prompt or `codex exec` does not create
-the structured Plugin binding. A bound natural-language connector request is
-still handled because App Builder loads Connector Contributor before product
-discovery. Scripts that require deterministic explicit invocation should use
-the standalone Skills path below.
+the structured Plugin binding. Codex may route an installed Plugin from a
+matching natural-language request, but scripts that require deterministic
+explicit invocation should use the standalone Skills path below.
 
 ### Claude web and desktop
 
@@ -97,10 +92,8 @@ to the account, so it is also available in Claude Code when signed in with the
 same account on Claude Code 2.1.273 or later. On older Claude Code versions,
 use the manual CLI installation below.
 
-Claude web and desktop route unqualified requests through App Builder. Use the
-`/` picker to invoke Dex SDK or Connector Contributor directly for standalone
-work. This repository does not distribute standalone ZIP Skills for those
-surfaces.
+Claude web and desktop use natural-language routing or the `/` picker. This
+repository does not distribute standalone ZIP Skills for those surfaces.
 
 ### Claude Code CLI
 
@@ -162,10 +155,6 @@ Invoke the standalone connector contributor with the host's Skill syntax:
 
 Cursor uses the same short slash command for Plugin and standalone installs;
 the installation source differs even though the invocation text does not.
-
-Without an explicit specialist invocation, only App Builder is eligible for
-implicit loading. It deterministically loads the appropriate sibling skill for
-a standalone SDK or official connector-library request.
 
 The standalone bundle is for coding-agent hosts. Use the Plugin path for
 Claude web and desktop.

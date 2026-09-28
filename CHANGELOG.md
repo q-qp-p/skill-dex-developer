@@ -2,6 +2,12 @@
 
 All notable changes to Dex Skills are documented here.
 
+## 0.25.12 - 2026-09-27
+
+- Allow all three Dex Skills to route from precise natural-language descriptions while keeping App Builder the product-workflow default.
+- Keep Codex Plugin starter prompts in natural language without standalone Skill invocation syntax.
+- Synchronize the Codex, Claude Code, and Cursor plugin manifests at version 0.25.12.
+
 ## 0.25.11 - 2026-09-27
 
 - Document Plugin and standalone Skills as mutually exclusive installation paths with host-specific invocation syntax.

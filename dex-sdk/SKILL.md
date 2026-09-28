@@ -1,7 +1,6 @@
 ---
 name: dex-sdk
-description: Technical sub-skill for implementing, debugging, testing, and operating applications with the Superdurable Dex SDK in Python, Go, Java, TypeScript, or Rust. Use when the user explicitly chooses dex-sdk for standalone SDK work or when dex-app-builder or dex-connector-contributor loads it. Do not select it as the primary workflow for Dex product, application, or business-process requests.
-disable-model-invocation: true
+description: Implement, debug, test, and operate applications with the Superdurable Dex SDK in Python, Go, Java, TypeScript, or Rust. Use for standalone SDK work and when dex-app-builder or dex-connector-contributor loads it. Do not use as the primary workflow for Dex product, application, or business-process requests.
 ---
 
 # Dex SDK

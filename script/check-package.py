@@ -240,8 +240,9 @@ def check_app_builder() -> None:
     content = (APP_BUILDER / "SKILL.md").read_text()
     required = (
         "../dex-sdk/SKILL.md",
-        "only implicitly invoked Dex skill",
-        "Classify the initial request",
+        "default coordinator",
+        "If App Builder receives a standalone specialist request",
+        "classify it",
         "before product discovery",
         "standalone official connector-library creation or modification",
         "make it the owning workflow",
@@ -493,11 +494,11 @@ def check_connector_contributor() -> None:
 
 def check_invocation_policy() -> None:
     expected = {
-        APP_BUILDER: ("true", False),
-        SDK: ("false", True),
-        CONNECTOR_CONTRIBUTOR: ("false", True),
+        APP_BUILDER: "true",
+        SDK: "true",
+        CONNECTOR_CONTRIBUTOR: "true",
     }
-    for skill, (allow_implicit, disable_model_invocation) in expected.items():
+    for skill, allow_implicit in expected.items():
         agent = skill / "agents" / "openai.yaml"
         content = agent.read_text()
         policy = f"allow_implicit_invocation: {allow_implicit}"
@@ -505,13 +506,8 @@ def check_invocation_policy() -> None:
             fail(f"{agent.relative_to(ROOT)} must contain: {policy}")
         skill_content = (skill / "SKILL.md").read_text()
         frontmatter = skill_content.split("---", 2)[1]
-        is_disabled = "disable-model-invocation: true" in frontmatter
-        if is_disabled != disable_model_invocation:
-            expected_value = "true" if disable_model_invocation else "absent"
-            fail(
-                f"{(skill / 'SKILL.md').relative_to(ROOT)} "
-                f"disable-model-invocation must be {expected_value}"
-            )
+        if "disable-model-invocation: true" in frontmatter:
+            fail(f"{(skill / 'SKILL.md').relative_to(ROOT)} must allow model invocation")
 
 
 def check_plugin_version_check() -> None:
@@ -745,7 +741,7 @@ def check_manifests(version: str) -> None:
         fail("Codex developer name must remain Super Durable")
     long_description = interface.get("longDescription", "")
     for routing_text in (
-        "Dex App Builder is the implicit entry point",
+        "Dex App Builder",
         "Dex SDK",
         "Dex Connector Contributor",
     ):
@@ -758,13 +754,15 @@ def check_manifests(version: str) -> None:
     if not isinstance(prompts, list) or len(prompts) != 4:
         fail("Codex default prompts must expose all three Dex workflows")
     required_prompts = {
-        "Use $dex-app-builder to discover, design, and build this Dex process application.",
-        "Use $dex-connector-contributor to add <XYZ> to Dex official connector library.",
-        "Use $dex-sdk to design a reliable standalone Dex Flow for this application.",
-        "Use $dex-app-builder to prototype and build this Dex workflow.",
+        "Discover, design, and build this Dex process application.",
+        "Add <XYZ> to Dex official connector library.",
+        "Design a reliable Dex Flow for this application.",
+        "Prototype and build this Dex workflow.",
     }
     if set(prompts) != required_prompts:
-        fail("Codex default prompts must explicitly invoke their owning Dex skills")
+        fail("Codex default prompts must use the natural-language workflow templates")
+    if any("$dex-" in prompt for prompt in prompts):
+        fail("Codex Plugin default prompts must not use standalone Skill syntax")
 
     cursor = manifests["cursor"]
     expected_skills = ["./dex-app-builder", "./dex-sdk", "./dex-connector-contributor"]
