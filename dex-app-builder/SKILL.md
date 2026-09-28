@@ -1,6 +1,6 @@
 ---
 name: dex-app-builder
-description: Primary entry point for designing and building Dex applications and process products with the pinned basic-process template stack. Use by default for Dex product, application, or workflow requests unless the user explicitly invokes $dex-sdk for standalone SDK work or $dex-connector-contributor for official connector-library work. Orchestrates business discovery, the UI decision, Go backend implementation, connector integration, local verification, and platform-ready handoff.
+description: Primary and only implicit entry point for Dex requests. Designs and builds applications and process products with the pinned basic-process template stack, routes standalone SDK work to dex-sdk, and routes official connector-library creation or modification to dex-connector-contributor. Orchestrates business discovery, the UI decision, Go backend implementation, connector integration, local verification, and platform-ready handoff.
 ---
 
 # Dex App Builder
@@ -10,22 +10,38 @@ Build the smallest coherent product that solves the confirmed business process. 
 ## Session start
 
 Before the first substantive Dex-related response, follow the shared
-[plugin version check](../references/plugin-version-check.md). Prefer the
+[Dex Skills version check](../dex-sdk/references/core/plugin-version-check.md). Prefer the
 lifecycle hook status; run the Skill fallback only when that status is
 `unavailable` or absent. Run it only once and never delay or block the task.
 
 ## Routing priority
 
-Treat this skill as the default coordinator for Dex application, product, and
-workflow requests. Keep end-to-end ownership while loading the specialist
-skills only where their capability is required:
+This is the only implicitly invoked Dex skill. Classify the initial request
+before product discovery, repository bootstrap, or any other App Builder work:
 
-- load sibling `$dex-sdk` during backend design and implementation;
-- load sibling `$dex-connector-contributor` only when an official connector,
-  operation, Trigger, or configuration UI unit must be created or changed.
+- For standalone official connector-library creation or modification—including
+  a connector, operation, Trigger, or configuration UI unit—read the sibling
+  [Connector Contributor](../dex-connector-contributor/SKILL.md) completely and
+  make it the owning workflow. The user's request already authorizes this
+  routing decision; do not ask them to invoke the specialist again, and do not
+  enter product discovery.
+- For standalone Dex SDK implementation, debugging, testing, or operations,
+  read the sibling [Dex SDK](../dex-sdk/SKILL.md) completely and make it the
+  owning workflow. Do not expand it into a product workflow.
+- For a Dex product, application, or business process—including application use
+  of a published connector—continue with App Builder. Load Dex SDK during
+  backend design and implementation. If this workflow later confirms a missing
+  or defective official connector capability, load Connector Contributor for
+  that contribution while retaining end-to-end application ownership here.
 
-If the user explicitly invokes either specialist for a standalone task, honor
-that choice and do not expand the work into this product workflow.
+If either sibling entrypoint cannot be read from the installed three-skill
+bundle, report that the installed bundle is incomplete and direct the user to
+update or reinstall it. Do not search arbitrary plugin-cache paths, substitute
+the superseded `dex-developer` skill, or infer that a specialist is unavailable
+from the current repository's instructions.
+
+If the user explicitly invokes either specialist, honor that choice without
+running this routing gate or expanding the task into this product workflow.
 
 ## Development workspace gate
 
@@ -49,7 +65,8 @@ editor configuration, or other project placeholders.
 
 For an effectively empty repository, initialize the application from
 `https://github.com/superdurable/dex-template-basic-process` at the exact release
-recorded in [TEMPLATE_BASELINE](../TEMPLATE_BASELINE). Materialize the template
+recorded in the [bundle baselines](../dex-sdk/references/core/bundle-baselines.md).
+Materialize the template
 inside the current repository while preserving its `.git` directory and any
 intentional user files. Review collisions before writing, do not initialize or
 read project-local agent-skill submodules, inspect `.superverse/template.json`,
@@ -92,7 +109,7 @@ If the user explicitly requests a non-template stack or dependency upgrade,
 explain the compatibility and verification consequences before editing. A
 non-Go backend is outside the Dex App Builder and Dex AI Platform path and
 cannot use the current Connector SDK. Route an explicitly requested standalone
-non-Go Dex application through `$dex-sdk`; do not imply that Go-only Connector
+non-Go Dex application through `dex-sdk`; do not imply that Go-only Connector
 capabilities remain available.
 
 When the repository already contains an application and build manifests,
@@ -295,7 +312,7 @@ For connectors:
 9. when that public connector or required operation/Trigger is absent or
    defective, read sibling
    [Connector Contributor](../dex-connector-contributor/SKILL.md) completely
-   and ask for authorization to use `$dex-connector-contributor` to create or
+   and ask for authorization to use `dex-connector-contributor` to create or
    modify it; never bypass the gap with direct provider code;
 10. after the local connector change builds, immediately test the application
    against its local module using an uncommitted `go.work` or temporary Go

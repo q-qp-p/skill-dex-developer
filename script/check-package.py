@@ -4,7 +4,9 @@
 import argparse
 import json
 import re
+import shutil
 import subprocess
+import tempfile
 from pathlib import Path
 
 
@@ -13,7 +15,16 @@ SDK = ROOT / "dex-sdk"
 APP_BUILDER = ROOT / "dex-app-builder"
 CONNECTOR_CONTRIBUTOR = ROOT / "dex-connector-contributor"
 SDK_REFERENCES = SDK / "references"
-PLUGIN_VERSION_CHECK = ROOT / "references" / "plugin-version-check.md"
+PLUGIN_VERSION_CHECK = SDK_REFERENCES / "core" / "plugin-version-check.md"
+BUNDLE_VERSION = SDK / "VERSION"
+BUNDLE_BASELINES = SDK_REFERENCES / "core" / "bundle-baselines.md"
+BASELINE_FILES = (
+    "DEX_BASELINE",
+    "DEX_SERVER_BASELINE",
+    "DEX_CLI_BASELINE",
+    "TEMPLATE_BASELINE",
+    "CONNECTOR_LIBRARY_BASELINE",
+)
 VERSION_CHECK_SCRIPT = ROOT / "hooks" / "version-check.mjs"
 HOOK_CONFIGS = {
     "codex": ROOT / "hooks" / "codex.json",
@@ -33,12 +44,14 @@ MARKETPLACES = {
 }
 CORE_TOPICS = {
     "ai-agents.md",
+    "bundle-baselines.md",
     "data-handling.md",
     "error-handling.md",
     "getting-started.md",
     "modeling.md",
     "operations.md",
     "patterns.md",
+    "plugin-version-check.md",
     "primitives.md",
     "step-options.md",
     "testing.md",
@@ -227,13 +240,21 @@ def check_app_builder() -> None:
     content = (APP_BUILDER / "SKILL.md").read_text()
     required = (
         "../dex-sdk/SKILL.md",
+        "only implicitly invoked Dex skill",
+        "Classify the initial request",
+        "before product discovery",
+        "standalone official connector-library creation or modification",
+        "make it the owning workflow",
+        "published connector—continue with App Builder",
+        "installed bundle is incomplete",
+        "Do not search arbitrary plugin-cache paths",
         "../dex-sdk/references/go/go.md",
         "Go SDK",
         "strict FDG 2.0",
         "writable repository or",
         "project workspace",
         "effectively empty",
-        "../TEMPLATE_BASELINE",
+        "../dex-sdk/references/core/bundle-baselines.md",
         "`TEMPLATE_BASELINE` is the",
         "application stack authority",
         "In the first implementation update for an effectively empty repository",
@@ -266,7 +287,7 @@ def check_app_builder() -> None:
         "match every required Trigger, Query, Mutation, and UI capability",
         "stop connector-dependent",
         "do not infer support from memory",
-        "$dex-connector-contributor",
+        "`dex-connector-contributor`",
         "schedules a Connector Step",
         "temporary Go",
         "connector library already exists",
@@ -401,6 +422,7 @@ def check_connector_contributor() -> None:
         "../dex-app-builder/references/dex-web-v2.md",
         "superdurable/dex-connectors-library",
         "documented public API or official SDK",
+        "Add <XYZ> to Dex official connector library",
         "connector.yaml",
         "Connector SDK and official connector modules are Go-only",
         "ask the user to open",
@@ -428,6 +450,20 @@ def check_connector_contributor() -> None:
             fail(f"Connector Contributor acceptance scenarios must contain: {scenario}")
 
     workflow = (references_dir / "repository-workflow.md").read_text()
+    normalized_workflow = " ".join(workflow.split())
+    for checkout_contract in (
+        "current working directory does not determine the target repository",
+        "Git remote identity",
+        "accessible project or workspace roots",
+        "secondary project folders",
+        "isolated managed worktree",
+        "report the exact target checkout path",
+        "read the target checkout's `AGENTS.md`",
+        "Do not repoint `origin` on an in-use clone",
+        "A Git worktree shares remotes",
+    ):
+        if checkout_contract not in normalized_workflow:
+            fail(f"Connector Contributor checkout workflow must contain: {checkout_contract}")
     for fork_contract in (
         "https://github.com/superdurable/dex-connectors-library/fork",
         "click **Create fork**",
@@ -457,21 +493,30 @@ def check_connector_contributor() -> None:
 
 def check_invocation_policy() -> None:
     expected = {
-        APP_BUILDER: "true",
-        SDK: "false",
-        CONNECTOR_CONTRIBUTOR: "false",
+        APP_BUILDER: ("true", False),
+        SDK: ("false", True),
+        CONNECTOR_CONTRIBUTOR: ("false", True),
     }
-    for skill, allow_implicit in expected.items():
+    for skill, (allow_implicit, disable_model_invocation) in expected.items():
         agent = skill / "agents" / "openai.yaml"
         content = agent.read_text()
         policy = f"allow_implicit_invocation: {allow_implicit}"
         if policy not in content:
             fail(f"{agent.relative_to(ROOT)} must contain: {policy}")
+        skill_content = (skill / "SKILL.md").read_text()
+        frontmatter = skill_content.split("---", 2)[1]
+        is_disabled = "disable-model-invocation: true" in frontmatter
+        if is_disabled != disable_model_invocation:
+            expected_value = "true" if disable_model_invocation else "absent"
+            fail(
+                f"{(skill / 'SKILL.md').relative_to(ROOT)} "
+                f"disable-model-invocation must be {expected_value}"
+            )
 
 
 def check_plugin_version_check() -> None:
     if not PLUGIN_VERSION_CHECK.is_file():
-        fail("references/plugin-version-check.md must exist")
+        fail("dex-sdk/references/core/plugin-version-check.md must exist")
     content = PLUGIN_VERSION_CHECK.read_text()
     for text in (
         "Dex Skills lifecycle version check",
@@ -487,11 +532,57 @@ def check_plugin_version_check() -> None:
         if text not in content:
             fail(f"plugin version check must contain: {text}")
 
-    relative_link = "../references/plugin-version-check.md"
-    for skill in (APP_BUILDER, SDK, CONNECTOR_CONTRIBUTOR):
+    relative_links = {
+        APP_BUILDER: "../dex-sdk/references/core/plugin-version-check.md",
+        SDK: "references/core/plugin-version-check.md",
+        CONNECTOR_CONTRIBUTOR: "../dex-sdk/references/core/plugin-version-check.md",
+    }
+    for skill, relative_link in relative_links.items():
         content = (skill / "SKILL.md").read_text()
         if relative_link not in content:
-            fail(f"{skill.name}/SKILL.md must load the plugin version check")
+            fail(f"{skill.name}/SKILL.md must load the Dex Skills version check")
+
+
+def check_standalone_bundle(version: str) -> None:
+    if BUNDLE_VERSION.read_text().strip() != version:
+        fail("dex-sdk/VERSION must match the root VERSION")
+
+    baselines = BUNDLE_BASELINES.read_text()
+    for baseline_name in BASELINE_FILES:
+        expected = (ROOT / baseline_name).read_text().strip()
+        if f"{baseline_name}={expected}" not in baselines:
+            fail(f"bundle baselines must mirror {baseline_name}={expected}")
+
+    with tempfile.TemporaryDirectory() as temporary_directory:
+        install_root = Path(temporary_directory).resolve()
+        for skill in (APP_BUILDER, SDK, CONNECTOR_CONTRIBUTOR):
+            shutil.copytree(skill, install_root / skill.name)
+
+        installed_skills = sorted(
+            path.parent.name for path in install_root.glob("*/SKILL.md")
+        )
+        expected_skills = sorted(
+            skill.name for skill in (APP_BUILDER, SDK, CONNECTOR_CONTRIBUTOR)
+        )
+        if installed_skills != expected_skills:
+            fail("standalone bundle must copy exactly the three public Skills")
+
+        for markdown in install_root.rglob("*.md"):
+            prose = FENCED_BLOCK.sub("", markdown.read_text())
+            for target in MARKDOWN_LINK.findall(prose):
+                resolved = local_link_target(markdown, target)
+                if resolved is None:
+                    continue
+                if not resolved.is_relative_to(install_root):
+                    fail(
+                        "standalone link escapes the installed bundle in "
+                        f"{markdown.relative_to(install_root)}: {target}"
+                    )
+                if not resolved.exists():
+                    fail(
+                        "broken standalone link in "
+                        f"{markdown.relative_to(install_root)}: {target}"
+                    )
 
 
 def command_hook(config: dict, event: str, matcher: str, path: Path) -> dict:
@@ -542,6 +633,14 @@ def check_hook_configs(manifests: dict) -> None:
     ):
         if text not in script:
             fail(f"version hook script must contain: {text}")
+    for forbidden in (
+        "npm install",
+        "npx skills",
+        "plugin update",
+        "plugin marketplace upgrade",
+    ):
+        if forbidden in script:
+            fail(f"version check hook must not install or update: {forbidden}")
 
     codex_path = HOOK_CONFIGS["codex"]
     codex = load_json(codex_path)
@@ -635,6 +734,8 @@ def check_manifests(version: str) -> None:
     codex = manifests["codex"]
     if codex.get("skills") != "./":
         fail("Codex manifest must discover root skills with ./")
+    if "mainSkill" in codex:
+        fail("Codex manifest must not invent a mainSkill field")
     interface = codex.get("interface")
     if not isinstance(interface, dict):
         fail("Codex manifest must define interface metadata")
@@ -642,18 +743,28 @@ def check_manifests(version: str) -> None:
         fail("Codex display name must be Dex")
     if interface.get("developerName") != "Super Durable":
         fail("Codex developer name must remain Super Durable")
+    long_description = interface.get("longDescription", "")
+    for routing_text in (
+        "Dex App Builder is the implicit entry point",
+        "Dex SDK",
+        "Dex Connector Contributor",
+    ):
+        if routing_text not in long_description:
+            fail(f"Codex long description must contain: {routing_text}")
     for field in ("composerIcon", "logo"):
         if interface.get(field) != "./assets/logo.png":
             fail(f"Codex {field} must use ./assets/logo.png")
     prompts = interface.get("defaultPrompt")
-    if not isinstance(prompts, list) or not prompts or "$dex-app-builder" not in prompts[0]:
-        fail("Codex default prompts must put $dex-app-builder first")
-    if len(prompts) < 2 or "$dex-connector-contributor" not in prompts[1]:
-        fail("Codex default prompts must put $dex-connector-contributor second")
-    if not any("$dex-sdk" in prompt for prompt in prompts):
-        fail("Codex default prompts must expose $dex-sdk")
-    if not any("$dex-connector-contributor" in prompt for prompt in prompts):
-        fail("Codex default prompts must expose $dex-connector-contributor")
+    if not isinstance(prompts, list) or len(prompts) != 4:
+        fail("Codex default prompts must expose all three Dex workflows")
+    required_prompts = {
+        "Use $dex-app-builder to discover, design, and build this Dex process application.",
+        "Use $dex-connector-contributor to add <XYZ> to Dex official connector library.",
+        "Use $dex-sdk to design a reliable standalone Dex Flow for this application.",
+        "Use $dex-app-builder to prototype and build this Dex workflow.",
+    }
+    if set(prompts) != required_prompts:
+        fail("Codex default prompts must explicitly invoke their owning Dex skills")
 
     cursor = manifests["cursor"]
     expected_skills = ["./dex-app-builder", "./dex-sdk", "./dex-connector-contributor"]
@@ -798,6 +909,7 @@ def main() -> None:
         fail("CONNECTOR_LIBRARY_BASELINE must contain a published component tag")
 
     check_skills(baseline)
+    check_standalone_bundle(current_version)
     check_manifests(current_version)
     check_agent_rules()
     if arguments.base_ref:

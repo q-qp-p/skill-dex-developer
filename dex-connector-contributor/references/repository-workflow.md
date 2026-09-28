@@ -5,6 +5,37 @@ Contribute through the user's GitHub fork of the official
 maintainer may instead choose the [maintainer branch path](#maintainer-branch-path).
 Treat the GitHub fork and the local clone as separate steps.
 
+## Target checkout discovery
+
+The chat's current working directory does not determine the target repository.
+Before changing files, identify `superdurable/dex-connectors-library` by Git
+remote identity or by a verified fork whose GitHub parent is that repository.
+Do not infer identity from a directory name such as `dex-connectors-library`,
+and do not treat an unrelated application checkout as the connector library.
+
+Inspect candidates in this order:
+
+1. a checkout or worktree already verified in the current conversation;
+2. the current checkout and its registered Git worktrees;
+3. Git repositories beneath the host's accessible project or workspace roots,
+   including secondary project folders, without scanning unrelated private
+   directories;
+4. a new clone selected through the fork workflow below when no suitable local
+   checkout exists.
+
+For every candidate, inspect its remotes. Accept it only when a remote resolves
+to the official repository or GitHub verifies that the remote is a fork of the
+official repository. Prefer a clean checkout that no other active task uses.
+Preserve all unrelated changes; when a suitable clone is busy or dirty, create
+an isolated managed worktree when the host supports it, otherwise a normal Git
+worktree. Do not repoint or delete an in-use clone.
+
+Before implementation, report the exact target checkout path and the remote
+identity that established it, then read the target checkout's `AGENTS.md` and
+other host-native repository instructions. Instructions found in the chat's
+unrelated starting repository do not prove that the Contributor skill is
+missing. The installed sibling skill bundle remains the skill authority.
+
 ## Fork discovery and user handoff
 
 Before changing files, look for an existing user-owned fork in this order:
@@ -29,11 +60,16 @@ that GitHub finished creating the fork, then discover and verify its exact URL.
 If the user declines, stop before implementation and report that a fork is
 required for the upstream contribution workflow.
 
-After verification, reuse a suitable existing local clone or clone the user's
-fork. Configure remotes so:
+After verification, reuse the target clone selected above or clone the user's
+fork. Configure the contribution checkout's remotes so:
 
 - `origin` is the user's verified fork;
 - `upstream` is `https://github.com/superdurable/dex-connectors-library`.
+
+Do not repoint `origin` on an in-use clone that names the official repository.
+Use that clone only to establish repository identity, then create a separate
+clone of the verified fork for the contribution. A Git worktree shares remotes
+with its parent clone, so it is not an isolation boundary for remote changes.
 
 Fetch the latest `upstream/main`, read its `AGENTS.md`, preserve unrelated user
 files, and create an isolated topic branch or managed worktree from

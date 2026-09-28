@@ -13,11 +13,12 @@ publisher, while the stable plugin ID remains `superdurable-dex`.
 | `dex-sdk` | Implement, debug, test, and operate Dex applications in Python, Go, Java, TypeScript, or Rust. |
 | `dex-connector-contributor` | Create, verify, and upstream official connector operations, Triggers, and configuration UI units. |
 
-Start with `dex-app-builder` for Dex product, application, and process work. It
-loads the specialist `dex-sdk` and `dex-connector-contributor` skills when the
-confirmed design requires them. Invoke a specialist directly only for a
-standalone SDK or official connector-library task. Install the complete plugin
-so all three skills are present.
+`dex-app-builder` is the plugin's only implicit entry point. It keeps Dex
+product, application, and process work, but routes a standalone SDK request to
+`dex-sdk` and a standalone official connector-library request to
+`dex-connector-contributor` before product discovery. Invoke a specialist
+directly for deterministic standalone work. Install the complete plugin so all
+three skills and their sibling links are present.
 
 ## Requires a coding workspace
 
@@ -32,6 +33,18 @@ run tests, build artifacts, or deploy the application from an ordinary chat.
 
 ## Install
 
+Choose exactly one installation path:
+
+1. **Plugin (recommended):** installs all three Skills together and uses the
+   host's marketplace lifecycle.
+2. **Standalone Skills:** installs all three Skills directly with the Agent
+   Skills CLI.
+
+Do not install both. Duplicate copies can shadow one another and make the
+loaded version ambiguous.
+
+The invocation syntax depends on both the host and the installation path.
+
 ### Codex desktop app
 
 Open the plugin browser, choose **Add a marketplace**, and use:
@@ -45,22 +58,35 @@ Open the plugin browser, choose **Add a marketplace**, and use:
 Add the marketplace, open **Super Durable**, and install **Dex**. This route
 does not require the separate Codex CLI.
 
+To use the Plugin, type `@`, select **Dex** from the picker, then enter a
+natural-language request. App Builder receives unqualified requests and routes
+standalone SDK or official connector-library work before starting its product
+workflow. The Plugin's SDK and Connector starter prompts explicitly invoke the
+matching specialist. Typing the plain text `@Dex` without selecting the picker
+item does not create the Plugin binding.
+
 ### Codex CLI
 
 Only use this route when `codex --version` works in the shell:
 
 ```bash
 codex plugin marketplace add superdurable/dex-skills
-codex
+codex plugin add superdurable-dex@superdurable
 ```
 
-Inside Codex CLI, open `/plugins`, select the **Super Durable** marketplace,
-and install **Dex**. There is no `codex plugin add` step in these instructions.
+Open an existing repository or create an empty one, then start a new task.
+Type `@`, select **Dex**, and choose the Connector starter prompt or explicitly
+invoke the specialist. For example:
 
-Open an existing repository or create an empty one, then start a new task. Use
-`$dex-app-builder` for the primary product workflow. Explicitly invoke
-`$dex-sdk` only for standalone SDK work or `$dex-connector-contributor` only
-for standalone official connector-library contribution.
+```text
+Use $dex-connector-contributor to add <XYZ> to Dex official connector library.
+```
+
+Raw `@Dex` text in the initial `codex` prompt or `codex exec` does not create
+the structured Plugin binding. A bound natural-language connector request is
+still handled because App Builder loads Connector Contributor before product
+discovery. Scripts that require deterministic explicit invocation should use
+the standalone Skills path below.
 
 ### Claude web and desktop
 
@@ -68,7 +94,13 @@ Open **Customize → Plugins → Add → Add marketplace**, choose **Add from a
 repository**, and enter `https://github.com/superdurable/dex-skills`. Install
 **Dex** from the **Super Durable** marketplace. Claude saves the installation
 to the account, so it is also available in Claude Code when signed in with the
-same account.
+same account on Claude Code 2.1.273 or later. On older Claude Code versions,
+use the manual CLI installation below.
+
+Claude web and desktop route unqualified requests through App Builder. Use the
+`/` picker to invoke Dex SDK or Connector Contributor directly for standalone
+work. This repository does not distribute standalone ZIP Skills for those
+surfaces.
 
 ### Claude Code CLI
 
@@ -87,33 +119,74 @@ Or run the slash-command equivalents inside an interactive Claude Code session:
 ```
 
 Invoke `/superdurable-dex:dex-sdk`, `/superdurable-dex:dex-app-builder`, or
-`/superdurable-dex:dex-connector-contributor`.
+`/superdurable-dex:dex-connector-contributor`. For example:
+
+```text
+/superdurable-dex:dex-connector-contributor Add <XYZ> to Dex official connector library
+```
 
 ### Cursor desktop app
 
-Import `https://github.com/superdurable/dex-skills` from **Customize → From
-GitHub Repository**, then open **Dex**, select **Install**, and choose a user or
-project scope. The three skills appear as `/dex-sdk`, `/dex-app-builder`, and
-`/dex-connector-contributor`.
+Open a project, then use **Customize → Plugins → Add → From GitHub Repository**
+and enter `github.com/superdurable/dex-skills`. Open **Dex**, select
+**Install**, and choose a user or project scope. The three Skills appear as
+`/dex-sdk`, `/dex-app-builder`, and `/dex-connector-contributor`.
 
 ### Cursor CLI
 
 Cursor's official documentation describes marketplace installation through
-**Customize** and does not document a separate shell command for installing
-this GitHub marketplace. Install the plugin through the desktop app; do not
-guess a `cursor plugin install` command.
+**Customize** and does not provide a non-interactive shell command for
+installing this GitHub marketplace. A user-scope desktop installation is
+available in Cursor CLI. Alternatively, start `cursor-agent`, enter `/plugin`,
+open the Marketplace tab, and install **Dex**. Do not guess a
+`cursor plugin install` command.
 
-Agent Skills clients can install the same bundle directly:
+### Standalone Skills
+
+Use this path instead of the Plugin. Install all three Skills together for the
+selected coding agent:
 
 ```bash
-npx skills add superdurable/dex-skills --all
+npx skills add superdurable/dex-skills --skill '*' --agent codex --global
+npx skills add superdurable/dex-skills --skill '*' --agent claude-code --global
+npx skills add superdurable/dex-skills --skill '*' --agent cursor --global
 ```
+
+Invoke the standalone connector contributor with the host's Skill syntax:
+
+| Host | Invocation |
+| --- | --- |
+| Codex | `$dex-connector-contributor Add <XYZ> to Dex official connector library` |
+| Claude Code | `/dex-connector-contributor Add <XYZ> to Dex official connector library` |
+| Cursor | `/dex-connector-contributor Add <XYZ> to Dex official connector library` |
+
+Cursor uses the same short slash command for Plugin and standalone installs;
+the installation source differs even though the invocation text does not.
+
+Without an explicit specialist invocation, only App Builder is eligible for
+implicit loading. It deterministically loads the appropriate sibling skill for
+a standalone SDK or official connector-library request.
+
+The standalone bundle is for coding-agent hosts. Use the Plugin path for
+Claude web and desktop.
 
 ## Upgrade
 
-An active chat keeps the plugin version it loaded when the chat started. After
-an upgrade, restart the client when applicable and begin a new chat in the
-repository.
+An active chat keeps the Plugin or Skills version it loaded when the chat
+started. After an upgrade, restart the client when applicable and begin a new
+chat in the repository.
+
+### Standalone Skills
+
+Update all three Skills together:
+
+```bash
+npx skills update dex-app-builder dex-sdk dex-connector-contributor --global
+```
+
+If the installed `skills` CLI does not support `update`, rerun the exact
+host-specific `npx skills add ... --skill '*' --agent ... --global` command
+from the installation section.
 
 ### Automatic future-version reminder
 
@@ -129,10 +202,12 @@ about one second and uses ETag revalidation. Until you upgrade, every new Dex
 chat can include the reminder; unrelated chats remain silent. Restoring an old
 chat or compacting its context does not repeat it.
 
-The hook reads the installed `VERSION` and requests only public release
+The Plugin hook reads the installed `VERSION` and requests only public release
 metadata from GitHub. It does not read or upload the prompt, repository files,
 credentials, or project content. It only suggests an upgrade; it never changes
-or upgrades the plugin automatically.
+or upgrades the Plugin automatically. Standalone Skills use the same
+best-effort version comparison from their packaged reference, but they have no
+Plugin lifecycle hook and are never updated automatically by Dex.
 
 Codex asks you to review and trust the hook when a hook-enabled release is first
 enabled. Because `0.25.6` adds clearer review metadata, upgrading from `0.25.5`
@@ -197,17 +272,17 @@ import; manage that installation through **Customize** instead of guessing one.
 
 ## Migrating from the old plugin
 
-The former plugin ID `dex` and invocation `$dex-developer` were replaced by
-`superdurable-dex` and `$dex-sdk`. Remove or update the old marketplace install,
-install **Dex** from the **Super Durable** marketplace, and start a new task so
-the new skill names are discovered.
+The former Plugin ID `dex` and Skill name `dex-developer` were replaced by
+`superdurable-dex` and `dex-sdk`. Remove or update the old marketplace install,
+choose either the current Plugin or standalone bundle, and start a new task so
+the new Skill names are discovered.
 
 A direct skill install is not replaced by the plugin. If
 `~/.claude/skills/dex-developer`, another client's skills-directory copy, or an
 `npx skills` install of `dex-developer` exists, it keeps loading its older
-pinned Server and CLI guidance and can shadow the plugin. Remove it with the
-tool that installed it, install `superdurable-dex@superdurable`, and start a new
-task.
+pinned Server and CLI guidance and can shadow the current installation. Remove
+it with the tool that installed it, install exactly one current distribution,
+and start a new task.
 
 ## Dex SDK
 

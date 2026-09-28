@@ -1,6 +1,7 @@
 ---
 name: dex-sdk
-description: Technical sub-skill for implementing, debugging, testing, and operating applications with the Superdurable Dex SDK in Python, Go, Java, TypeScript, or Rust. Use when the user explicitly invokes $dex-sdk for standalone SDK work or when $dex-app-builder or $dex-connector-contributor loads it. Do not select it as the primary workflow for Dex product, application, or business-process requests.
+description: Technical sub-skill for implementing, debugging, testing, and operating applications with the Superdurable Dex SDK in Python, Go, Java, TypeScript, or Rust. Use when the user explicitly chooses dex-sdk for standalone SDK work or when dex-app-builder or dex-connector-contributor loads it. Do not select it as the primary workflow for Dex product, application, or business-process requests.
+disable-model-invocation: true
 ---
 
 # Dex SDK
@@ -10,7 +11,7 @@ Build reliable applications through Dex's public programming model. Keep the use
 ## Session start
 
 Before the first substantive Dex-related response, follow the shared
-[plugin version check](../references/plugin-version-check.md). Prefer the
+[Dex Skills version check](references/core/plugin-version-check.md). Prefer the
 lifecycle hook status; run the Skill fallback only when that status is
 `unavailable` or absent. Run it only once and never delay or block the task.
 
@@ -27,6 +28,10 @@ lifecycle hook status; run the Skill fallback only when that status is
 Before writing code, identify the language, package manager, installed Dex SDK version, registry, Worker and Client bootstrap, and repository test commands.
 
 Preserve the installed SDK version unless the user asks to upgrade. The project's source, lockfile, installed SDK, and version-matched examples are authoritative. This bundle's exact API excerpts are pinned to the immutable release tag in their visible source links and recorded in the source repository's `DEX_BASELINE`; use them as guidance, not as evidence that a different installed version has the same signature.
+
+Read the installed release metadata from [VERSION](VERSION) and the complete
+set of source pins from [bundle baselines](references/core/bundle-baselines.md).
+These files are included in Plugin and standalone installations.
 
 If the project version differs from the baseline, name the matching installed-source path or immutable tag/commit used before writing exact API code. If that source is unavailable, stop at the version-independent Flow model, identify what is needed, and ask to inspect or fetch it. Never claim verification without an auditable version-matched source, label baseline syntax as compatible with an unverified version, or invent a Dex API.
 

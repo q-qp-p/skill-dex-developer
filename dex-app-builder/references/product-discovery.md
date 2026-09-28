@@ -14,7 +14,7 @@ set as equivalent defaults.
 Only an explicit user request can replace the template stack for a new
 application. Before accepting that request, explain that Dex App Builder, Dex AI
 Platform, strict FDG 2.0, and the current Connector SDK use the template's Go
-backend. A requested non-Go backend becomes a standalone `$dex-sdk` project
+backend. A requested non-Go backend becomes a standalone `dex-sdk` project
 without Connector SDK support, not a modified App Builder default.
 
 ## Role, operation, and permission matrix
@@ -105,7 +105,7 @@ gap decision.
 If the published catalog or immutable release manifest cannot be verified,
 stop connector-dependent implementation and report the blocker. A missing
 connector, operation, Trigger, or UI unit with a documented API or official SDK
-becomes a `$dex-connector-contributor` work item and production release blocker;
+becomes a `dex-connector-contributor` work item and production release blocker;
 it is not permission to install the provider SDK or write local integration
 code.
 
