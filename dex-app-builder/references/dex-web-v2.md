@@ -1,6 +1,6 @@
 # Dex Web v2 and FDG 2.0
 
-Reference capability baselines: Dex Server `v0.14.0`, Dex CLI `v0.14.0`, and
+Reference capability baselines: Dex Server `v0.14.1`, Dex CLI `v0.14.1`, and
 Dex Go SDK `v0.13.1`. These validate this skill's guidance; they are not an
 instruction to upgrade an application. A generated application uses the exact
 Server, CLI, and Go SDK versions pinned by its `TEMPLATE_BASELINE` release unless
@@ -10,7 +10,11 @@ trusted-header enforcement, dynamic definition sources, embedded reverse-proxy
 mounts, local Flow starts, and local setup for Connector operations, Trigger
 bindings, and configuration UI units.
 
-Released connector modules may require an older Go SDK; at connectors `main` `d975226` every connector required `sdk-go v0.11.3`. Go minimum version selection builds the application with its own `v0.13.1` requirement, so keep the application pin and do not wait for connector re-releases.
+Released connector modules may require an older Connector SDK; at connectors
+`main` `980a6f9`, modules require exact releases from `sdkgo/v0.7.0` through
+`sdkgo/v0.10.0`. Go minimum version selection builds the application with its
+own Dex Go SDK `v0.13.1` requirement, so keep the application pin and do not
+wait for connector re-releases.
 
 Web v2 is Go-only. Validate every Flow with the v2 analyzer and never fall back to v1.
 
@@ -115,6 +119,16 @@ non-secret operation configuration to sibling `use-configurations.json`, keyed
 by connector, connection, operation, Flow type, and Step type. The application
 loads it once through `localconfig`, so a configuration edit requires an
 application restart.
+
+The connector release owns setup guidance for the complete rendered surface.
+Dex Web shows the authorization guide's provider start URL and ordered steps,
+then shows each manifest default below its field as parenthetical guidance.
+Descriptions explain units, valid format, override use, and blank behavior.
+Operation and Trigger unit descriptions explain the choice in context. Verified
+OAuth or OpenID Connect claims and declared read-only provider pickers should
+produce identity and resource fields instead of asking the user to retype them.
+An application consuming a released connector must not add duplicate free-text
+configuration for those derived values.
 
 Studio Host API 0.2 keeps the iframe at an opaque origin and accepts only
 nonce-bound protocol messages. `use.configuration.save` writes the scoped

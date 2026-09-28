@@ -398,10 +398,10 @@ Flow**. It finishes with a clean, ready-for-review PR and monitored CI.
 
 Connector source excerpts are pinned to the repository snapshot in
 `CONNECTOR_LIBRARY_BASELINE`. The reference releases are Connector SDK
-`sdkgo/v0.8.0`, Slack `connectors/slack/v0.9.0`, Gmail
-`connectors/google/gmail/v0.10.0`, and Google Sheets
-`connectors/google/spreadsheet/v0.7.0`. The snapshot deliberately trails newer
-connector releases; new work pins the latest published component tag.
+`sdkgo/v0.11.0`, Slack `connectors/slack/v0.11.0`, Gmail
+`connectors/google/gmail/v0.13.0`, and Google Sheets
+`connectors/google/spreadsheet/v0.8.0`. New work still verifies the latest
+published component tag before changing a connector.
 
 ## Releases
 

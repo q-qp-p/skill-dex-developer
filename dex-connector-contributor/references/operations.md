@@ -20,7 +20,7 @@ factory. Application code normally calls a factory such as
 `openai.NewCreateResponseStep`; generic `sdkgo.NewQueryStep` and
 `sdkgo.NewMutationStep` are advanced escape hatches.
 
-The immutable [connector contract factory example](https://github.com/superdurable/dex-connectors-library/blob/connectors/slack/v0.9.0/docs/connector-contract.md)
+The immutable [connector contract factory example](https://github.com/superdurable/dex-connectors-library/blob/connectors/slack/v0.11.0/docs/connector-contract.md)
 shows the intended application surface:
 
 <!-- connector-source: docs/connector-contract.md -->

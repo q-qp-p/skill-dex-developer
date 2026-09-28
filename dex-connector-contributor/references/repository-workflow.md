@@ -196,13 +196,13 @@ user's behalf unless explicitly authorized.
 ## Fixed immutable reference snapshot
 
 The public examples used by this skill are validated against the immutable
-`connectors/slack/v0.9.0` repository snapshot. At that snapshot the exact
+`connectors/slack/v0.11.0` repository snapshot. At that snapshot the exact
 published component versions are:
 
-- Connector SDK `sdkgo/v0.8.0`;
-- Slack `connectors/slack/v0.9.0`;
-- Gmail `connectors/google/gmail/v0.10.0`;
-- Google Sheets `connectors/google/spreadsheet/v0.7.0`.
+- Connector SDK `sdkgo/v0.11.0`;
+- Slack `connectors/slack/v0.11.0`;
+- Gmail `connectors/google/gmail/v0.13.0`;
+- Google Sheets `connectors/google/spreadsheet/v0.8.0`.
 
 These are reference baselines, not permission to downgrade a repository. The
 snapshot deliberately trails current releases until a reviewed baseline

@@ -35,7 +35,7 @@ The filter runs before identity resolution, input mapping, or any Dex call. Retu
 
 For RPC delivery, register the application's bound method with application-owned `dex.RPCOptions`, then pass that method directly to `NewDexRPCTriggerTarget`. The application decides whether stable provider event IDs need deduplication, stores only bounded domain state, and locks only the business state or effect that must commit atomically.
 
-Use the released [Slack example](https://github.com/superdurable/dex-connectors-library/tree/connectors/slack/v0.9.0/connectors/slack/examples/thread-approval) and [Gmail example](https://github.com/superdurable/dex-connectors-library/tree/connectors/google/gmail/v0.10.0/connectors/google/gmail/examples/thread-reply) as the exact integration references. Both use Connector SDK `sdkgo/v0.8.0`.
+Use the released [Slack example](https://github.com/superdurable/dex-connectors-library/tree/connectors/slack/v0.11.0/connectors/slack/examples/thread-approval) and [Gmail example](https://github.com/superdurable/dex-connectors-library/tree/connectors/google/gmail/v0.13.0/connectors/google/gmail/examples/thread-reply) as exact integration references. Their modules pin the exact Connector SDK releases they support.
 
 ## Dex Web v2 management metadata
 

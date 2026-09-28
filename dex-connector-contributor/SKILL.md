@@ -32,7 +32,9 @@ Before changing connector behavior:
 3. Read the shared [Dex Web v2 reference](../dex-app-builder/references/dex-web-v2.md)
    for Start Flow, Connections, configuration, and Studio behavior.
 4. Read [repository workflow](references/repository-workflow.md).
-5. Load only the task references that apply:
+5. Read [connector configuration guidance](references/configuration-guidance.md)
+   before changing authorization, operations, Triggers, examples, or UI units.
+6. Load only the task references that apply:
    [operations](references/operations.md), [Triggers](references/triggers.md),
    [UI units](references/ui-units.md), and
    [examples, testing, and PR](references/examples-testing-pr.md).
@@ -72,12 +74,15 @@ Use this order:
    isolated topic worktree from the latest `upstream/main` without disturbing
    unrelated files.
 3. Inspect repository instructions and identify the provider capability,
-   public contract, auth scopes, rate limits,
+   public contract, auth scopes, configuration provenance, rate limits,
    idempotency support, pagination, event acknowledgement, and failure modes.
 4. Update `connector.yaml`, then run code generation before provider code.
 5. Implement the provider adapter and provider-facing tests.
-6. Add Trigger and UI-unit behavior when the capability needs them.
-7. Add or extend a connector-local runnable example.
+6. Add Trigger and UI-unit behavior when the capability needs them. Audit every
+   authorization, operation, and Trigger configuration field against the
+   connector configuration guidance.
+7. Add or extend a connector-local runnable example and verify its complete
+   setup surface in Dex Web Connections.
 8. Run the complete verification matrix and inspect generated/catalog drift.
 9. Commit one clean module-scoped change, push to the user's fork (or the
    verified maintainer branch), open a ready-for-review PR against the official

@@ -21,10 +21,10 @@ PINNED_LINK = re.compile(
     r"(?P<kind>blob|tree)/(?P<target>[^)\s#]+)"
 )
 REFERENCE_RELEASES = (
-    "sdkgo/v0.8.0",
-    "connectors/slack/v0.9.0",
-    "connectors/google/gmail/v0.10.0",
-    "connectors/google/spreadsheet/v0.7.0",
+    "sdkgo/v0.11.0",
+    "connectors/slack/v0.11.0",
+    "connectors/google/gmail/v0.13.0",
+    "connectors/google/spreadsheet/v0.8.0",
 )
 
 

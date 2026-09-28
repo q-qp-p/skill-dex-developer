@@ -186,8 +186,8 @@ decision and the resulting reuse limitation in the handoff.
 
 ## Released Trigger examples
 
-Use the [Slack thread approval example](https://github.com/superdurable/dex-connectors-library/tree/connectors/slack/v0.9.0/connectors/slack/examples/thread-approval) for a Socket Mode root event, application-owned channel/poster/text filters, thread query, typed reply RPC, thread-reply Mutation, and composed configuration UI units.
+Use the [Slack thread approval example](https://github.com/superdurable/dex-connectors-library/tree/connectors/slack/v0.11.0/connectors/slack/examples/thread-approval) for a Socket Mode root event, application-owned channel/poster/text filters, thread query, typed reply RPC, thread-reply Mutation, and composed configuration UI units.
 
-Use the [Gmail thread reply example](https://github.com/superdurable/dex-connectors-library/tree/connectors/google/gmail/v0.10.0/connectors/google/gmail/examples/thread-reply) for a polled root message, application-owned sender/text filters, message query, typed reply RPC, email-reply Mutation, and composed configuration UI units. Its polling transport is a local alpha path, not a production push-delivery design.
+Use the [Gmail thread reply example](https://github.com/superdurable/dex-connectors-library/tree/connectors/google/gmail/v0.13.0/connectors/google/gmail/examples/thread-reply) for a polled root message, application-owned sender/text filters, message query, typed reply RPC, email-reply Mutation, and composed configuration UI units. Its polling transport is a local alpha path, not a production push-delivery design.
 
 Both examples derive one stable Flow ID from provider thread identity. They absorb root redelivery through deterministic starts, handle reply redelivery in bounded application-owned thread state, and move uncertain or rejected external writes into explicit recovery instead of blind resend.

@@ -2,6 +2,14 @@
 
 All notable changes to Dex Skills are documented here.
 
+## 0.28.0 - 2026-09-28
+
+- Require connector contributors to audit every authorization, operation, and Trigger configuration field exposed by every runnable example.
+- Require provider start URLs, exact page paths, value provenance, formats, units, secrecy, blank behavior, derived claims, read-only pickers, and contextual UI-unit descriptions.
+- Document Dex Web parenthesized manifest defaults and prevent applications from reintroducing free-text fields for provider-derived values.
+- Advance Dex Server and CLI baselines to `v0.14.1`, the basic-process template baseline to `v1.7.2`, and the connector snapshot to Slack `v0.11.0`.
+- Synchronize the Codex, Claude Code, and Cursor plugin manifests at version 0.28.0.
+
 ## 0.27.1 - 2026-09-28
 
 - Advance the basic-process template baseline from `v1.7.0` to `v1.7.1`.

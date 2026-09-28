@@ -48,6 +48,9 @@ triggerRunner, err := slack.NewLocalMessageTriggerRunner(store, threadapproval.C
         BindingName: threadapproval.StartTriggerBinding,
         Target: sdkgo.NewDexFlowTriggerTarget(
             client, flow, startTriggerFilter, threadapproval.ResolveFlowID, threadapproval.MapToFlowInput,
+            sdkgo.WithTriggerLogger(bindingLogger(
+                logger, slack.ChannelThreadCreatedTriggerDefinition.Trigger.TriggerName, threadapproval.StartTriggerBinding,
+            )),
         ),
     }},
     ThreadReplyCreatedRoutes: []slack.LocalThreadReplyCreatedTriggerRoute{{
@@ -55,12 +58,15 @@ triggerRunner, err := slack.NewLocalMessageTriggerRunner(store, threadapproval.C
         Target: sdkgo.NewDexRPCTriggerTarget(
             client, flow.ReceiveThreadReply, replyTriggerFilter, threadapproval.ResolveFlowID,
             threadapproval.MapToReceiveThreadReplyInput,
+            sdkgo.WithTriggerLogger(bindingLogger(
+                logger, slack.ThreadReplyCreatedTriggerDefinition.Trigger.TriggerName, threadapproval.ReplyTriggerBinding,
+            )),
         ),
     }},
-})
+}, slack.WithLogger(logger))
 ```
 
-Source: [Slack thread approval runner at the immutable baseline](https://github.com/superdurable/dex-connectors-library/blob/connectors/slack/v0.9.0/connectors/slack/examples/thread-approval/main.go).
+Source: [Slack thread approval runner at the immutable baseline](https://github.com/superdurable/dex-connectors-library/blob/connectors/slack/v0.11.0/connectors/slack/examples/thread-approval/main.go).
 
 ## Required verification
 

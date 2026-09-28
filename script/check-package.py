@@ -78,6 +78,7 @@ APP_BUILDER_REFERENCES = {
     "ui-workflow.md",
 }
 CONNECTOR_CONTRIBUTOR_REFERENCES = {
+    "configuration-guidance.md",
     "repository-workflow.md",
     "operations.md",
     "triggers.md",
@@ -561,11 +562,24 @@ def check_connector_contributor() -> None:
     ):
         if fork_contract not in workflow:
             fail(f"Connector Contributor fork workflow must contain: {fork_contract}")
+    guidance = (references_dir / "configuration-guidance.md").read_text()
+    for guidance_contract in (
+        "Audit the complete rendered surface",
+        "Derive values before explaining them",
+        "spec.auth.guide.startURL",
+        "Every remaining field",
+        "provider HTTPS URL where the user starts",
+        "parenthesized defaults",
+        "every runnable example",
+    ):
+        if guidance_contract not in guidance:
+            fail(f"Connector configuration guidance must contain: {guidance_contract}")
+
     for release in (
-        "sdkgo/v0.8.0",
-        "connectors/slack/v0.9.0",
-        "connectors/google/gmail/v0.10.0",
-        "connectors/google/spreadsheet/v0.7.0",
+        "sdkgo/v0.11.0",
+        "connectors/slack/v0.11.0",
+        "connectors/google/gmail/v0.13.0",
+        "connectors/google/spreadsheet/v0.8.0",
     ):
         if release not in workflow:
             fail(f"Connector Contributor reference releases must contain: {release}")

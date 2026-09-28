@@ -4,6 +4,11 @@ Connector UI units are small reusable React TypeScript components composed by
 Dex Web v2 for one Connector Step or Trigger binding configuration. They are
 not Dex primitives and never receive credentials.
 
+Read [connector configuration guidance](configuration-guidance.md) before
+authoring a unit. Every rendered field needs provider-specific provenance and
+blank behavior; use a verified claim or read-only picker instead of free text
+when the provider can supply the value.
+
 ## Manifest and generated contract
 
 Declare Studio Host API range `>=0.2.0 <0.3.0`, the setup entrypoint, exact
@@ -18,29 +23,38 @@ The SDK public types at the immutable baseline are:
 <!-- connector-source: sdkgo/configuration_ui.go -->
 ```go
 type ConnectorConfigurationUI struct {
+    // Units lists reusable UI units in application composition order.
     Units []ConnectorUIUnit `json:"units" yaml:"units"`
 }
 
 // ConnectorUIUnit is one reusable unit from a Connector release's Studio unit
 // catalog. Bindings connect the unit's named ports to configuration JSON paths.
 type ConnectorUIUnit struct {
-    ID          string               `json:"id" yaml:"id"`
-    UnitID      string               `json:"unitId" yaml:"unitId"`
-    Label       string               `json:"label" yaml:"label"`
-    Description string               `json:"description,omitempty" yaml:"description,omitempty"`
-    Required    bool                 `json:"required" yaml:"required"`
-    Bindings    []ConnectorUIBinding `json:"bindings" yaml:"bindings"`
+    // ID is the stable application-local identity of this unit use.
+    ID string `json:"id" yaml:"id"`
+    // UnitID identifies a unit in the connector's released UI catalog.
+    UnitID string `json:"unitId" yaml:"unitId"`
+    // Label is the application-facing unit label.
+    Label string `json:"label" yaml:"label"`
+    // Description explains how to choose or obtain the configured value.
+    Description string `json:"description" yaml:"description"`
+    // Required reports whether the application must configure this unit.
+    Required bool `json:"required" yaml:"required"`
+    // Bindings map unit ports to application-owned configuration paths.
+    Bindings []ConnectorUIBinding `json:"bindings" yaml:"bindings"`
 }
 
 // ConnectorUIBinding maps one Connector UI unit port to an RFC 6901 JSON
 // Pointer in the application-owned configuration object.
 type ConnectorUIBinding struct {
-    Port        string `json:"port" yaml:"port"`
+    // Port names an input or output declared by the released unit.
+    Port string `json:"port" yaml:"port"`
+    // JSONPointer is an RFC 6901 path into application configuration.
     JSONPointer string `json:"jsonPointer" yaml:"jsonPointer"`
 }
 ```
 
-Source: [Connector configuration UI types at the immutable baseline](https://github.com/superdurable/dex-connectors-library/blob/connectors/slack/v0.9.0/sdkgo/configuration_ui.go).
+Source: [Connector configuration UI types at the immutable baseline](https://github.com/superdurable/dex-connectors-library/blob/connectors/slack/v0.11.0/sdkgo/configuration_ui.go).
 
 Use generated unit and port constants rather than string copies. Every binding
 maps one named port to an RFC 6901 JSON Pointer in the application-owned
@@ -75,17 +89,24 @@ composition:
 ```go
 ConfigurationUI: sdkgo.ConnectorConfigurationUI{Units: []sdkgo.ConnectorUIUnit{{
     ID: "completionText", UnitID: slack.UIUnitTextInput, Label: "Completion reply", Required: true,
-    Bindings: []sdkgo.ConnectorUIBinding{{Port: slack.UITextInputPortText, JSONPointer: "/text"}},
+    Description: "Enter the Slack message posted to the thread after the configured approval reply arrives.",
+    Bindings:    []sdkgo.ConnectorUIBinding{{Port: slack.UITextInputPortText, JSONPointer: "/text"}},
 }}},
 ```
 
-Source: [Slack operation configuration composition at the immutable baseline](https://github.com/superdurable/dex-connectors-library/blob/connectors/slack/v0.9.0/connectors/slack/examples/thread-approval/flow/workflow.go).
+Source: [Slack operation configuration composition at the immutable baseline](https://github.com/superdurable/dex-connectors-library/blob/connectors/slack/v0.11.0/connectors/slack/examples/thread-approval/flow/workflow.go).
 
 ## UI/UX acceptance
 
 Test the unit inside Dex Web **Connections**, not only in Storybook or a direct
 iframe. Verify:
 
+- every example authorization, operation, and Trigger field is enumerated;
+- provider start links, exact page paths, format, units, secrecy, and blank
+  behavior are visible where the user needs them;
+- safe manifest defaults render as parenthetical guidance without duplicated
+  literal values in descriptions;
+- verified claims and read-only picker outputs replace derivable free text;
 - authorization and reauthorization;
 - loading, empty, validation, expired/revoked, provider error, retry, and
   success states;
