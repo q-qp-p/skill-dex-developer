@@ -320,11 +320,14 @@ state, API calls, images, animation, branding, or visual polish at this stage.
 
 After that confirmation, design the Flow, Connector boundaries, and application
 OpenAPI contract together. Generate the Go server interfaces and TypeScript
-client before implementing the Go backend. Wire the static pages through the
-generated client only after the real Dex and Connector paths run, then complete
-real E2E. The template mock server remains a contract-level test double after
-the schema is fixed. Add imagery and visual polish only after real E2E passes,
-then rerun mock E2E, real E2E, and the production build.
+client locally before implementing the Go backend; generated directories are
+ignored build outputs and never enter commits or pull requests. Wire the static
+pages through the generated client only after the real Dex and Connector paths
+run, then complete real E2E. Component tests may mock that client, and a
+browser-only edge case may use test-local Playwright request interception, but
+the application does not ship a second mock backend or Mock Controls. Add
+imagery and visual polish only after real E2E passes, then rerun component
+tests, real E2E, and the production build.
 
 Backend implementation is Go-only, starts from
 `superdurable/dex-template-basic-process`, and must satisfy strict Dex Web v2 /
@@ -367,8 +370,9 @@ supported connectors in the local **Connections** view. The default plaintext
 development store is `~/.dex/connectors/connections.json`; pass
 `--connector-config-dir` to isolate a stack. Start the application with
 **DEX_CONNECTOR_CONFIG_FILE** set to the absolute path shown by Dex Web.
-The mock validates HTTP and UI behavior only; it cannot prove Dex durability,
-Worker replacement, Timer, or RPC semantics. The workflow finishes with local
+UI test doubles validate component behavior only; they cannot prove Dex
+durability, Worker replacement, Timer, RPC, Connector, or application E2E
+semantics. The workflow finishes with local
 tests and a clean handoff ready for future Dex AI Platform upload; it does not
 claim that upload is available today.
 

@@ -8,7 +8,7 @@ and lockfiles remain authoritative for application code.
 DEX_BASELINE=sdk-go/v0.13.1
 DEX_SERVER_BASELINE=server/v0.14.0
 DEX_CLI_BASELINE=cli-v0.14.0
-TEMPLATE_BASELINE=v1.6.2
+TEMPLATE_BASELINE=v1.7.0
 CONNECTOR_LIBRARY_BASELINE=connectors/slack/v0.9.0
 ```
 

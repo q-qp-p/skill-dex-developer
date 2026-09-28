@@ -2,7 +2,17 @@
 
 ## Implementation loop
 
-Use the basic-process template's stable commands. Change `openapi/openapi.yaml`, then regenerate; never hand-edit generated Go or TypeScript clients.
+Use the basic-process template's stable commands. Change `openapi/openapi.yaml`,
+then regenerate; never hand-edit generated Go or TypeScript clients. The
+generated directories exist only as ignored local build outputs. Never stage,
+commit, or include them in a pull request.
+
+The public command surface is `make bootstrap`, `make generate`,
+`make check-fdg-v2`, `make test-unit`, `make test-integration`,
+`make test-e2e`, `make build`, `make dev`, and `make check`. Build, test, and
+development targets regenerate before compilation; `make check` generates only
+once. Do not restore `make check-generated`, `make mock`, or
+`make test-mock-e2e`.
 
 Keep the template release's `go.mod`, `go.sum`, npm lockfile, Go toolchain,
 Dex Server/CLI baselines, generators, and Make targets unchanged unless the
@@ -10,12 +20,17 @@ user explicitly requested the corresponding stack or dependency change. A
 newer `DEX_BASELINE` in the skill repository is not an application upgrade
 instruction.
 
-For **No custom UI**, reduce OpenAPI to `GetApplicationInfo` plus confirmed integration ingress, regenerate both clients, and remove process-management routes and mock lifecycle code. Verify the Hello World page through the generated client. Do not run a mock approval checkpoint for an inert shell.
+For **No custom UI**, reduce OpenAPI to `GetApplicationInfo` plus confirmed
+integration ingress, regenerate both clients locally, and remove
+process-management routes, mock-server routes, mock lifecycle code, Mock
+Controls, mock launch scripts, and mock E2E. Verify the Hello World page
+through the generated client. Do not run a mock approval checkpoint for an
+inert shell.
 
 For **Custom UI**, use `npm --prefix web run dev` for the low-fidelity static
 checkpoint and verify only that each direct page URL and navigation path renders.
-Do not start or extend the mock server, model lifecycle states, generate visual
-assets, or polish the surface before the page inventory is confirmed.
+Do not introduce a mock server, model lifecycle states, generate visual assets,
+or polish the surface before the page inventory is confirmed.
 The approved discovery artifact must name the Dex Web v2 capability gap that
 requires each custom management surface. Keep management operations covered by
 Summary RPC, Display RPC, Action RPC, Indexed Attributes, Work Queue, editable
@@ -24,12 +39,15 @@ fields, timeline, or graph inspection out of the custom backend and UI.
 During Flow and Connector design, finalize `openapi/openapi.yaml`, run
 `make generate`, and implement the generated Go server interfaces before wiring
 the generated TypeScript client into the UI. Run real Dex and Connector
-integration and E2E before visual polish. After the contract exists, keep
-`make mock` and `make test-mock-e2e` as fast UI test tools, not as a gate before
-backend implementation. Run the narrowest relevant check after each edit batch.
-Before handoff run the repository's full `make check`, including mock E2E, real
-Dex integration and E2E, Worker replacement, FDG 2.0 validation, and the
-production build. After visual polish, rerun both mock and real E2E.
+integration and E2E before visual polish. After the contract exists, use
+component-level mocks of the generated client for difficult UI states. Permit
+test-local Playwright request interception only for a browser-only edge case;
+do not add an application-level mock server, second Go business backend,
+product mock route, or user-visible Mock Controls. Run the narrowest relevant
+check after each edit batch. Before handoff run the repository's full
+`make check`, which generates once and then covers real Dex integration and
+E2E, FDG 2.0 validation, frontend tests, and the production build. After visual
+polish, rerun component tests and real E2E.
 
 Before installing a database, cache, ORM, or separate read model, review the
 storage decision matrix and name the exact query, concurrency, transaction, or
@@ -40,7 +58,9 @@ When external storage is justified, test its declared authority boundary,
 projection/synchronization lag, retry behavior, outage handling, and
 reconciliation instead of treating a successful happy-path write as proof.
 
-Treat mock results as HTTP/UI evidence only. They cannot establish Dex durability, Worker replacement, Timer, RPC, retry, or provider semantics.
+Treat component mocks and intercepted browser responses as UI evidence only.
+They cannot establish Dex durability, Worker replacement, Timer, RPC, retry,
+provider, or application E2E semantics.
 
 Show Dex Web early. Once the first Flow graph renders, keep one user-facing `dexcli dev` stack running with a persistent `--flow-rendering-dir`, stable ports, and persistent state, and give the user its URL before continuing. Then keep implementing and testing against isolated test stacks. Do not wait until verification passes to start it, and do not let test scripts reuse or stop it. Report its URL again at handoff.
 
@@ -59,7 +79,7 @@ Do not add or update a project-local skill submodule. The coding-agent host
 supplies the immutable Dex Skills release independently from the application
 template.
 
-Template scripts call `dexcli` from `PATH` and do not check its version. Run `dexcli version` first and require at least `v0.13.8`. When upgrading the global CLI would break other projects pinned to older Servers, install a project-local CLI and put its directory first on `PATH` for the template commands; `scripts/check-fdg-v2.sh` also honors `DEXCLI`.
+Template scripts call `dexcli` from `PATH` and do not check its version. Run `dexcli version` first and require at least `v0.14.0`. When upgrading the global CLI would break other projects pinned to older Servers, install a project-local CLI and put its directory first on `PATH` for the template commands; `scripts/check-fdg-v2.sh` also honors `DEXCLI`.
 
 Validate every Flow file, not only the template's `internal/process/flow.go`; see [Dex Web v2 validation](dex-web-v2.md#validation).
 
@@ -106,11 +126,11 @@ Ensure:
 - a Custom UI has an approved static page inventory, navigation, fields, and
   actions before backend work, with no early visual-polish artifacts;
 - its OpenAPI contract was designed with the Flow and Connector boundaries,
-  both generated clients are current, and the Go HTTP boundary implements the
-  generated server interfaces;
-- its dynamic UI uses only the generated TypeScript client, mock behavior
-  conforms to the fixed contract, and visual polish followed a passing real
-  Dex and Connector end-to-end journey;
+  both generated clients reproduce locally, neither generated directory is
+  tracked, and the Go HTTP boundary implements the generated server interfaces;
+- its dynamic UI uses only the generated TypeScript client, UI mocks exist only
+  in test processes, and visual polish followed a passing real Dex and
+  Connector end-to-end journey;
 - secrets are absent from files, logs, generated values, and archives;
 - dependencies and released connector versions are pinned;
 - every connector capability matrix records the canonical published catalog,

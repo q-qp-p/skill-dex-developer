@@ -178,12 +178,44 @@ def main() -> None:
     template_version = template_manifest.get("templateVersion")
     if not isinstance(template_version, str) or SEMVER.fullmatch(template_version) is None:
         fail("template baseline must declare a stable templateVersion")
-    if template_manifest.get("commands", {}).get("checkFdgV2") != "make check-fdg-v2":
-        fail("template baseline must expose checkFdgV2")
-    if template_manifest.get("commands", {}).get("mock") != "make mock":
-        fail("template baseline must expose mock")
-    if template_manifest.get("commands", {}).get("testMockE2E") != "make test-mock-e2e":
-        fail("template baseline must expose testMockE2E")
+    expected_commands = {
+        "bootstrap": "make bootstrap",
+        "generate": "make generate",
+        "checkFdgV2": "make check-fdg-v2",
+        "testUnit": "make test-unit",
+        "testIntegration": "make test-integration",
+        "testE2E": "make test-e2e",
+        "build": "make build",
+        "dev": "make dev",
+        "check": "make check",
+    }
+    if template_manifest.get("commands") != expected_commands:
+        fail("template baseline must expose only the supported lean command set")
+    require_text(
+        arguments.template_root / ".gitignore",
+        "/internal/api/generated/",
+        "/web/src/api/generated/",
+    )
+    tracked_generated = git(
+        arguments.template_root,
+        "ls-files",
+        "internal/api/generated",
+        "web/src/api/generated",
+    )
+    if tracked_generated:
+        fail("template baseline must not track generated OpenAPI clients")
+    for removed_path in (
+        "cmd/mock-server",
+        "internal/mockserver",
+        "docs/local-mock.md",
+        "scripts/check-generated.sh",
+        "scripts/run-mock-e2e.sh",
+        "scripts/with-mock.sh",
+        "web/e2e/mock-basic-process.spec.ts",
+        "web/src/MockControls.tsx",
+    ):
+        if (arguments.template_root / removed_path).exists():
+            fail(f"template baseline still contains removed mock path: {removed_path}")
     template_cli_baseline = (
         arguments.template_root / "DEX_CLI_BASELINE"
     ).read_text().strip()

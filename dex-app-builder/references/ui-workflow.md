@@ -12,7 +12,7 @@ Dex Web owns every process-management interaction. Adapt the template to keep:
 
 - a non-business Hello World React page;
 - the Go HTTP server and OpenAPI source;
-- generated Go server interfaces and TypeScript client;
+- locally generated Go server interfaces and TypeScript client;
 - one `GetApplicationInfo` operation used by the page;
 - generation, build, and smoke-test commands.
 
@@ -27,8 +27,9 @@ system may use the generic HTTP webhook connector.
 
 Do not require mock approval for the inert shell. Verify that the generated
 client calls `GetApplicationInfo`, the production build passes, and no
-management route remains. If custom behavior is requested later, follow the
-workflow below before connecting it to production.
+management route remains. Remove mock-server routes, lifecycle state, Mock
+Controls, mock launch scripts, and mock E2E. If custom behavior is requested
+later, follow the workflow below before connecting it to production.
 
 ## Custom UI
 
@@ -76,6 +77,7 @@ Update `openapi/openapi.yaml` and run `make generate` before implementing HTTP
 handlers. The Go backend implements the generated server interfaces, and the
 browser later consumes the generated TypeScript client. Do not hand-write
 parallel transport types.
+The generated directories are ignored local build artifacts. Regenerate them in the workspace, but never edit or commit them.
 
 Implement and verify the Go Flows and required Connectors before returning to
 dynamic frontend work. A missing public Connector capability follows the
@@ -90,11 +92,13 @@ Add the confirmed loading, validation, empty, success, failure, retry, recovery,
 and terminal behavior. The browser calls the application API; it never imports
 a Dex client or accesses raw Dex primitives.
 
-Bring the template mock server into conformance with the now-fixed OpenAPI
-contract and retain Mock Controls only in mock mode. Use local typed fixtures
-for isolated component states and `make test-mock-e2e` for a fast contract-level
-journey, but prove waits, RPCs, retries, Worker replacement, provider effects,
-and terminal behavior with the real Dex and Connector end-to-end path.
+Use component-level mocks of the generated client for isolated loading,
+validation, empty, failure, retry, and terminal states. If a browser-only edge
+case cannot be triggered economically through the real application, use
+request interception inside that Playwright test only. Do not add an
+application-level mock API, a second Go business backend, product mock routes,
+or user-visible Mock Controls. Prove waits, RPCs, retries, Worker replacement,
+provider effects, and terminal behavior with the real Dex and Connector end-to-end path; mock evidence cannot substitute for it.
 
 Do not claim application-level UI controls provide platform RBAC. A permission
 selector filters work; it does not grant permission. Enforce identity-to-
@@ -106,5 +110,5 @@ provider secrets server-side.
 Only after the real end-to-end journey passes may the UI add imagery, custom
 icons, branding, animation, refined typography, decorative styling, and
 responsive fine-tuning. Preserve the generated client boundary and confirmed
-behavior. Then rerun frontend tests, `make test-mock-e2e`, the real end-to-end
-journey, accessibility checks, and the production build.
+behavior. Then rerun frontend component tests, the real end-to-end journey,
+accessibility checks, and the production build.

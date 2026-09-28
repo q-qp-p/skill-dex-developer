@@ -188,8 +188,8 @@ Adapt the template to retain only its future-ready architecture:
 - a non-business React/Vite Hello World page;
 - the Go HTTP server;
 - the OpenAPI source and generation pipeline;
-- generated Go server interfaces and TypeScript client;
-- build, generated-code, and smoke-test commands;
+- locally generated Go server interfaces and TypeScript client;
+- generation, build, and smoke-test commands;
 - one non-business `GetApplicationInfo` operation returning the application name and optional Dex Web URL.
 
 Remove every custom process-management operation and surface: approval, rejection, retry, escalation, status, display, list, search, detail, Action or Attribute proxies, dashboards, forms, queues, lifecycle mock state, and Mock Controls. Remove their handlers, services, fixtures, generated usages, and E2E tests. Do not keep speculative endpoints.
@@ -281,8 +281,11 @@ Before implementing backend handlers, update `openapi/openapi.yaml` as the
 contract source and run the template generation command. Implement the Go HTTP
 boundary through the generated server interfaces and reserve the generated
 TypeScript client for the later UI integration stage. Never hand-write parallel
-request, response, or client types. Do not resume dynamic frontend work while
-the Go Flow, Connector, and application boundary are being implemented.
+request, response, or client types. Treat `internal/api/generated` and
+`web/src/api/generated` as ignored local build outputs: regenerate them in the
+workspace when needed, but never add them to Git or a pull request.
+Do not resume dynamic frontend work while the Go Flow, Connector, and
+application boundary are being implemented.
 
 Start Dex Web as soon as the first Flow graph exists. The moment a Flow source first renders with `dexcli visualize --schema-version 2.0 --json` (even with warnings), and before finishing implementation or tests:
 
@@ -361,20 +364,27 @@ Make connector mutations idempotent and reconcile unknown outcomes query-first. 
 
 Read [build, test, and handoff](references/build-test-handoff.md). Run the narrowest tests while iterating, then the template's full supported check. Every Flow must pass FDG 2.0 JSON analysis with `valid: true`.
 
-For No custom UI, verify the Hello World page, `GetApplicationInfo` generated-client call, generated-code checks, production build, absence of management routes, Dex Web actions/display, and any retained webhook.
+For No custom UI, verify the Hello World page, `GetApplicationInfo`
+generated-client call, local regeneration and compilation, production build,
+absence of management routes, Dex Web actions/display, and any retained
+webhook. Remove mock-server routes, lifecycle state, Mock Controls, mock launch
+scripts, and mock E2E from the product; do not preserve them as dormant
+scaffolding.
 
 For Custom UI, wait until the Go backend and its real Dex and Connector paths
 run before replacing inert wireframe controls with generated TypeScript client
 calls. Then implement the confirmed loading, validation, empty, success,
 failure, retry, recovery, and terminal behavior and run the real end-to-end
-journey. Update the template mock server only after the OpenAPI contract is
-fixed, and use it as a contract-compatible test double; `make mock` and
-`make test-mock-e2e` are verification tools, not permission to delay backend
-work behind a complete mock application.
+journey. Use component-level mocks of the generated client for UI states that
+are difficult to trigger economically. A browser-only edge case may use
+test-local Playwright request interception.
+Do not create an application-level mock server. Do not create a second Go business backend, product mock routes,
+or user-visible Mock Controls.
+Mock evidence never replaces real Dex durability, Connector, or application E2E evidence.
 
 Only after the real Dex and Connector end-to-end journey passes may the Custom
 UI add images, custom icons, branding, animation, refined responsive behavior,
-or other visual polish. Rerun frontend tests, mock E2E, real E2E, and the
+or other visual polish. Rerun frontend component tests, real E2E, and the
 production build after polishing. Do not generate or source visual assets
 before this stage.
 
