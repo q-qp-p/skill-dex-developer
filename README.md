@@ -369,12 +369,25 @@ bindings from FDG 2.0. It configures released Gmail, Slack, GitHub, or other
 supported connectors in the local **Connections** view. The default plaintext
 development store is `~/.dex/connectors/connections.json`; pass
 `--connector-config-dir` to isolate a stack. Start the application with
-**DEX_CONNECTOR_CONFIG_FILE** set to the absolute path shown by Dex Web.
+**DEX_CONNECTOR_CONFIG_FILE** set to the absolute path shown by Dex Web. The
+Connector SDK rereads the current credential for every provider call and uses a
+released connector's refresh driver for supported on-demand token refresh.
+
+The pinned template also owns `dex-app.yaml` and
+`make superverse-release-artifacts`. A project Release contains the app's full
+FDG 2.0 bundle plus connector and environment contracts. In hosted deployment,
+Superverse mounts a digest-verified non-secret connector snapshot and gives the
+application only a broker URL and release-bound workload identity; refresh
+tokens, service-account keys, and webhook secrets never enter application code
+or Flow state. Project Publishing selects eligible default-branch commits
+without author-based filtering and deploys the whole Release, not one Flow
+Type.
 UI test doubles validate component behavior only; they cannot prove Dex
 durability, Worker replacement, Timer, RPC, Connector, or application E2E
 semantics. The workflow finishes with local
-tests and a clean handoff ready for future Dex AI Platform upload; it does not
-claim that upload is available today.
+tests and a clean project-level Publishing handoff. A deployment claim must
+include observed Release, connector configuration revision, deployment, and
+real E2E identities rather than a mock or image-only build.
 
 ## Dex Connector Contributor
 

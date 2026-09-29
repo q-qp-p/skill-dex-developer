@@ -2,6 +2,14 @@
 
 All notable changes to Dex Skills are documented here.
 
+## 0.29.0 - 2026-09-29
+
+- Advance the basic-process template baseline to `v1.8.0` and require its `dex-app.yaml` and immutable Release artifact contract.
+- Document project-level Publishing from any eligible default-branch commit, whole-application Releases, and Build/Runs-only Flow Type selection.
+- Require hosted connector configuration revisions, mounted digest-verified snapshots, workload-only broker access, and provider token isolation from application code and Flow state.
+- Document local on-demand OAuth refresh, hosted refresh-token rotation, multi-auth selection, fail-closed readiness, and real refresh E2E evidence.
+- Synchronize the Codex, Claude Code, and Cursor plugin manifests at version 0.29.0.
+
 ## 0.28.2 - 2026-09-28
 
 - Default new Flow designs to parallel Steps and require an evidence-backed, explicitly confirmed evolution gate before introducing SubFlows.

@@ -116,7 +116,43 @@ Load the store once with the Connector SDK `localconfig` package and create each
 
 Configuration is fixed at application startup. Credentials are reread for every provider call, so reauthorization takes effect without an application restart. Dex Web and application restarts preserve the JSON file. Restarting Dex Web clears only pending OAuth/PKCE exchanges, submitted client secrets, and UI sessions.
 
-Local OAuth stores short-lived access tokens without refresh tokens. Reauthorize after expiry. Deleting a local credential removes only the file record; it does not revoke the provider grant.
+For a connector authorization method with a refresh driver, the local store
+persists the refresh token and expiry as private `0600` credential material.
+The Connector SDK resolves the latest file on every provider call, performs
+single-flight on-demand refresh near expiry, atomically preserves refresh-token
+rotation, and marks terminal grants such as `invalid_grant` for
+reauthorization. Deleting a local credential removes only the file record; it
+does not revoke the provider grant.
+
+## Hosted configuration and credential boundary
+
+The application release owns only non-secret connector requirements. Keep each
+static connection in `dex-app.yaml`; `make superverse-release-artifacts` emits
+the connector contract with the full application Release. Do not put an auth
+method selection, token, service-account key, webhook secret, or environment
+configuration value in the repository or Release artifacts.
+
+In Superverse, the user selects an authorization method declared by the exact
+connector release and completes configuration in the target environment's
+hosted Dex Web. Superverse persists an immutable non-secret configuration
+revision and stores credential material separately under KMS protection. The
+browser, Dex Web, application, and configuration init container never receive
+refresh tokens or KMS decrypt authority.
+
+The deployment mounts the exact configuration snapshot selected by its
+revision, object version, and SHA-256 digest. The application reads it through
+`SUPERVERSE_CONNECTOR_CONFIG_FILE`; it receives only an internal broker URL and
+a release-bound workload credential for provider access. The broker performs
+connector-specific refresh, refresh-token rotation, concurrency control, and
+least-privilege operation credential resolution. Application code must not
+read credential S3 objects, implement its own refresh loop, or persist tokens
+in Flow state.
+
+A non-secret configuration edit creates a new revision and needs a redeploy.
+Credential refresh or rotation applies on the next Connector call without a
+restart. Missing configuration, digest mismatch, an unsupported connector
+driver, or a terminal refresh failure must fail closed and surface either
+deployment-blocked or reauthorization-required state.
 
 ## AI agents
 

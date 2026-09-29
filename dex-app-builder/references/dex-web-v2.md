@@ -150,6 +150,21 @@ pending OAuth/PKCE exchanges and UI sessions. Credential replacement is read
 for each provider call; non-secret connection, binding, and operation
 configuration remains startup-bound in the application.
 
+Hosted Dex Web uses the same release-owned authorization and field UI, but its
+project, environment, and Release scope comes from the trusted Studio backend.
+Browser parameters cannot select or override that scope. Dex Web delegates
+non-secret configuration CAS writes, OAuth start/callback, credential writes,
+validation, and revoke to Superverse; it never reads S3 or KMS directly and
+never displays local file paths, S3 keys, launch commands, or stored secrets.
+
+The target environment is READY only after Superverse validates a configuration
+revision against the selected Release connector contract. Configuration fields
+that can be obtained from verified claims, profile APIs, or declared read-only
+setup commands render as derived read-only values rather than duplicate text
+inputs. Every remaining normal or OAuth field keeps the connector-owned start
+URL, exact provider page path, creation or lookup steps, format, units, secret
+status, blank semantics, and parenthesized manifest default.
+
 **POST /api/v2/search** accepts several permissions; a run matches any requested permission, then Flow type and other filters apply with AND. A historical permission match discovers work that is or was available. Dex Web rechecks current Action eligibility when the run opens.
 
 ## Source layout
