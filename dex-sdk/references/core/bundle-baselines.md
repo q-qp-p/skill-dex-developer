@@ -6,8 +6,8 @@ and lockfiles remain authoritative for application code.
 
 ```text
 DEX_BASELINE=sdk-go/v0.13.1
-DEX_SERVER_BASELINE=server/v0.14.1
-DEX_CLI_BASELINE=cli-v0.14.1
+DEX_SERVER_BASELINE=server/v1.1.2
+DEX_CLI_BASELINE=cli-v1.1.2
 TEMPLATE_BASELINE=v1.8.0
 ```
 

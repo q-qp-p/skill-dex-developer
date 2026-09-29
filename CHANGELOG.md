@@ -2,6 +2,11 @@
 
 All notable changes to Dex Skills are documented here.
 
+## 0.29.1 - 2026-09-29
+
+- Advance the Dex Server and CLI baselines to `v1.1.2` for release-scoped hosted Connector setup commands.
+- Synchronize the Codex, Claude Code, and Cursor plugin manifests at version 0.29.1.
+
 ## 0.29.0 - 2026-09-29
 
 - Advance the basic-process template baseline to `v1.8.0` and require its `dex-app.yaml` and immutable Release artifact contract.
