@@ -190,10 +190,10 @@ Every Step declares exactly:
 Every indexed Attribute has one exact directive and `dex.Indexed` declaration:
 
 ```go
-// dex:indexed-attribute attribute-key:case-status index-key:case-status index-type:keyword value-type:string description:"Current case status"
+// dex:indexed-attribute attribute-key:case-status index-key:keyword2 index-type:keyword value-type:string description:"Current case status"
 var CaseStatus = dex.DefineAttribute[string](
     "case-status",
-    dex.Indexed(dex.AttributeIndex{Type: dex.IndexKeyword}),
+    dex.Indexed(dex.AttributeIndex{Type: dex.IndexKeyword, IndexKey: "keyword2"}),
 )
 ```
 

@@ -2,6 +2,11 @@
 
 All notable changes to Dex Skills are documented here.
 
+## 0.29.3 - 2026-09-29
+
+- Align App Builder's indexed Attribute metadata example with the shared generic slot policy, using explicit keyword2 in both the annotation and SDK definition.
+- Synchronize the Codex, Claude Code, and Cursor plugin manifests at version 0.29.3.
+
 ## 0.29.2 - 2026-09-29
 
 - Require explicit generic numbered Search Attribute slots shared across Flow types, while retaining business names on Attributes and reserving Dex system indexes.
