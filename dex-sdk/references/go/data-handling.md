@@ -1,5 +1,9 @@
 # Go data handling
 
+For application indexes, keep business Attribute names and supply explicit generic typed keys such as `keyword1`, `keywordList1`, `text1`, or `int1`; reuse the same typed slots across Flow types and constrain searches by FlowType. See [core primitives](../core/primitives.md#attribute). Pinned excerpts preserve their baseline names rather than defining the naming policy.
+
+Use `dex.LockAttribute(CurrentMessagesLock)` in `ExecuteLockAttributes` (or the applicable method lock option) and registration-time `RPCOptions.LockAttributes`. Define the non-indexed singleton `currentMessagesLock` with `dex.DefineAttribute` and type `bool`, then register it alongside the map. Follow [whole-map coordination](../core/data-handling.md#whole-map-coordination): every protected writer uses the same singleton lock, its bool value is not an acquisition flag, and map loads remain explicit.
+
 Step input/output describes transitions; Attributes hold current state; AttributeMaps partition it; Channels hold queued intent; Streams hold incremental output; BlobCache carries large serialized values. Choose one authority for each fact.
 
 ## Schema and commit boundary

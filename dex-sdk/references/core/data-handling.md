@@ -99,7 +99,17 @@ For keyed lookup, use a fixed partition count and a stable cross-language hash. 
 
 Inside a handler, map size and instance-key enumeration include buffered writes and deletes. They do not provide server-side pagination. An unbounded map can therefore avoid blob rewrite amplification while still becoming expensive to enumerate, transfer, and decode.
 
-Locks are scoped to one AttributeMap instance. Lock the exact instance when parallel Steps or RPCs perform a read-modify-write on the same value; unrelated instances can remain concurrent.
+AttributeMap locks are scoped to one instance. Lock the exact instance when parallel Steps or RPCs perform a read-modify-write on the same value; unrelated instances can remain concurrent.
+
+#### Whole-map coordination
+
+When a write invariant spans multiple instances or the whole collection, define a separate non-map, non-indexed bool Attribute as the coordination key. For example, register both `currentMessages` (an AttributeMap) and `currentMessagesLock` (a singleton bool Attribute) in the Flow's `PersistenceSchema`.
+
+Every cooperating Step, timeout handler, and RPC that writes, deletes, archives, or otherwise changes the protected map must acquire the same singleton Attribute lock through its method-specific StepOptions, timeout options, or registration-time RPCOptions. A writer that acquires only a map-instance lock does not conflict with this singleton lock and can bypass the invariant. Use instance locks for independent updates or the shared coordination lock for a map-wide invariant; adding a shared lock serializes all participating writers within that Flow execution, not other Flow executions.
+
+The bool value is not the lock state. Do not implement acquisition by reading or toggling it, and do not manually release it. Dex owns acquisition and release around the invocation. The coordination Attribute does not need to be indexed or have a persisted value to identify the lock. Locks do not load map data: select exactly the instances read, or the whole map when an operation must enumerate it. Treat RPC lock conflict as contention and apply the application's retry policy.
+
+#### RPC selections
 
 RPC registration options describe fixed locks and loads. Invocation options can add exact AttributeMap locks, exact AttributeMap loads, and exact ChannelMap loads chosen from request data. The SDK unions, sorts, and deduplicates both sets; invocation options cannot remove a registered requirement. Locking and loading are independent, so every dynamic read-modify-write selects the same AttributeMap instance in both collections.
 

@@ -2,6 +2,13 @@
 
 All notable changes to Dex Skills are documented here.
 
+## 0.29.2 - 2026-09-29
+
+- Require explicit generic numbered Search Attribute slots shared across Flow types, while retaining business names on Attributes and reserving Dex system indexes.
+- Document singleton bool coordination Attributes for map-wide write invariants, including participation by all writers, independent loading, and SDK-managed lock ownership.
+- Synchronize core and all five language references without changing pinned baseline source excerpts.
+- Synchronize the Codex, Claude Code, and Cursor plugin manifests at version 0.29.2.
+
 ## 0.29.1 - 2026-09-29
 
 - Advance the Dex Server and CLI baselines to `v1.1.2` for release-scoped hosted Connector setup commands.

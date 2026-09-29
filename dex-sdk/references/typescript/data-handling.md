@@ -1,5 +1,9 @@
 # TypeScript data handling
 
+For application indexes, keep business Attribute names and supply explicit generic typed keys such as `keyword1`, `keywordList1`, `text1`, or `int1`; reuse the same typed slots across Flow types and constrain searches by FlowType. See [core primitives](../core/primitives.md#attribute). Pinned excerpts preserve their baseline names rather than defining the naming policy.
+
+Register a non-indexed singleton Attribute with `booleanCodec` alongside the map and use `currentMessagesLock.lock()` in the applicable StepOptions or registration-time RPCOptions locks. Follow [whole-map coordination](../core/data-handling.md#whole-map-coordination): every protected writer uses the same singleton lock, its bool value is not an acquisition flag, and map loads remain explicit.
+
 ## Codecs are runtime contracts
 
 TypeScript types disappear at runtime. Use scalar codecs for scalar wire values and a deliberate `jsonCodec<T>` for objects. Add decode validation for untrusted or evolving data. Omitted codecs use JSON but do not validate object structure.

@@ -109,6 +109,8 @@ Represent one entity lifecycle as a Flow, keep its current state in Attributes, 
 
 Use sequential chunks for append-only messages, audit events, or subscriber history. Use hash partitions for customer profiles, account metadata, or configuration records that need direct keyed lookup and updates. Neither pattern creates server-side map pagination or a secondary index.
 
+For a cross-instance write invariant, use a [singleton coordination Attribute](data-handling.md#whole-map-coordination) shared by every writer of the protected map. This is an application lock convention, not an automatic lock over all map instances. Independent partition updates can retain per-instance locks when no map-wide invariant applies.
+
 ## Selection checklist
 
 - Does the Flow graph expose every success, wait, retry exhaustion, cancellation, timeout, and terminal path?

@@ -26,7 +26,7 @@ lifecycle hook status; run the Skill fallback only when that status is
 
 Before writing code, identify the language, package manager, installed Dex SDK version, registry, Worker and Client bootstrap, and repository test commands.
 
-Preserve the installed SDK version unless the user asks to upgrade. The project's source, lockfile, installed SDK, and version-matched examples are authoritative. This bundle's exact API excerpts are pinned to the immutable release tag in their visible source links and recorded in the source repository's `DEX_BASELINE`; use them as guidance, not as evidence that a different installed version has the same signature.
+Preserve the installed SDK version unless the user asks to upgrade. Pinned source excerpts retain the exact baseline names, including older `CustomKeyword` slots or implicit index keys. They demonstrate API shapes; new application indexes must follow the generic numbered-slot policy in [core primitives](references/core/primitives.md#attribute). The project's source, lockfile, installed SDK, and version-matched examples are authoritative. This bundle's exact API excerpts are pinned to the immutable release tag in their visible source links and recorded in the source repository's `DEX_BASELINE`; use them as guidance, not as evidence that a different installed version has the same signature.
 
 Read the installed release metadata from [VERSION](VERSION) and the complete
 set of source pins from [bundle baselines](references/core/bundle-baselines.md).
@@ -105,7 +105,10 @@ can own facts shared by multiple processes; cross-Flow reuse is an
 ownership-design question, not by itself a storage gap. Use indexed Attributes
 and Dex search for supported lookup paths, typed RPCs for reads and mutations,
 Channels for queued intent, bounded AttributeMap chunks or partitions for
-growing collections, and Dex blob storage for large values.
+growing collections, and Dex blob storage for large values. Assign application indexes explicit
+generic typed slots shared across Flow types; keep business names on Attributes.
+For map-wide write invariants, follow the singleton coordination-lock pattern in
+[data handling](references/core/data-handling.md#whole-map-coordination).
 
 Introduce an external database or search store only for a confirmed access or
 scale requirement Dex cannot reasonably satisfy: complex/ad-hoc indexes,
