@@ -107,6 +107,8 @@ and Dex search for supported lookup paths, typed RPCs for reads and mutations,
 Channels for queued intent, bounded AttributeMap chunks or partitions for
 growing collections, and Dex blob storage for large values. Assign application indexes explicit
 generic typed slots shared across Flow types; keep business names on Attributes.
+Application run searches constrain FlowType and exclude ContinuedAsNew runs;
+see [core primitives](references/core/primitives.md#attribute).
 For map-wide write invariants, follow the singleton coordination-lock pattern in
 [data handling](references/core/data-handling.md#whole-map-coordination).
 

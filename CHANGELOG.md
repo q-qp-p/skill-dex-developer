@@ -2,6 +2,12 @@
 
 All notable changes to Dex Skills are documented here.
 
+## 0.29.4 - 2026-09-29
+
+- Require application run searches to constrain FlowType and exclude ContinuedAsNew runs, matching Dex Web's visibility filter.
+- Preserve both predicates when composing caller filters with OR; reserve continued-run searches for explicit execution-chain inspection.
+- Synchronize SDK core, five language references, and plugin manifests at version 0.29.4 without changing source baselines.
+
 ## 0.29.3 - 2026-09-29
 
 - Align App Builder's indexed Attribute metadata example with the shared generic slot policy, using explicit keyword2 in both the annotation and SDK definition.
