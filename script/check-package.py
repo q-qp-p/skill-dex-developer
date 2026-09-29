@@ -374,6 +374,16 @@ def check_app_builder() -> None:
         "Do not add an external database, cache, ORM, outbox, or shadow read model",
         "high-concurrency reads and writes",
         "“Future flexibility”",
+        "`dex-app.yaml`",
+        "Project release and hosted deployment handoff",
+        "Publishing is project-scoped, not coding-session-scoped",
+        "filter commits by author",
+        "Publishing has no Flow Type",
+        "`SUPERVERSE_CONNECTOR_CONFIG_FILE`",
+        "Application code never reads, persists, logs, or refreshes provider refresh tokens",
+        "READY configuration revision",
+        "exact revision, object version, and digest",
+        "refresh or rotation takes",
     )
     for text in required:
         if text not in content:
@@ -461,6 +471,11 @@ def check_app_builder() -> None:
         "Remove an unneeded dependency when Dex meets the requirement",
         "approved discovery artifact must name the Dex Web v2 capability gap",
         "management UI capability mapping was completed before the UI-mode",
+        "`make superverse-release-artifacts` emits a valid FDG 2.0 bundle",
+        "selected default-branch commit regardless of",
+        "one immutable whole-app Release",
+        "hosted deployment pins a READY connector configuration revision",
+        "forced token expiry, concurrent Connector calls, refresh-token rotation",
     ):
         if text not in build_handoff:
             fail(f"build and handoff must contain: {text}")
@@ -479,6 +494,11 @@ def check_app_builder() -> None:
         "## Internal connector library decision",
         "Do not infer access to a private repository",
         "uncommitted `go.work` or temporary Go",
+        "## Hosted configuration and credential boundary",
+        "`SUPERVERSE_CONNECTOR_CONFIG_FILE`",
+        "The broker performs",
+        "Application code must not",
+        "A non-secret configuration edit creates a new revision",
     ):
         if text not in connector_architecture:
             fail(f"connector architecture must contain: {text}")
@@ -543,6 +563,9 @@ def check_app_builder() -> None:
         "capture:qr-code",
         "without submitting the Action",
         "Superverse remains responsible for identity",
+        "Hosted Dex Web uses the same release-owned authorization and field UI",
+        "Browser parameters cannot select or override that scope",
+        "parenthesized manifest default",
     ):
         if text not in dex_web:
             fail(f"Dex Web v2 reference must contain: {text}")

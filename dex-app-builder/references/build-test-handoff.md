@@ -154,10 +154,27 @@ Ensure:
 - every Connector factory uses pure `MapToOperationInput` and graph-only `Annotations`;
 - each Connector Trigger binding has a static binding name, application-owned Flow ID resolver, and typed target;
 - the displayed local connection path and **DEX_CONNECTOR_CONFIG_FILE** launch command work after a Dex Web restart;
+- `dex-app.yaml` lists every Release Flow source and static connector
+  connection without configuration values or secrets;
+- `make superverse-release-artifacts` emits a valid FDG 2.0 bundle, connector
+  contract, environment contract, and exact application manifest;
+- project Publishing accepts the selected default-branch commit regardless of
+  author, prepares one immutable whole-app Release, and never treats a Flow
+  Type as a deployment unit;
+- a hosted deployment pins a READY connector configuration revision, exact S3
+  object version, and digest, and fails closed when any identity mismatches;
+- hosted application code reads only the mounted non-secret snapshot and uses
+  the broker workload identity; it never reads or refreshes provider tokens;
+- forced token expiry, concurrent Connector calls, refresh-token rotation, and
+  Worker restart have real integration coverage when the connector supports
+  refresh;
 - connector fork/PR status and any release blocker are explicit;
 - no `go.work`, local `replace`, branch, pseudo-version, or commit SHA remains
   in the production dependency graph;
 - the repository has a clean, reviewable commit;
 - limitations and unimplemented integrations are explicit.
 
-Dex AI Platform upload is not available yet. State that the repository is ready for future import only when no connector release blocker remains. Do not invent an upload command, deployment URL, or success result.
+For a requested Dex AI Platform deployment, record the observed project URL,
+source commit, Release ID, configuration revision, deployment identity, and
+real E2E result. Never substitute local mocks or an image-only build for those
+identities, and never invent an upload command, URL, or success result.

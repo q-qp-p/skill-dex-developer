@@ -187,6 +187,7 @@ def main() -> None:
         "testE2E": "make test-e2e",
         "build": "make build",
         "dev": "make dev",
+        "releaseArtifacts": "make superverse-release-artifacts",
         "check": "make check",
     }
     if template_manifest.get("commands") != expected_commands:
@@ -195,6 +196,19 @@ def main() -> None:
         arguments.template_root / ".gitignore",
         "/internal/api/generated/",
         "/web/src/api/generated/",
+    )
+    require_text(
+        arguments.template_root / "dex-app.yaml",
+        '"schemaVersion": "superverse.dev/dex-app/v1"',
+        '"flowDefinitions"',
+        '"connectors"',
+    )
+    require_text(
+        arguments.template_root / "README.md",
+        "## Hosted release artifacts",
+        "make superverse-release-artifacts",
+        "SUPERVERSE_CONNECTOR_CONFIG_FILE",
+        "SUPERVERSE_CONNECTOR_BROKER_URL",
     )
     tracked_generated = git(
         arguments.template_root,

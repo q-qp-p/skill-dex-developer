@@ -82,10 +82,11 @@ For a new or effectively empty application, `TEMPLATE_BASELINE` is the
 application stack authority. Before proposing implementation, inspect that
 immutable template release's `go.mod`, `go.sum`, `web/package.json`,
 `web/package-lock.json`, `DEX_SERVER_BASELINE`, `DEX_CLI_BASELINE`, Makefile,
-and `.superverse/template.json`. Preserve their exact languages, module and
-package versions, lockfiles, generated-code tools, directory layout, and
-bootstrap/test commands unless the user explicitly requests a stack or version
-change.
+`.superverse/template.json`, and `dex-app.yaml`. Preserve their exact languages,
+module and package versions, lockfiles, generated-code tools, directory layout,
+and bootstrap/test commands unless the user explicitly requests a stack or
+version change. Keep every Flow source and static connector connection in
+`dex-app.yaml`; never put configuration values or credentials there.
 
 In the first implementation update for an effectively empty repository, name
 the pinned template release and state that its Go backend and exact dependency
@@ -130,6 +131,8 @@ template stack or continue as an explicitly requested standalone SDK project.
 - A retained Hello World page and OpenAPI generation skeleton do not count as a custom process UI.
 - Keep production Work Queue authorization behind a trusted authentication boundary. Dex Web's local permission selector is development-only.
 - Keep credentials in a connector/runtime boundary. A Flow stores only a logical connection ID.
+- Use the template's connector bootstrap. Local development reads `DEX_CONNECTOR_CONFIG_FILE`; hosted deployments read the mounted `SUPERVERSE_CONNECTOR_CONFIG_FILE` and resolve operation credentials through the internal broker.
+- Application code never reads, persists, logs, or refreshes provider refresh tokens and never reads the hosted credential S3 prefix directly.
 - Do not mutate another repository, fork, publish, deploy, upload, or open a pull request without authorization for that action.
 
 Read [product discovery](references/product-discovery.md) before proposing architecture.
@@ -382,6 +385,15 @@ For an RPC target, register the application's bound method with application-owne
 
 Make connector mutations idempotent and reconcile unknown outcomes query-first. A missing connector release blocks production handoff. Never invent an unreleased connector API.
 
+Use the manifest-selected authorization method. The user chooses among the
+methods declared by the exact connector release; application code must not
+hard-code OAuth, API-key, or service-account fields outside that contract.
+Local calls resolve the newest credential from the local store and let the
+Connector SDK perform supported on-demand refresh. Hosted calls use only the
+platform broker and a release-bound workload credential. A rotated access or
+refresh token takes effect on the next Connector call without changing Flow
+state or rebuilding the app.
+
 ## Stage 4: integrate the Custom UI, verify, polish, and hand off
 
 Read [build, test, and handoff](references/build-test-handoff.md). Run the narrowest tests while iterating, then the template's full supported check. Every Flow must pass FDG 2.0 JSON analysis with `valid: true`.
@@ -412,6 +424,31 @@ before this stage.
 
 Use a real Dex Server for waits, RPCs, Channels, retries, Worker replacement, terminal behavior, Work Queue permission history, and connector boundaries. Use deadline-based convergence rather than fixed sleeps.
 
+### Project release and hosted deployment handoff
+
+Before platform handoff, keep `dex-app.yaml` complete and run the template's
+`make superverse-release-artifacts` target. It must render every declared Flow
+as valid FDG 2.0 and emit the Flow Definition bundle, connector contract,
+environment contract, and exact application manifest. Treat missing, duplicate,
+or diagnostic-bearing Flow Definitions as release failures.
+
+Publishing is project-scoped, not coding-session-scoped. The user selects any
+eligible default-branch commit, prepares one immutable Release for the whole
+application, configures the target environment, and deploys that Release. Do
+not filter commits by author or by whether an agent created them. A selected
+Flow Type changes only Build or Runs inspection; Publishing has no Flow Type
+deployment selector and deploys every Flow Definition in the Release.
+
+For hosted connector configuration, wait for the environment to report a
+READY configuration revision bound to the selected Release connector contract.
+Deployment must pin that exact revision, object version, and digest. The
+platform mounts the verified non-secret snapshot and supplies the broker URL
+and workload credential file. A non-secret configuration change requires a new
+revision and redeploy; broker-managed credential refresh or rotation takes
+effect on the next call without restart. Missing or mismatched configuration,
+snapshot digest, broker support, or workload identity is a deployment blocker,
+not a warning to bypass.
+
 Finish with:
 
 - confirmed business, UI-mode, permission-boundary, and connector decisions;
@@ -419,6 +456,11 @@ Finish with:
 - connector release or fork/PR status;
 - exact test evidence;
 - remaining limitations and release blockers;
-- a clean Git commit suitable for future platform import.
+- a clean default-branch Git commit suitable for project-level Publishing;
+- the generated Release artifact check and hosted connector readiness status
+  when deployment was requested.
 
-Dex AI Platform import is not implemented yet. Say the project is ready for future upload only when no connector release blocker remains; never fabricate a command or deployment result.
+When the user requests deployment, use the project's canonical Publishing page
+to prepare the selected commit, configure its target environment, and deploy
+the immutable Release. Report only observed Release, configuration revision,
+deployment, and E2E identities; never fabricate a deployment result.
