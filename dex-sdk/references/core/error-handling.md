@@ -1,5 +1,7 @@
 # Error handling design
 
+Use the [read-after-write matrix](read-after-write.md) to distinguish accepted mutations, direct-state readback and later business completion. Do not classify every Signal write as eventual. A successful direct Temporal RPC followed by a matching typed Query read needs no convergence polling; a failed or ambiguous write still needs reconciliation.
+
 Use this guide before implementing a Client boundary, not only after a failure. Design the outcome of Flow starts, RPCs, cleanup, admission, waits, and external Stream writes alongside the happy path. Then read the selected language's **error-handling.md** for its actual public error model.
 
 ## Classify at the decision boundary

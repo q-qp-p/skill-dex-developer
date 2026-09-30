@@ -38,6 +38,11 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: superdurable/dex
+          ref: ${{ steps.baselines.outputs.server }}
+          path: upstream-dex-server
+      - uses: actions/checkout@v4
+        with:
+          repository: superdurable/dex
           ref: ${{ steps.baselines.outputs.cli }}
           path: upstream-dex-cli
           fetch-depth: 0
@@ -48,10 +53,12 @@ jobs:
           path: upstream-template
       - name: Validate package and manifests
         run: python3 script/check-package.py
+      - name: Test source validation and baseline updater
+        run: python3 -m unittest discover -s test -p 'test_*.py'
       - name: Test lifecycle version hook
         run: node --test test/version-check.test.mjs
       - name: Validate Dex SDK reference sources
-        run: python3 script/check-reference-sources.py --dex-root upstream-dex-sdk
+        run: python3 script/check-reference-sources.py --dex-root upstream-dex-sdk --server-root upstream-dex-server --cli-root upstream-dex-cli
       - name: Validate CLI, Server, and template baselines
         run: |
           python3 script/check-upstream-baselines.py \

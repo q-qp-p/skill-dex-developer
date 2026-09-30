@@ -1,5 +1,7 @@
 # Rust error handling
 
+Before designing sequential writes and reads, use the [shared read-after-write matrix](../core/read-after-write.md). Temporal RPC direct-state readback is strong when the registered/read-loaded state matches the write; search indexes, Attribute Store projections and triggered business completion are separate. Follow this page for the language-specific error and timeout model.
+
 Separate handler failures from controller/client failures. A Step or RPC returns `HandlerResult<T>` and uses `HandlerError` to control retryable Worker behavior. A Client operation returns `SdkResult<T>` and exposes typed `SdkError` variants. Do not collapse either into strings before policy or HTTP mapping has examined it.
 
 ## Handler failures and retries

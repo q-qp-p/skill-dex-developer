@@ -1,5 +1,7 @@
 # Testing durable behavior
 
+Verify [read-after-write consistency](read-after-write.md#verification) with first-read assertions for direct Temporal RPC state, including loaded maps and queues. Use a controlled Step or projection gate to demonstrate that readable state does not imply downstream completion. Reserve bounded polling for documented eventual views and explicit asynchronous completion.
+
 Use a real Dex Server integration whenever behavior crosses a Worker, Client, persistence boundary, wait, retry, Timer, RPC, Stream, or SubFlow. A handler-only unit test cannot prove durable coordination.
 
 ## Minimum integration harness

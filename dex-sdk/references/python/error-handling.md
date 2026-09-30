@@ -1,5 +1,7 @@
 # Python error handling
 
+Before designing sequential writes and reads, use the [shared read-after-write matrix](../core/read-after-write.md). Temporal RPC direct-state readback is strong when the registered/read-loaded state matches the write; search indexes, Attribute Store projections and triggered business completion are separate. Follow this page for the language-specific error and timeout model.
+
 Application exceptions from `wait_for`, `execute`, RPC, and timeout handlers drive configured retry/recovery. Typed Dex exceptions describe service outcomes; `asyncio` cancellation/timeouts and transport failures describe caller/runtime conditions.
 
 Catch precise exceptions such as `FlowNotFoundError`, `FlowNotActiveError`, `FlowAlreadyStartedError`, `LongPollTimeoutError`, `RequestTimeoutError`, `FlowUncompletedError`, `RpcLockConflictError`, and not-loaded errors. Durable Step and Attribute waits never expose transport long-poll expiry; they reattach with the effective Request ID and preserve the total `request_timeout` budget. `RequestTimeoutError` means that caller-visible budget expired, not that the Flow or accepted durable Update failed. `internal_handler_timeout` rollover is transparent. Do not parse messages. Let unexpected defects retain tracebacks.

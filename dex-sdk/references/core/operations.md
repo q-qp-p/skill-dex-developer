@@ -1,5 +1,7 @@
 # Production operations
 
+Before reporting a mutation as effective or complete, identify its [write/read consistency and completion boundary](read-after-write.md). CLI `updated: true` and `skipped: true` acknowledge request acceptance. A subsequent Temporal Flow-state Query may block until the accepted signal is processed; search and projections can still lag.
+
 Use this guide for Dex Server deployment, production inspection, and authorized recovery. Read [testing.md](testing.md) for verification scenarios and [troubleshooting.md](troubleshooting.md) for diagnostic routing.
 
 ## Diagnostic order

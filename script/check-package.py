@@ -42,6 +42,7 @@ MARKETPLACES = {
     "cursor": ROOT / ".cursor-plugin" / "marketplace.json",
 }
 CORE_TOPICS = {
+    "read-after-write.md",
     "ai-agents.md",
     "bundle-baselines.md",
     "data-handling.md",
@@ -152,6 +153,15 @@ def check_reachable_links(skill: Path, references: list[Path]) -> None:
         fail(f"references not reachable from {skill.name}/SKILL.md: {rendered}")
 
 
+def reference_baseline(source_path: str, sdk_baseline: str) -> str:
+    prefix = Path(source_path).parts[0]
+    if prefix in {"server", "web", "protos"}:
+        return (ROOT / "DEX_SERVER_BASELINE").read_text().strip()
+    if prefix == "cli":
+        return (ROOT / "DEX_CLI_BASELINE").read_text().strip()
+    return sdk_baseline
+
+
 def check_sdk(baseline: str) -> None:
     core_files = {path.name for path in (SDK_REFERENCES / "core").glob("*.md")}
     if core_files != CORE_TOPICS:
@@ -177,7 +187,7 @@ def check_sdk(baseline: str) -> None:
         for source_path in SOURCE_MARKER.findall(content):
             expected_link = (
                 "https://github.com/superdurable/dex/blob/"
-                f"{baseline}/{source_path}"
+                f"{reference_baseline(source_path, baseline)}/{source_path}"
             )
             marker = f"<!-- dex-source: {source_path} -->"
             marker_position = content.index(marker)

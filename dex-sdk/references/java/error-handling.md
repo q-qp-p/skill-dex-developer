@@ -1,5 +1,7 @@
 # Java error handling
 
+Before designing sequential writes and reads, use the [shared read-after-write matrix](../core/read-after-write.md). Temporal RPC direct-state readback is strong when the registered/read-loaded state matches the write; search indexes, Attribute Store projections and triggered business completion are separate. Follow this page for the language-specific error and timeout model.
+
 Separate three categories: application rejection, retryable Worker failure, and Client/service failure.
 
 ## Handler failures

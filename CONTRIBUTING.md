@@ -41,7 +41,10 @@ Run from the repository root:
 
 ```bash
 python3 script/check-package.py
-python3 script/check-reference-sources.py --dex-root /path/to/dex-sdk-baseline
+python3 script/check-reference-sources.py \
+  --dex-root /path/to/dex-sdk-baseline \
+  --server-root /path/to/dex-server-baseline \
+  --cli-root /path/to/dex-cli-baseline
 python3 script/check-upstream-baselines.py \
   --dex-root /path/to/dex-cli-baseline \
   --template-root /path/to/dex-template-basic-process

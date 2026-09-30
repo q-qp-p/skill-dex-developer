@@ -42,6 +42,11 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: superdurable/dex
+          ref: ${{ steps.metadata.outputs.server }}
+          path: upstream-dex-server
+      - uses: actions/checkout@v4
+        with:
+          repository: superdurable/dex
           ref: ${{ steps.metadata.outputs.cli }}
           path: upstream-dex-cli
           fetch-depth: 0
@@ -53,7 +58,7 @@ jobs:
       - name: Validate release package
         run: |
           python3 script/check-package.py
-          python3 script/check-reference-sources.py --dex-root upstream-dex-sdk
+          python3 script/check-reference-sources.py --dex-root upstream-dex-sdk --server-root upstream-dex-server --cli-root upstream-dex-cli
           python3 script/check-upstream-baselines.py \
             --dex-root upstream-dex-cli \
             --template-root upstream-template

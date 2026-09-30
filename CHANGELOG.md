@@ -2,6 +2,13 @@
 
 All notable changes to Dex Skills are documented here.
 
+## 0.29.9 - 2026-09-30
+
+- Document Signal acceptance, strong Temporal RPC direct-state readback, eventual search/projection visibility, and asynchronous business completion as separate contracts.
+- Add a version-pinned write/read matrix with backend, lifecycle, delayed-start, Worker-routing, timeout, and retry limits; require it at relevant SDK and application boundaries.
+- Require first-read integration assertions for strong paths and controlled completion/projection gates for asynchronous behavior.
+- Extend source validation across SDK, Server, and CLI baselines; synchronize Codex, Claude Code, and Cursor manifests without advancing dependency pins.
+
 ## 0.29.8 - 2026-09-30
 
 - Require an Attribute-match or Step-completion wait after a successful or deduplicated start only when the response promises a critical business milestone, such as a committed database source-of-truth write.

@@ -57,6 +57,8 @@ After entering the checkout:
    [Dex SDK skill](../dex-sdk/SKILL.md) completely and follow its progressive
    disclosure routing for the required Core references and the
    [Go handbook](../dex-sdk/references/go/go.md).
+   For Dex writes followed by reads or completion checks, include the shared
+   [read-after-write matrix](../dex-sdk/references/core/read-after-write.md).
 4. Treat the checkout's current rules, commands, examples, acceptance criteria,
    and pull-request template as the sole connector-authoring authority.
 

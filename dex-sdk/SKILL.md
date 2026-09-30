@@ -48,6 +48,8 @@ Always read the entry page for the project's language first:
 
 Before writing or reviewing any Client boundary—including Flow start, RPC, cleanup, admission, waits, or external Stream writes—read [Error handling](references/core/error-handling.md) and the selected language's **error-handling.md**. This is implementation guidance; do not defer it until a failure needs troubleshooting.
 
+For mutations followed by reads or completion checks, also read [Read-after-write consistency](references/core/read-after-write.md). Classify the write/read pair. Direct Temporal RPC state readback is strong; search/projections and triggered business work have separate confirmation boundaries. Do not require polling or callbacks merely because a write uses Signal.
+
 Then load only the references required by the task:
 
 | Task | Core reference | Language reference |
@@ -57,7 +59,7 @@ Then load only the references required by the task:
 | Primitive selection or exact API | [Primitives](references/core/primitives.md) | selected language's **primitives.md** |
 | StepOptions, durability, timeout, heartbeat, retry, loads, locks, or failure route | [StepOptions](references/core/step-options.md) | selected language's **advanced-features.md** |
 | Design-pattern choice | [Patterns](references/core/patterns.md) | selected language's **patterns.md** |
-| Client calls, admission, RPC, cleanup, waits, or external Streams | [Error handling](references/core/error-handling.md) | selected language's **error-handling.md** |
+| Client calls, admission, RPC, cleanup, waits, or external Streams | [Error handling](references/core/error-handling.md) and [Read-after-write consistency](references/core/read-after-write.md) | selected language's **error-handling.md** |
 | Integration or failure-path tests | [Testing](references/core/testing.md) | selected language's **testing.md** |
 | Failure diagnosis | [Troubleshooting](references/core/troubleshooting.md) and [Error handling](references/core/error-handling.md) | selected language's **error-handling.md** and **gotchas.md** |
 | Production inspection or mutation | [Operations](references/core/operations.md) | selected language's **observability.md** |
