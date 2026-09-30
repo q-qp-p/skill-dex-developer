@@ -125,4 +125,4 @@ Sources:
 - Pattern catalog: https://docs.superdurable.io/design-patterns
 - Sequential chunking: https://docs.superdurable.io/design-patterns/sequentially-chunked-attribute-map
 - Hash partitioning: https://docs.superdurable.io/design-patterns/hash-partitioned-attribute-map
-- Baseline runnable implementations: https://github.com/superdurable/dex/tree/sdk-go/v0.13.1/examples
+- Baseline runnable implementations: https://github.com/superdurable/dex/tree/sdk-go/v1.2.1/examples

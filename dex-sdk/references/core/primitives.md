@@ -80,7 +80,7 @@ Use an RPC for every application read or write of Flow-owned Attribute, Attribut
 
 Use a Channel instead when the caller should enqueue work without synchronous application-level handling.
 
-An RPC without Attribute locks or transactional execution starts from a backend query. If its handler returns only output, Dex does not signal the Flow, and a retained terminal execution can serve the query. Success therefore does not prove that the Flow is active. Locks, explicit transactions, returned durable effects, or Server policy can select an active-only Update or Signal path. A query-path handler may run before a later Signal discovers that the Flow is terminal, so keep external mutations idempotent and do not treat `FlowNotActive` as proof that the handler never ran.
+An RPC without Attribute locks or transactional execution starts from a backend query. If its handler returns only output, Dex does not signal the Flow, and a retained terminal execution can serve the query. Success therefore does not prove that the Flow is active. Locks, explicit transactions, returned durable effects, or Server policy can select an active-only Update or Signal path. A query-path handler may run before a later Signal discovers that the Flow is terminal, so keep external mutations idempotent and do not treat `FlowNotActiveOrNotFoundError` as proof that the handler never ran.
 
 Use a lifecycle API when a response needs current execution status. A read-only RPC returns its application-state snapshot; it does not add terminal status that the application did not persist.
 

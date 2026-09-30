@@ -2,6 +2,25 @@
 
 All notable changes to Dex Skills are documented here.
 
+## 0.29.12 - 2026-09-30
+
+- Advance the immutable SDK source baseline and all SDK source links to the published sdk-go/v1.2.1 release, which contains the five-SDK missing/inactive error rename.
+- Use FlowNotActiveOrNotFoundError, Java FlowNotActiveOrNotFoundException, and Rust SdkError::FlowNotActiveOrNotFound; preserve query-only missing translation, active-required mutation interpretation, and distinct service failures.
+- Distinguish the released SDK API baseline from older dependency pins retained in the tagged example manifests; require installed-version evidence before changing existing applications.
+- Add exact cross-language error/source references and public-type/metadata verification; synchronize plugin manifests while retaining Server, CLI, and template baselines.
+
+## 0.29.11 - 2026-09-30
+
+- Keep Go SDK-derived Flow/Step type names; allow custom GetFlowType/GetStepType only for unavoidable renames of production definitions while preserving their existing durable identities.
+- Remove the blanket Dex Web type-name override workaround and route metadata mismatches to analyzer/SDK diagnosis.
+- Add old-execution rollout verification for that exception and synchronize plugin manifests without changing dependency baselines.
+
+## 0.29.10 - 2026-09-30
+
+- Map typed missing/not-active failures directly to the business Get contract's not-found result only for confirmed query-only RPCs; retained closed executions remain readable.
+- Prohibit lifecycle probes, short-timeout waits, retries, and history lookups solely to distinguish missing from closed on that read path, while preserving active-only mutation semantics and genuine service failures.
+- Add real-server missing-target verification and synchronize core, all five language error references, and plugin manifests without changing dependency baselines.
+
 ## 0.29.9 - 2026-09-30
 
 - Document Signal acceptance, strong Temporal RPC direct-state readback, eventual search/projection visibility, and asynchronous business completion as separate contracts.

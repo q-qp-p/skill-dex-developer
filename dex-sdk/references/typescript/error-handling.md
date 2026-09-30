@@ -10,7 +10,7 @@ Do not catch and return a success decision merely to suppress retry. That commit
 
 ## Client failures
 
-Catch exported SDK error classes such as `FlowAlreadyStartedError`, `FlowNotFoundError`, `FlowNotActiveError`, and `RequestTimeoutError`. Durable Step and Attribute waits never expose transport long-poll expiry; they reattach with the effective Request ID and preserve the total `requestTimeoutMs` budget. `RequestTimeoutError` means that caller-visible budget expired, not that the Flow or accepted durable Update failed. `internalHandlerTimeoutMs` rollover is transparent. For lower-level cases, `DexServiceError` exposes the gRPC code and diagnostic detail. Do not compare human-readable detail for normal control flow when a typed error exists.
+Catch exported SDK error classes such as `FlowAlreadyStartedError`, `FlowNotFoundError`, `FlowNotActiveOrNotFoundError`, and `RequestTimeoutError`. Durable Step and Attribute waits never expose transport long-poll expiry; they reattach with the effective Request ID and preserve the total `requestTimeoutMs` budget. `RequestTimeoutError` means that caller-visible budget expired, not that the Flow or accepted durable Update failed. `internalHandlerTimeoutMs` rollover is transparent. For lower-level cases, `DexServiceError` exposes the gRPC code and diagnostic detail. Do not compare human-readable detail for normal control flow when a typed error exists.
 
 Concrete remote Client errors extend `DexServiceError`; local definition, value-mapping, argument, and programming errors do not. In a `catch` block, keep the value `unknown` and narrow with `instanceof`. Catch `DexServiceError` only at a boundary whose policy intentionally treats every remote Dex outcome the same; ordinary domain logic should match the concrete exported class it can decide.
 
@@ -20,7 +20,7 @@ For an idempotent start, set one stable `StartFlowOptions.requestId` and `ignore
 
 For an explicitly best-effort external `client.writeStream`, log sanitized identity and discard only an `instanceof DexServiceError` failure. Rethrow other values so codec, definition, and programming defects remain visible.
 
-[Pinned example error classification](https://github.com/superdurable/dex/blob/sdk-go/v0.13.1/examples/typescript/src/service-errors.ts)
+[Pinned example error classification](https://github.com/superdurable/dex/blob/sdk-go/v1.2.1/examples/typescript/src/service-errors.ts)
 <!-- dex-source: examples/typescript/src/service-errors.ts -->
 ```typescript
 export function isFlowAlreadyStarted(error: unknown): boolean {
@@ -33,6 +33,10 @@ export function isFlowMissingOrInactive(error: unknown): boolean {
 ```
 
 The runnable examples use code classification only where one service code intentionally combines missing and inactive outcomes. Prefer exported concrete errors in new application code.
+
+## Query-only Get failures
+
+Follow the shared [missing query target rule](../core/error-handling.md#missing-query-targets). For a business Get confirmed to have no registration or invocation locks, no transaction, no returned durable effects, and no Server-forced Update routing, catch `FlowNotActiveOrNotFoundError` or `FlowNotFoundError` with `instanceof` and return the contract's not-found result directly. Retained closed executions remain readable, so do not call WaitForFlow, describe/search/history APIs, or add a timeout probe or retry to distinguish missing from closed. Preserve other errors and any explicit retention/unavailable contract. Do not apply this translation to mutations or active-only RPC paths.
 
 ## Async discipline
 

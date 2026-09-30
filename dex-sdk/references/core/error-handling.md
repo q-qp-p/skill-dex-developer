@@ -16,6 +16,22 @@ Normal application logic catches only concrete SDK errors whose outcomes it can 
 
 The public error shape is language-specific. Python, Java, and TypeScript expose a remote-only service-error base; Go concrete remote errors unwrap to `*ServiceError`; Rust uses one `SdkError` enum for both service-backed and local failures. Never copy a catch pattern between SDKs without checking the selected language page and installed version.
 
+## Missing or inactive target errors
+
+At the released v1.2.1 API baseline, use the exact public names:
+
+| SDK | Combined missing/inactive target error | Source |
+| --- | --- | --- |
+| Go | `*dex.FlowNotActiveOrNotFoundError` | [Definition and mapping](https://github.com/superdurable/dex/blob/sdk-go/v1.2.1/sdk-go/dex/errors.go) |
+| Python | `FlowNotActiveOrNotFoundError` | [Definition](https://github.com/superdurable/dex/blob/sdk-go/v1.2.1/sdk-python/dex/runtime_errors.py) |
+| TypeScript | `FlowNotActiveOrNotFoundError` | [Definition](https://github.com/superdurable/dex/blob/sdk-go/v1.2.1/sdk-typescript/src/errors.ts) |
+| Java | `FlowNotActiveOrNotFoundException` | [Definition](https://github.com/superdurable/dex/blob/sdk-go/v1.2.1/sdk-java/src/main/java/io/superdurable/dex/exceptions/FlowNotActiveOrNotFoundException.java) |
+| Rust | `SdkError::FlowNotActiveOrNotFound` | [Definition and mapping](https://github.com/superdurable/dex/blob/sdk-go/v1.2.1/sdk-rust/crates/dex-sdk/src/sdk_error.rs) |
+
+These names replace the old not-active-only names without compatibility aliases. The rename preserves Server routing, protocol sub-statuses, service metadata, and cause chains. The separate Flow-not-found error remains available for operations mapped to it. Inspect an existing application's installed SDK before changing a catch or import; do not assume older packages export the new names.
+
+The combined type alone cannot distinguish a missing Flow from an unusable closed target. Interpret it using the actual operation: at a confirmed query-only Get boundary it means missing/unreadable target, while an active-required mutation can also encounter a closed target. Neither outcome proves the requested mutation succeeded. Preserve unrelated Worker, transport, and service failures.
+
 ## Start identity and duplicate starts
 
 ### Start first; reconcile only after an error
@@ -66,7 +82,7 @@ Commit-confirming API: StartFlow succeeds or deduplicates
 
 ## Closed-Flow races
 
-A typed terminal or not-active error proves that the attempted interaction had no active target. It does not prove that the requested work succeeded. First reconcile from already loaded authoritative domain state and operation invariants. Re-inspect the Flow only when the outcome depends on distinguishing running, successfully completed, other terminal, and missing states and that distinction is not otherwise available. Do not spend a status call when every possible state has the same idempotent outcome.
+For an operation that requires an active target, a typed terminal or not-active error proves that the attempted interaction had no active target. It does not prove that the requested work succeeded. First reconcile from already loaded authoritative domain state and operation invariants. Re-inspect the Flow only when the outcome depends on distinguishing running, successfully completed, other terminal, and missing states and that distinction is not otherwise available. Do not spend a status call when every possible state has the same idempotent outcome. Interpret query-only RPC errors under the [missing query target rule](#missing-query-targets) instead.
 
 Do not assume every RPC targets only an active Flow. A query-only RPC without locks or transactional execution can read a retained terminal execution. It may succeed after closure, so use a lifecycle API when active versus terminal changes the result. If a query-path handler returns durable effects, it may run before the later Signal fails with a not-active error. Transactional, locked, and Server-forced Update paths require an active execution before the Worker handler runs.
 
@@ -74,9 +90,9 @@ A completed child may satisfy an idempotent cleanup only when successful complet
 
 ### Terminal read RPC rule
 
-Before handling a typed not-active error from an RPC, inspect its registered options, any invocation-time AttributeMap locks, the handler result, and Server routing policy. A business snapshot RPC with no Attribute locks, no transactional execution, no durable effects, and no Server policy requiring an active execution must read the retained terminal execution directly. Closure alone is not a reason for this query to fail. If it does fail, diagnose the actual routing, handler, retention, or service failure; do not mask it with a history fallback.
+Before handling a typed not-active error from an RPC, inspect its registered options, any invocation-time AttributeMap locks, the handler result, and Server routing policy. A business snapshot RPC with no Attribute locks, no transactional execution, no durable effects, and no Server policy requiring an active execution must read the retained terminal execution directly. Closure alone is not a reason for this query to fail. Handle typed missing-target errors under the [query-only rule](#missing-query-targets). Preserve other routing, handler, retention, or service failures; do not mask them with a history fallback.
 
-Do not add a `FlowNotActiveError → WaitForFlow → Step-output decoding` fallback to a business read. Read the snapshot from its typed read-only RPC and retained Attributes/AttributeMaps. Do not reconstruct it by matching historical Step names: execution history is not the entity's read contract, and an intermediate Step output may omit later committed state.
+Do not add a `FlowNotActiveOrNotFoundError → WaitForFlow → Step-output decoding` fallback to a business read. Read the snapshot from its typed read-only RPC and retained Attributes/AttributeMaps. Do not reconstruct it by matching historical Step names: execution history is not the entity's read contract, and an intermediate Step output may omit later committed state.
 
 Use `WaitForFlow` when the caller explicitly needs engine terminal status or completion output, or to reconcile an inactive mutation/idempotent cleanup whose outcome cannot be established through authoritative domain state or a typed read-only RPC. Keep its completion-output contract distinct from an entity snapshot. History remains appropriate for explicit diagnosis or execution recovery, not routine business reads. Retention expiry or a missing execution must retain an explicit unavailable/missing outcome.
 
@@ -88,6 +104,20 @@ Wrong: typed snapshot RPC fails as not-active
 Right: register a typed snapshot RPC as query-only over retained Attributes
        → invoke that typed RPC directly before and after closure
        → surface genuine read failures; request engine status separately only if needed
+```
+
+### Missing query targets
+
+At a business Get boundary whose RPC is confirmed query-only by the checks above, translate the SDK's typed combined missing/inactive error or separate Flow-not-found error directly to the contract's not-found result. A retained closed execution is readable on this path; the error means no readable target execution exists, not that closure needs reconciliation. InvokeRPC maps the Server's Flow-not-found sub-status to the combined missing/inactive type even for a query; its name does not make that query active-only.
+
+Do not follow that missing-target error with WaitForFlow, DescribeFlow, search, history lookup, a short timeout probe, or a retry just to distinguish missing from closed. Return the missing result at the Get boundary. No readable retained execution does not prove the business entity never existed; preserve the domain contract's retention/unavailable distinction when it requires one. Keep other service and Worker failures visible rather than converting every read error to not-found.
+
+This translation belongs only to that confirmed query-only boundary. Mutating, transactional, locked, and Server-forced Update RPCs can fail because a retained execution is closed; their not-active error still needs the operation-specific interpretation above.
+
+```text
+Wrong: pure Get → FlowNotActiveOrNotFoundError → WaitForFlow with a short timeout → decide missing
+Right: pure Get → typed missing/not-active error → return the Get contract's not-found result
+Closed retained Flow → the same pure Get → return its retained snapshot
 ```
 
 ## Ambiguous mutations
@@ -113,6 +143,7 @@ If an API must return the first admission decision after a Flow can close quickl
 - Are retries bounded, idempotent, and tied to one stable Request ID?
 - Can a closed or missing Flow converge without an unnecessary status call?
 - Do terminal snapshot reads use typed query-only RPCs with the required collection loads, without locks, transactions, durable effects, or active-only Server routing?
+- Does a confirmed query-only Get map typed missing/not-active directly to its missing result, without a lifecycle probe, retry, or added timeout?
 - Is every terminal-readable entity covered by a real-server post-closure RPC test, including an assertion that the business read uses no lifecycle/history fallback?
 - Does best-effort observation remain separate from authoritative business state?
 - Do local definition, mapping, serialization, and programming defects remain visible?

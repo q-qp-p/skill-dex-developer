@@ -1,10 +1,12 @@
 # Go handbook
 
+The SDK API reference uses the [released v1.2.1 baseline](../core/bundle-baselines.md); the source examples' older dependency pins below remain factual and do not define the current error API.
+
 Use this page first for a Go application. It describes the application boundary and points to focused pages; always check the version selected by `go.mod` and `go.sum`.
 
 ## Version and source authority
 
-The [baseline module](https://github.com/superdurable/dex/blob/sdk-go/v0.13.1/examples/go/go.mod) uses `github.com/superdurable/dex/sdk-go v0.13.0`. Before editing an existing project, run `go list -m github.com/superdurable/dex/sdk-go` and inspect that SDK version. If it differs from the baseline, installed source wins. Identify the inspected module-cache path, vendored path, or immutable tag/commit before presenting exact syntax. If no version-matched source is available, give only the version-independent Flow model and request that source; do not adapt baseline snippets speculatively. Pinned sources show known-good shapes, not a promise that every version has the same surface.
+The [baseline module](https://github.com/superdurable/dex/blob/sdk-go/v1.2.1/examples/go/go.mod) uses `github.com/superdurable/dex/sdk-go v0.13.0`. Before editing an existing project, run `go list -m github.com/superdurable/dex/sdk-go` and inspect that SDK version. If it differs from the baseline, installed source wins. Identify the inspected module-cache path, vendored path, or immutable tag/commit before presenting exact syntax. If no version-matched source is available, give only the version-independent Flow model and request that source; do not adapt baseline snippets speculatively. Pinned sources show known-good shapes, not a promise that every version has the same surface.
 
 ## Project shape and local run
 
@@ -48,9 +50,9 @@ for Java, Python, TypeScript, or Rust Flow definitions.
 
 ## Minimal Flow
 
-Declare schema at package scope, embed defaults, register Step types, and return a decision from every Execute method.
+Declare schema at package scope, embed defaults, register Step types, and return a decision from every Execute method. Keep SDK-derived Flow and Step type names; do not implement `GetFlowType` or `GetStepType` except for the [required production-rename case](versioning.md#default-flow-and-step-type-names).
 
-[Pinned runnable source](https://github.com/superdurable/dex/blob/sdk-go/v0.13.1/examples/go/primitives/flow/workflow.go)
+[Pinned runnable source](https://github.com/superdurable/dex/blob/sdk-go/v1.2.1/examples/go/primitives/flow/workflow.go)
 <!-- dex-source: examples/go/primitives/flow/workflow.go -->
 ```go
 var (
@@ -78,7 +80,7 @@ Use `dex.None` for nil-only input/output and concrete structs for durable payloa
 
 A no-wait Step embeds the input-typed default and returns a durable decision:
 
-[Pinned runnable source](https://github.com/superdurable/dex/blob/sdk-go/v0.13.1/examples/go/primitives/flow/workflow.go)
+[Pinned runnable source](https://github.com/superdurable/dex/blob/sdk-go/v1.2.1/examples/go/primitives/flow/workflow.go)
 <!-- dex-source: examples/go/primitives/flow/workflow.go -->
 ```go
 type Finish struct {
@@ -95,7 +97,7 @@ func (Finish) Execute(ctx dex.Context, input int) (*dex.StepDecision, error) {
 
 ## Registry, Worker, and Client
 
-Construct every Flow once, then pass the same definitions into the Registry used by Worker and Client. See the [registry](https://github.com/superdurable/dex/blob/sdk-go/v0.13.1/examples/go/registry/registry.go) and [bootstrap](https://github.com/superdurable/dex/blob/sdk-go/v0.13.1/examples/go/cmd/server/dex/dex.go). Controllers start with `client.StartFlow(ctx, flow, flowID, input, options)` and retain the run ID for diagnostics.
+Construct every Flow once, then pass the same definitions into the Registry used by Worker and Client. See the [registry](https://github.com/superdurable/dex/blob/sdk-go/v1.2.1/examples/go/registry/registry.go) and [bootstrap](https://github.com/superdurable/dex/blob/sdk-go/v1.2.1/examples/go/cmd/server/dex/dex.go). Controllers start with `client.StartFlow(ctx, flow, flowID, input, options)` and retain the run ID for diagnostics.
 
 ## Route by task
 

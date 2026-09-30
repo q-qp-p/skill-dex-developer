@@ -6,7 +6,7 @@ Prefer integration tests against a real Dex Server. Unit tests can verify pure h
 
 Run `dexcli dev`, start the application Worker, and create a Client from the same Registry and BlobCache. Give every test a unique Flow ID. Bound setup, calls, polling, and cleanup with `context.WithTimeout`.
 
-[Pinned integration source](https://github.com/superdurable/dex/blob/sdk-go/v0.13.1/examples/go/integ/main_test.go)
+[Pinned integration source](https://github.com/superdurable/dex/blob/sdk-go/v1.2.1/examples/go/integ/main_test.go)
 <!-- dex-source: examples/go/integ/main_test.go -->
 ```go
 func integrationContext(t *testing.T) context.Context {
@@ -21,6 +21,10 @@ func integrationContext(t *testing.T) context.Context {
 cd examples/go
 make e2eTests
 ```
+
+## Production type renames
+
+For the [type-name override exception](versioning.md#default-flow-and-step-type-names), start a real Flow on the deployed type names, stop at a durable boundary, and replace the Worker with the renamed Go definitions. Verify the registered Flow/Step strings are unchanged and the old execution resumes through its reachable Steps. A new execution alone cannot prove rename safety. New or not-yet-production definitions keep their inherited type-name defaults.
 
 ## Required scenarios
 

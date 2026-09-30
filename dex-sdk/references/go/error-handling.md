@@ -6,7 +6,7 @@ Before designing sequential writes and reads, use the [shared read-after-write m
 
 Application errors from WaitFor, Execute, RPC, and timeout handlers drive configured retry/recovery. Typed Client errors describe Dex outcomes. Context/transport errors describe caller cancellation or connectivity. Keep these layers distinct.
 
-Use `errors.As` for `*dex.FlowNotFoundError`, `*dex.FlowNotActiveError`, `*dex.FlowAlreadyStartedError`, `*dex.LongPollTimeoutError`, `*dex.RequestTimeoutError`, and `*dex.FlowUncompletedError`. Durable Step and Attribute waits never expose transport long-poll expiry; they reattach with the effective Request ID and preserve the total `RequestTimeout` budget. `RequestTimeoutError` means that caller-visible budget expired, not that the Flow or accepted durable Update failed. `InternalHandlerTimeout` rollover is transparent. Keep `ServiceError.SubStatus` for diagnostics; never parse strings.
+Use `errors.As` for `*dex.FlowNotFoundError`, `*dex.FlowNotActiveOrNotFoundError`, `*dex.FlowAlreadyStartedError`, `*dex.LongPollTimeoutError`, `*dex.RequestTimeoutError`, and `*dex.FlowUncompletedError`. Durable Step and Attribute waits never expose transport long-poll expiry; they reattach with the effective Request ID and preserve the total `RequestTimeout` budget. `RequestTimeoutError` means that caller-visible budget expired, not that the Flow or accepted durable Update failed. `InternalHandlerTimeout` rollover is transparent. Keep `ServiceError.SubStatus` for diagnostics; never parse strings.
 
 Every concrete remote Client error unwraps to `*dex.ServiceError`; local definition, value-mapping, argument, and programming errors do not. Use `errors.As(err, &serviceError)` only at a narrow boundary whose policy intentionally treats every remote Dex outcome the same. Ordinary domain logic should continue matching the concrete error type it can decide.
 
@@ -30,15 +30,19 @@ For a failure that leaves acceptance unknown, a bounded retry can call StartFlow
 
 ## Terminal business reads
 
-Apply the shared [terminal read RPC rule](../core/error-handling.md#terminal-read-rpc-rule) before catching `*dex.FlowNotActiveError` from a snapshot RPC. Inspect its `dex.DefineRPC` registration in `GetRPCs`: `dex.RPCOptions.LockAttributes` must be empty and `IsTransactional` false for a terminal query. Include any `RPCInvokeOptions.LockAttributeMapInstances` in that check; collection loads alone do not require a transaction. The handler must return only typed output, with no durable effects, and Server policy must permit the query path.
+Apply the shared [terminal read RPC rule](../core/error-handling.md#terminal-read-rpc-rule) before catching `*dex.FlowNotActiveOrNotFoundError` from a snapshot RPC. Inspect its `dex.DefineRPC` registration in `GetRPCs`: `dex.RPCOptions.LockAttributes` must be empty and `IsTransactional` false for a terminal query. Include any `RPCInvokeOptions.LockAttributeMapInstances` in that check; collection loads alone do not require a transaction. The handler must return only typed output, with no durable effects, and Server policy must permit the query path.
 
 Call `Client.InvokeRPC` (or `InvokeRPCWithOptions` for selective instance loads) directly on the typed `Get*` method. Do not catch not-active and decode historical Step outputs into the snapshot. Reserve `WaitForFlow` for its explicit lifecycle/completion or mutation-reconciliation contract. Prove the read through the real-server [terminal entity test](../core/testing.md#terminal-entity-reads).
+
+## Query-only Get failures
+
+Follow the shared [missing query target rule](../core/error-handling.md#missing-query-targets). For a business Get confirmed to have no registration or invocation locks, no transaction, no returned durable effects, and no Server-forced Update routing, catch `*dex.FlowNotActiveOrNotFoundError` or `*dex.FlowNotFoundError` with `errors.As` and return the contract's not-found result directly. Retained closed executions remain readable, so do not call WaitForFlow, describe/search/history APIs, or add a timeout probe or retry to distinguish missing from closed. Preserve other errors and any explicit retention/unavailable contract. Do not apply this translation to mutations or active-only RPC paths.
 
 ## Retry ownership
 
 Return an error when Step options should decide retry. Use `dex.RetryAfter` only when the application knows a meaningful delay. Never add an in-memory retry loop around Step work; it disappears with the Worker and hides attempts.
 
-[Pinned runnable source](https://github.com/superdurable/dex/blob/sdk-go/v0.13.1/examples/go/patterns/polling/backoff.go)
+[Pinned runnable source](https://github.com/superdurable/dex/blob/sdk-go/v1.2.1/examples/go/patterns/polling/backoff.go)
 <!-- dex-source: examples/go/patterns/polling/backoff.go -->
 ```go
 result, err := step.service.AttemptExternalAPICall("Poll for BackoffPollingFlow")

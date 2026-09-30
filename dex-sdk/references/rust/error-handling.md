@@ -8,7 +8,7 @@ Separate handler failures from controller/client failures. A Step or RPC returns
 
 Return errors with `?` when a durable read or write fails. For an application failure, construct a stable error type and useful message. `HandlerError::retry_after` overrides the next retry delay for that failure; `StepOptions::execute_retry` still bounds attempts.
 
-[Runnable source](https://github.com/superdurable/dex/blob/sdk-go/v0.13.1/examples/rust/src/primitives/custom_retry/flow.rs)
+[Runnable source](https://github.com/superdurable/dex/blob/sdk-go/v1.2.1/examples/rust/src/primitives/custom_retry/flow.rs)
 <!-- dex-source: examples/rust/src/primitives/custom_retry/flow.rs -->
 ```rust
 fn options(&self) -> StepOptions<Self::Input> {
@@ -37,7 +37,7 @@ Make Execute side effects idempotent across attempts. Dex retries a logical meth
 
 Configure retry policies for the phase that can fail. WaitFor should normally be pure durable preparation. If WaitFor exhaustion is explicitly recoverable, set `WaitForFailurePolicy::Proceed`; Execute must then check `context.wait_for_method_failed()` before selecting a recovery transition.
 
-[Runnable source](https://github.com/superdurable/dex/blob/sdk-go/v0.13.1/examples/rust/src/primitives/proceed_on_wait_failure/flow.rs)
+[Runnable source](https://github.com/superdurable/dex/blob/sdk-go/v1.2.1/examples/rust/src/primitives/proceed_on_wait_failure/flow.rs)
 <!-- dex-source: examples/rust/src/primitives/proceed_on_wait_failure/flow.rs -->
 ```rust
 fn options(&self) -> StepOptions<Self::Input> {
@@ -77,6 +77,10 @@ When the API promises a critical operation has completed, follow the shared [req
 For an idempotent start, set one stable `StartFlowOptions::request_id(...)` and `ignore_already_started(true)` only when a retry of that same logical request may attach to the existing run. A remaining `SdkError::FlowAlreadyStarted` means a different Request ID owns the Flow ID. Treat it as a domain conflict unless the coordinator contract deliberately redirects the command to that existing Flow. Another service-backed variant can leave acceptance unknown; retry with the same identities or read owning domain state, never a dedicated start-deduplication table.
 
 For an explicitly best-effort external `Client::write_stream`, suppress only `SdkError::Service { .. }`, the remote fallback produced by that operation. Propagate local argument and value-mapping variants. Context Stream writes inside a handler remain `HandlerResult` work and must participate in the Step's retry or recovery policy.
+
+## Query-only Get failures
+
+Follow the shared [missing query target rule](../core/error-handling.md#missing-query-targets). For a business Get confirmed to have no registration or invocation locks, no transaction, no returned durable effects, and no Server-forced Update routing, catch `SdkError::FlowNotActiveOrNotFound` or `SdkError::FlowNotFound` and return the contract's not-found result directly. Retained closed executions remain readable, so do not call WaitForFlow, describe/search/history APIs, or add a timeout probe or retry to distinguish missing from closed. Preserve other errors and any explicit retention/unavailable contract. Do not apply this translation to mutations or active-only RPC paths.
 
 ## Terminal decisions
 

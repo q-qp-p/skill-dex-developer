@@ -45,6 +45,8 @@ For an operation that launches separately owned work, run a real-server applicat
 
 For every Flow-owned business entity whose contract permits reads after closure, run a real Dex/Temporal integration test with the application's registry, Worker, and Server routing policy. Persist the final business snapshot, close the Flow, establish terminal status in the test harness, then call its typed `Get*` read-only RPC directly through the application read boundary. Cover each readable terminal outcome supported by the entity contract and assert the returned snapshot includes the final committed Attributes/AttributeMaps.
 
+For a nonexistent Flow ID, call the same query-only Get through the real application boundary and assert its typed missing/not-active error becomes the declared not-found result directly. Assert no lifecycle/status probe, search, history call, retry, or short-timeout wait is issued. Keep a Worker/service failure case distinct from not-found, and cover the application's retention/unavailable contract when relevant.
+
 Also assert that the business read performs no `WaitForFlow`, history lookup, or historical Step-output decoding. A test-side spy/counter or a guard that fails on those calls may observe the real Client boundary; keep the snapshot RPC on the real Server/Worker path. A harness wait used to establish closure is allowed and must be counted separately. A mock-only test or a handler invoked directly cannot prove terminal query support. If production policy forces active-only RPC execution, resolve that conflict explicitly before claiming the entity remains terminal-readable; do not make a history fallback pass the test.
 
 ## Data and deployment scenarios
@@ -58,3 +60,5 @@ For version changes, run an open Flow on the old Worker, deploy the new registry
 Assert the user-visible SDK failure type, final Flow status, recovery Step, and durable state. Do not merely assert that an exception occurred. When an external effect has an unknown outcome, record and test that state rather than assuming success or failure.
 
 Read the selected language's **testing.md** for its harness, commands, and runnable sources.
+
+At the v1.2.1 SDK baseline, assert the combined missing/inactive type from the [public error table](error-handling.md#missing-or-inactive-target-errors) for a missing query target and for closed active-required operations. Keep separate Flow-not-found mappings distinct. Verify the selected language's metadata and cause/service extraction remain available; include sync and async surfaces where that SDK exposes both. These assertions do not permit lifecycle probes in the application query-only Get path.

@@ -71,12 +71,11 @@ Observed with Dex CLI v0.13.8 and Go SDK v0.12.1:
   `dexcli dev --flow-rendering-dir DIRECTORY`, which holds the FDG 2.0 JSON
   files. Without it the catalog is empty. Regenerate the JSON after every Flow
   change.
-- Start Flow sends the FDG's Flow and Step type names. The analyzer uses the
-  bare Go type name, while the Go SDK registers package-qualified defaults such
-  as `orders.OrderFlow`, so the Worker rejects the start. Override
-  `GetFlowType` and `GetStepType` with compile-time strings on every Flow and
-  Step; the same names let Run-timeline nodes match the graph. They are durable
-  identities, so choose them before Flows are open.
+- Start Flow sends the FDG's Flow and Step type names, which must match the
+  Worker's registrations. Follow the SDK's [default type-name rule](../../dex-sdk/references/go/versioning.md#default-flow-and-step-type-names).
+  Keep derived names for new definitions. If the graph and Worker names differ,
+  diagnose the analyzer/SDK version or generated metadata; do not implement
+  `GetFlowType` and `GetStepType` on every Flow and Step as a Web workaround.
 - Dex Web invokes `WaitFor` on the start Step, and the Worker rejects that call
   for an execute-only Step (`dex.StepDefaultsNoWaitFor`). Embed
   `dex.StepDefaults` in the start Step and return `dex.SkipWaitImmediately()`
@@ -280,7 +279,7 @@ A Flow that compiles, runs, and passes real-Dex tests can still fail `dexcli vis
 | --- | --- | --- |
 | `hidden_dex_decision` | error | Every `Execute` returns its own Dex decisions. A helper that returns `*dex.StepDecision`, such as `router.enterStage(ctx, stage)`, hides the transition. Helpers may only compute inputs or record state. |
 | `connector_factory_step_type` | error | A Connector factory `StepType` is a non-empty compile-time string. A helper that builds `slack.NewPostThreadReplyStep(...)` from a parameter fails, and every `sdkgo.StepRef` to it then reports `unknown_step_target`. |
-| `dynamic_type_name` | error | `GetFlowType` and `GetStepType` return a string literal or constant. |
+| `dynamic_type_name` | error | When the production-rename exception requires `GetFlowType` or `GetStepType`, return the exact previous production identity as a string literal or constant. Otherwise keep the SDK defaults. |
 | `v2_view_rpc` | error | The Flow defines `GetDexSummary` and `GetDexDisplay` and registers both as RPCs. |
 | `v2_view_rpc_output` | error | Each view returns one `map[string]any` literal whose keys are exactly the declared `dex:field` keys. A map built in a loop "omits declared field". |
 | `v2_directive` | error | `value-type` matches the Go type: an unnamed slice Attribute is `array` (`string-array` for `[]string`), not `json`. An optional `dex:input` (`required:false`) is a pointer field such as `*string`. |
