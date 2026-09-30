@@ -2,6 +2,23 @@
 
 All notable changes to Dex Skills are documented here.
 
+## 0.29.8 - 2026-09-30
+
+- Require an Attribute-match or Step-completion wait after a successful or deduplicated start only when the response promises a critical business milestone, such as a committed database source-of-truth write.
+- Keep acceptance-only starts free of waits; define post-commit markers, bounded wait outcomes, and real-server verification for both new and deduplicated starts.
+- Synchronize core and all five language error-handling references and plugin manifests without changing dependency baselines.
+
+## 0.29.7 - 2026-09-30
+
+- Return accepted-start responses from validated request/known initial fields without defensive post-success identity or Attribute rereads; distinguish acknowledgement from explicit admission/completion results.
+- Require the owning Flow to durably sequence dependent work, with downstream starts in Execute and crash recovery across acceptance/Step commit instead of API-side start/read/start orchestration.
+- Require StartFlow before any retry-protection read RPC, search, or status lookup; reconcile only after a relevant failure and preserve reads independently required by the business response contract.
+- Clarify the Request ID/ignore-already-started result matrix, SDK-generated IDs, bounded replay after unknown acceptance, and real-server call-order verification.
+- Promote terminal read-only RPC semantics to an explicit SDK error-handling rule and design-review gate, including registration/invocation locks, transactions, handler effects, Server policy, and retention boundaries.
+- Prohibit business snapshot fallbacks through `FlowNotActiveError`, `WaitForFlow`, and historical Step-output decoding; preserve explicit engine-status, completion-output, and mutation-reconciliation uses.
+- Require real Dex/Temporal post-closure typed snapshot reads with assertions that the application read uses no lifecycle/history fallback, and link App Builder verification to the shared SDK guidance.
+- Synchronize the Codex, Claude Code, and Cursor manifests; dependency baselines are unchanged.
+
 ## 0.29.4 - 2026-09-29
 
 - Require application run searches to constrain FlowType and exclude ContinuedAsNew runs, matching Dex Web's visibility filter.

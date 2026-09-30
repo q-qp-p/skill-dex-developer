@@ -29,6 +29,14 @@ stores only the validation or coordination state its own wait requires and
 cleans it up according to its own retention policy. Failed, expired, or
 otherwise temporary state must not pollute the authoritative store.
 
+## Own downstream starts durably
+
+For one business operation, the API starts one owning Flow and returns its accepted response. Do not sequence dependent top-level starts in the API handler, including `StartFlow → read status → StartFlow`. The process can exit or the request can be cancelled after the first start succeeds, leaving the next start unissued; retrying the HTTP handler does not establish a durable recovery owner.
+
+Put the follow-on work and its typed input/launch intent in the first Flow's durable graph and state. If the work shares its identity and lifecycle, implement it as Steps. If a genuinely separate owner/lifecycle requires another top-level Flow, have an Execute Step start it through an injected Client and coordinate via typed RPCs or Channels. Keep WaitFor for the durable conditions; platform applications never start or mutate another Flow there. Starting another top-level Flow from a Step does not make it a SubFlow; apply the existing evolution gate only when a real parent-child SubFlow is needed.
+
+A downstream start is a separate acceptance boundary, not an atomic transaction with the caller's Step completion. Preserve its stable Flow ID, Request ID bound to that complete downstream request, and appropriate start/reuse options in durable input or state. If the Worker dies after the downstream start is accepted but before the Step commits, Execute must retry the same start safely. Return or reconcile typed errors so Step retry/recovery owns progress. Never depend on an API-side snapshot/status branch to fill that gap, and never mark downstream work complete merely because its start succeeded.
+
 ## Start with parallel Steps
 
 New designs default to no SubFlows. Emit static or dynamic parallel Steps when
@@ -129,6 +137,7 @@ Use a new routing flag or Attribute so only new executions enter an incompatible
 - Can the graph explain every success, wait, failure, cancellation, and timeout path?
 - Are Step inputs and transitions typed?
 - Are side effects idempotent under retry?
+- Does one owning Flow durably sequence dependent starts, including recovery before downstream acceptance and after acceptance but before Step commit?
 - Does each Channel have one clear producer/consumer contract?
 - Are shared state changes protected when concurrent Steps or RPCs can race?
 - Is fan-out bounded?

@@ -90,14 +90,16 @@ Use a real Dex Server when behavior crosses a Client, Worker, wait, RPC, Channel
 Cover:
 
 - start and typed terminal output;
-- duplicate start/request behavior;
+- duplicate start/request behavior and [StartFlow-first ordering](../../dex-sdk/references/core/testing.md#startflow-ordering-and-retry-identity), with reconciliation reads confined to relevant error branches;
 - durable wait and Worker replacement;
+- accepted-start responses without defensive identity/Attribute rereads, and [durable downstream start recovery](../../dex-sdk/references/core/testing.md#downstream-start-recovery) with no dependent API-side second start;
 - Action eligibility, valid action, duplicate/late action, and terminal rejection;
 - role-to-permission mapping, unauthorized Action rejection, and multi-permission work discovery at the application boundary;
 - concurrent Action-source writes without projection-only locks and cumulative permission history after state changes and completion;
 - retry and exhausted-recovery behavior;
 - provider idempotency and unknown-outcome reconciliation;
 - summary/display reads before, during, and after terminal completion;
+- terminal-readable entity snapshots through typed `Get*` RPCs after closure, following the SDK's [terminal entity read scenario](../../dex-sdk/references/core/testing.md#terminal-entity-reads) and [terminal read RPC rule](../../dex-sdk/references/core/error-handling.md#terminal-read-rpc-rule);
 - connector Trigger Flow/RPC routing and correlation when used.
 - RPC-to-Connector-Step routing when an application RPC requests provider work;
 - application integration against any uncommitted local connector `replace`,
