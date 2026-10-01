@@ -12,7 +12,9 @@ Use this guide for Dex Server deployment, production inspection, and authorized 
 4. Run a bounded read-only inspection:
 
 ```bash
-dexcli flow inspect <flow-id> --all-history
+dexcli flow summary <flow-id> --timeout 30s --no-hydrate
+dexcli flow state <flow-id> --timeout 30s --no-hydrate
+dexcli flow history <flow-id> --page-size 80 --timeout 30s --no-hydrate
 ```
 
 5. Compare the active Step, Attributes, Channel waits, Timers, and recent semantic events with the intended graph.
@@ -78,6 +80,35 @@ The file survives Dex Web and application restarts. Restarting Dex Web clears pe
 Only the Go Connector SDK currently provides the local file loader. Never put the JSON record, access token, API key, or secret-bearing generated value into Flow state, logs, browser messages, or application responses.
 
 Connection credentials and Trigger binding matchers are separate. One connection may serve several Flows without sharing their filters. Trigger delivery is at least once: use deterministic Flow IDs for starts. Application RPCs own their redelivery policy, bounded deduplication state when needed, and business locks.
+
+## Native hosted project configuration
+
+Server and CLI v1.3.0 embed native project configuration. Project Connectors can
+render an exact admitted AppManifest before an application Release or Flow
+definition exists. Flow operations still require the actual validated definition.
+Project, environment, and Preview Session scope are immutable server startup
+configuration; browser parameters cannot override them. An authenticated private
+proxy supplies actor, mount, public origin, permissions, and CSRF context and
+blocks internal AppManifest/validation endpoints from browser routing.
+
+Dex and Go applications use the released Connector SDK's `sdkgo/projectconfig`
+storage contract. Ordinary snapshots contain logical connection IDs; credentials
+remain separately versioned private objects. Refresh/replacement applies on the
+next provider call, while ordinary configuration requires validation and a new
+deployment snapshot. OAuth dispatch is admitted before the provider call; an
+uncertain response or restart must be reconciled rather than blindly dispatched
+again. Never persist provider secrets in application Flow state or return them
+to the browser. Other SDK languages need an explicit supported runtime boundary;
+do not invent a language-specific project configuration loader.
+
+The S3 client uses the default AWS credential chain when both static key fields
+are omitted. Configure an explicit region and the workload's intended role;
+reject partially supplied static credentials. Verify real workload role access,
+project-prefix isolation, versioned conditional writes, KMS encryption, and denied
+cross-project access. Host-profile success does not prove workload-role acceptance.
+
+See the pinned [native project protocol](https://github.com/superdurable/dex/blob/server/v1.3.0/web/PROJECT_CONFIGURATION.md)
+and [Web boundary](https://github.com/superdurable/dex/blob/server/v1.3.0/web/README.md).
 
 ## Deploy Dex Server components
 
@@ -171,7 +202,9 @@ Before a mutation:
 - satisfy any explicit confirmation flag
 - re-inspect the Flow afterward
 
-Time travel is appropriate after deploying a code fix when replaying from a safe Step boundary will not duplicate an unprotected side effect. If that cannot be established, design an explicit recovery or compensation Step instead.
+Time travel is appropriate after deploying a code fix when replaying from a safe Step boundary will not duplicate an unprotected side effect. Preserve the original business resource, Flow ID, and operation identity; capture the exact diagnostic run and Step method before mutation. Reconcile provider objects and previously accepted writes first. Do not replace the account or resource merely to avoid its failed history. If a safe boundary cannot be established, design an explicit recovery or compensation Step instead.
+
+A time-travel reset cannot invent a missing method boundary or rewrite the original Start options. A failure before the first Execute may have no Execute reset point. Do not silently replace it with a fresh Flow. If a corrected start is needed, obtain authorization for that recovery, prove the old execution is closed, reconcile effects, and preserve the intended Flow ID and logical request identity under the exact reuse policy. Closed-execution reuse is not cross-run request deduplication; application admission must protect external effects. Where a recorded WaitFor boundary is appropriate, select that method explicitly and decide whether replaying later writes is safe before choosing `--skip-writes-reapply`.
 
 When a durable-history bug has already failed a Flow, validate the fix against that
 same history when safe:

@@ -39,6 +39,17 @@ For RPC delivery, register the application's bound method with application-owned
 
 Use the released [Slack example](https://github.com/superdurable/dex-connectors-library/tree/connectors/slack/v0.11.0/connectors/slack/examples/thread-approval) and [Gmail example](https://github.com/superdurable/dex-connectors-library/tree/connectors/google/gmail/v0.13.0/connectors/google/gmail/examples/thread-reply) as exact integration references. Their modules pin the exact Connector SDK releases they support.
 
+## Hosted configuration and recovery boundary
+
+Use the [Core native project configuration contract](../core/operations.md#native-hosted-project-configuration)
+for Server v1.3.0. Keep project scope and credentials behind the supported runtime
+boundary; a browser, Flow input, or ordinary Attribute cannot select secret
+storage. The Go Connector SDK has the released project configuration package;
+that capability does not create equivalent APIs in every Dex SDK language.
+For recovery after a Worker fix, preserve the original resource and Flow ID,
+reconcile external effects, and use an explicitly authorized, recorded Step
+boundary as described in [safe recovery](../core/operations.md#safe-recovery).
+
 ## Dex Web v2 management metadata
 
 The current FDG 2.0 management-interface analyzer reads Go source. Go Flow

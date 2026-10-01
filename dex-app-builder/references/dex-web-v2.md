@@ -1,14 +1,12 @@
 # Dex Web v2 and FDG 2.0
 
-Reference capability baselines: Dex Server `v0.14.1`, Dex CLI `v0.14.1`, and
-Dex Go SDK `v0.13.1`. These validate this skill's guidance; they are not an
-instruction to upgrade an application. A generated application uses the exact
-Server, CLI, and Go SDK versions pinned by its `TEMPLATE_BASELINE` release unless
-the user explicitly requests an upgrade. Both Server and CLI embed Web v2,
-including permission-based Work Queue, cumulative permission history,
-trusted-header enforcement, dynamic definition sources, embedded reverse-proxy
-mounts, local Flow starts, and local setup for Connector operations, Trigger
-bindings, and configuration UI units.
+Reference capability baselines: Dex Server `v1.3.0`, Dex CLI `v1.3.0`, and
+the SDK source baseline in [bundle-baselines.md](../../dex-sdk/references/core/bundle-baselines.md).
+These validate the guidance, not an instruction to upgrade an application.
+A generated application retains the exact Server, CLI, and Go SDK versions
+pinned by its `TEMPLATE_BASELINE` release unless the user authorizes an upgrade.
+Both Server and CLI embed Web v2, trusted hosted starts, native project
+configuration, permission-based Work Queue, and release-owned Connector setup.
 
 Released connector modules may require an older Connector SDK; at connectors
 `main` `980a6f9`, modules require exact releases from `sdkgo/v0.7.0` through
@@ -51,19 +49,27 @@ Production uses `trusted-header` behind an authenticated host or reverse proxy. 
 
 ## Start Flow
 
-The v2 Run workspace shows **Start Flow** only in `local-selector` mode and only
-when the selected local definition includes a supported typed Start input
-schema. Use it for local development and operation-only connector examples. It
-is not available in `trusted-header` mode and is not a production ingress
-mechanism.
+The v2 Run workspace shows **Start Flow** when the admitted definition has a
+supported typed Start schema and the deployment admits starts. In local-selector
+mode, the operator enters a reachable Worker address. Trusted hosted mode requires
+an authenticated private proxy to inject `flows.start`, actor identity, a fixed
+Worker target, an instance-bound target revision, and embedding CSRF context.
+The browser enters business input and retains its original Flow and operation
+IDs; it cannot select or override the hosted target. The proxy strips incoming
+trusted context headers, and port 8802 remains unreachable around that boundary.
 
-Choose a current Worker target, enter schema-valid JSON, and submit the start.
-Dex Web validates the input before encoding it. The Server rejects disabled
-starts with `START_FLOW_DISABLED`, unhealthy or unreachable Workers with
-`WORKER_UNHEALTHY`, duplicate/conflicting identity, and invalid typed input with
-a coded error. Do not work around those errors by removing types or bypassing
-the Worker health check. A connector with a real provider Trigger uses that
-Trigger instead of Start Flow for its Trigger acceptance path.
+Dex Web validates input and derives `skipWaitFor` from the validated Start
+phase: `execute` skips WaitFor, while `wait_for+execute` retains it. Missing,
+repeated, or unknown phases are invalid definitions. Do not rewrite an
+execute-only application Step into a dummy WaitFor to work around admission.
+Check the actual graph, source, installed Server, and Worker registration.
+
+Keep the original request UUID and body after an uncertain start response;
+reconcile through `POST /api/v2/start/recover`. Target/definition revisions,
+Worker override, permission, CSRF, typed input, and changed operation identity
+must fail with their actual coded errors. A new UUID is a new operation, not a
+safe retry. Connector Trigger applications still use the real Trigger for
+their Trigger acceptance path.
 
 Observed with Dex CLI v0.13.8 and Go SDK v0.12.1:
 
@@ -76,10 +82,10 @@ Observed with Dex CLI v0.13.8 and Go SDK v0.12.1:
   Keep derived names for new definitions. If the graph and Worker names differ,
   diagnose the analyzer/SDK version or generated metadata; do not implement
   `GetFlowType` and `GetStepType` on every Flow and Step as a Web workaround.
-- Dex Web invokes `WaitFor` on the start Step, and the Worker rejects that call
-  for an execute-only Step (`dex.StepDefaultsNoWaitFor`). Embed
-  `dex.StepDefaults` in the start Step and return `dex.SkipWaitImmediately()`
-  from its `WaitFor`.
+- Those older versions invoked `WaitFor` on an execute-only Start Step and
+  failed before Execute. Server v1.3.0 derives the correct option from its
+  validated graph; preserve the real Step semantics and inspect any existing
+  failed execution before an authorized recovery.
 - FDG 2.0 requires `GetDexSummary` and `GetDexDisplay`, both registered as
   RPCs, even when a Flow has little to show (`v2_view_rpc`).
 - A start input field of type `map[string]any` cannot drive the form
@@ -151,12 +157,23 @@ pending OAuth/PKCE exchanges and UI sessions. Credential replacement is read
 for each provider call; non-secret connection, binding, and operation
 configuration remains startup-bound in the application.
 
-Hosted Dex Web uses the same release-owned authorization and field UI, but its
-project, environment, and Release scope comes from the trusted Studio backend.
-Browser parameters cannot select or override that scope. Dex Web delegates
-non-secret configuration CAS writes, OAuth start/callback, credential writes,
-validation, and revoke to Superverse; it never reads S3 or KMS directly and
-never displays local file paths, S3 keys, launch commands, or stored secrets.
+Native project mode uses the same release-owned authorization and field UI.
+Project, environment, and Preview Session scope comes from immutable Dex startup
+configuration and trusted host admission; browser parameters cannot override it.
+Dex owns conditional, versioned native storage and OAuth dispatch. Application
+replicas consume validated immutable ordinary snapshots and separately resolved
+credentials through the released Go project configuration package. The private
+host admits exact manifests and deployments and blocks internal endpoints from
+browser routing. No secret values, S3 keys, local paths, or launch commands enter
+the browser. See [native project configuration](../../dex-sdk/references/core/operations.md#native-hosted-project-configuration).
+
+Embedded Action and Display-edit mutations require exactly one browser
+`X-CSRF-Token` matching one nonempty trusted `X-Dex-Web-CSRF-Token`; the host
+must validate the browser token and inject its own trusted context. Missing,
+duplicate, or mismatched tokens fail before Flow access. Malformed trusted
+context is rejected by the embedding ingress before mutation-specific checks.
+Test the actual native display and declared Action path, with the real Worker,
+and separately verify the consuming host's authentication/proxy boundary.
 
 The target environment is READY only after Superverse validates a configuration
 revision against the selected Release connector contract. Configuration fields

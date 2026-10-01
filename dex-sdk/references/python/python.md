@@ -25,6 +25,17 @@ Defaults use Dex `localhost:8801`, Worker `127.0.0.1:8803`, and HTTP `127.0.0.1:
 
 The Connector local JSON loader and generated `NewLocalConnection` API are Go-only. Do not invent a Python loader or deserialize Dex Web's credential file into Flow state. For a Python application, keep provider credentials behind an application-owned secret/runtime adapter until an official Python Connector SDK exposes the same contract.
 
+## Hosted configuration and recovery boundary
+
+Use the [Core native project configuration contract](../core/operations.md#native-hosted-project-configuration)
+for Server v1.3.0. Keep project scope and credentials behind the supported runtime
+boundary; a browser, Flow input, or ordinary Attribute cannot select secret
+storage. The Go Connector SDK has the released project configuration package;
+that capability does not create equivalent APIs in every Dex SDK language.
+For recovery after a Worker fix, preserve the original resource and Flow ID,
+reconcile external effects, and use an explicitly authorized, recorded Step
+boundary as described in [safe recovery](../core/operations.md#safe-recovery).
+
 ## Dex Web v2 management metadata
 
 The current FDG 2.0 management-interface analyzer reads Go source only. A

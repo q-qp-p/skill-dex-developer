@@ -573,8 +573,11 @@ def check_app_builder() -> None:
         "capture:qr-code",
         "without submitting the Action",
         "Superverse remains responsible for identity",
-        "Hosted Dex Web uses the same release-owned authorization and field UI",
-        "Browser parameters cannot select or override that scope",
+        "Native project mode uses the same release-owned authorization and field UI",
+        "browser parameters cannot override it",
+        "Dex owns conditional, versioned native storage and OAuth dispatch",
+        "`X-CSRF-Token` matching one nonempty trusted `X-Dex-Web-CSRF-Token`",
+        "reconcile through `POST /api/v2/start/recover`",
         "parenthesized manifest default",
     ):
         if text not in dex_web:

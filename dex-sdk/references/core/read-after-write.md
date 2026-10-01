@@ -63,15 +63,15 @@ Use a controlled gate on a subsequent business Step or projection writer to prov
 
 The following links explain the existing semantics at the bundle's immutable baselines. Preserve installed project versions and inspect version-matched source before writing exact API calls. This reference introduces no new API.
 
-- [Server Signal submissions and RPC routing](https://github.com/superdurable/dex/blob/server/v1.2.0/server/service/api/service.go)
-- [Signal receivers and direct effect application](https://github.com/superdurable/dex/blob/server/v1.2.0/server/service/interpreter/signalReceiver.go)
-- [Attribute writes](https://github.com/superdurable/dex/blob/server/v1.2.0/server/service/interpreter/persistence.go)
-- [Query snapshot preparation](https://github.com/superdurable/dex/blob/server/v1.2.0/server/service/interpreter/queryHandler.go)
-- [Temporal adapter](https://github.com/superdurable/dex/blob/server/v1.2.0/server/service/client/temporal/client.go) and [Cadence adapter](https://github.com/superdurable/dex/blob/server/v1.2.0/server/service/client/cadence/client.go)
-- [Attribute Store scheduling](https://github.com/superdurable/dex/blob/server/v1.2.0/server/service/interpreter/attributeSynchronizer.go)
-- [SubFlow delivery](https://github.com/superdurable/dex/blob/server/v1.2.0/server/service/interpreter/activityImpl.go)
+- [Server Signal submissions and RPC routing](https://github.com/superdurable/dex/blob/server/v1.3.0/server/service/api/service.go)
+- [Signal receivers and direct effect application](https://github.com/superdurable/dex/blob/server/v1.3.0/server/service/interpreter/signalReceiver.go)
+- [Attribute writes](https://github.com/superdurable/dex/blob/server/v1.3.0/server/service/interpreter/persistence.go)
+- [Query snapshot preparation](https://github.com/superdurable/dex/blob/server/v1.3.0/server/service/interpreter/queryHandler.go)
+- [Temporal adapter](https://github.com/superdurable/dex/blob/server/v1.3.0/server/service/client/temporal/client.go) and [Cadence adapter](https://github.com/superdurable/dex/blob/server/v1.3.0/server/service/client/cadence/client.go)
+- [Attribute Store scheduling](https://github.com/superdurable/dex/blob/server/v1.3.0/server/service/interpreter/attributeSynchronizer.go)
+- [SubFlow delivery](https://github.com/superdurable/dex/blob/server/v1.3.0/server/service/interpreter/activityImpl.go)
 - [Go Client](https://github.com/superdurable/dex/blob/sdk-go/v1.2.1/sdk-go/dex/client.go), [Python Client](https://github.com/superdurable/dex/blob/sdk-go/v1.2.1/sdk-python/dex/client.py), [Python AsyncClient](https://github.com/superdurable/dex/blob/sdk-go/v1.2.1/sdk-python/dex/async_client.py), [Java Client](https://github.com/superdurable/dex/blob/sdk-go/v1.2.1/sdk-java/src/main/java/io/superdurable/dex/Client.java), [TypeScript Client](https://github.com/superdurable/dex/blob/sdk-go/v1.2.1/sdk-typescript/src/client.ts), [Rust Client](https://github.com/superdurable/dex/blob/sdk-go/v1.2.1/sdk-rust/crates/dex-sdk/src/client.rs)
-- [CLI operations and success fields](https://github.com/superdurable/dex/blob/cli-v1.2.0/cli/internal/command/flow_client_operations.go)
-- [Web action RPC routing](https://github.com/superdurable/dex/blob/server/v1.2.0/web/api/v2.go)
+- [CLI operations and success fields](https://github.com/superdurable/dex/blob/cli-v1.3.0/cli/internal/command/flow_client_operations.go)
+- [Web action RPC routing](https://github.com/superdurable/dex/blob/server/v1.3.0/web/api/v2.go)
 
 Temporal describes the [Signal/Query ordering boundary](https://community.temporal.io/t/querying-workflow-after-signal/11375). Validate the Dex handler itself rather than treating that general ordering guarantee as completion of downstream business work.

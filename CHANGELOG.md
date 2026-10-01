@@ -2,6 +2,14 @@
 
 All notable changes to Dex Skills are documented here.
 
+## 0.29.15 - 2026-10-01
+
+- Advance the immutable Server and CLI baselines to v1.3.0; retain the SDK source and application template baselines.
+- Describe native project configuration, default AWS credential resolution, separately versioned secrets, validated deployment snapshots, and uncertain OAuth recovery.
+- Describe trusted hosted Start admission, graph-derived Start phase, fixed targets, original-operation reconciliation, and embedded mutation CSRF requirements.
+- Keep recovery on the original Flow when safe; distinguish a valid time-travel boundary from a closed execution's separately authorized corrected start.
+- Synchronize Core, all five language boundaries, App Builder guidance, and plugin manifests.
+
 ## 0.29.14 - 2026-09-30
 
 - Route OpenAI, Claude, and Gemini text generation through the `llm` connector (`connectors/superdurable/llm/v0.2.0`), whose model picker reads each provider's live model list so new lab models need no application change.

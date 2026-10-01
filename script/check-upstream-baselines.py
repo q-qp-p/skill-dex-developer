@@ -170,6 +170,20 @@ def main() -> None:
         "START_FLOW_DISABLED",
         "WORKER_UNHEALTHY",
         "v2StartStepInput",
+        "SkipWaitFor: definition.Start.SkipWaitFor",
+        "hostedStartRequestIdentity",
+        "START_IDENTITY_CONFLICT",
+    )
+    require_text(
+        arguments.dex_root / "web" / "api" / "v2.go",
+        "requireEmbeddedMutationCSRF",
+        "WEB_MUTATION_CSRF_INVALID",
+        "subtle.ConstantTimeCompare",
+    )
+    require_text(
+        arguments.dex_root / "web" / "project_configuration.go",
+        "projectconfig",
+        "APPLICATION_ENVIRONMENT_FORBIDDEN",
     )
 
     template_manifest = json.loads(
