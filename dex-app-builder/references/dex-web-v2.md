@@ -92,9 +92,11 @@ For a headless check, use the same endpoints as the browser:
 accepts `flowType`, `flowId`, `workerTargetAddress`, and raw JSON `input` with
 that revision in the `X-Dex-Flow-Definition-Revision` header.
 
-## Connections mode
+## Connectors mode
 
-In loopback **dexcli dev**, `/v2/connections` groups Connector Steps and Trigger bindings by connector ID and static connection name. It shows the exact module version, dependent Flows, Steps, operations, and bindings, plus **Missing**, **Ready**, **Expired**, **Conflict**, or **Unsupported** status. The Step drawer links the same identity to its setup page.
+In loopback **dexcli dev**, the **Connectors** tab at `/v2/connectors` groups Connector Steps and Trigger bindings by connector and static connection name, showing each connector by its release display name. It shows the exact module version, dependent Flows, Steps, operations, and bindings, plus **Missing**, **Ready**, **Expired**, **Conflict**, or **Unsupported** status. The Step drawer links the same identity to its setup page. `/v2/connections` links redirect there.
+
+A connector whose manifest declares `selection: multiple` holds several auth methods in one connection, such as several LLM providers, each added as its own card. Editing a saved connection keeps a stored secret when its field is left blank.
 
 Automatic setup requires an operation-specific factory from an exact official released module, a static `ConnectionName`, and no local module replacement. Different module versions for one connector/name key are a blocking conflict. Generic factories and unsupported dependencies still render the Flow but cannot write credentials.
 

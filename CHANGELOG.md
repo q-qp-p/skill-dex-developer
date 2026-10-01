@@ -2,6 +2,13 @@
 
 All notable changes to Dex Skills are documented here.
 
+## 0.29.13 - 2026-09-30
+
+- Advance the Dex Server and CLI baselines to `v1.2.0`, whose Dex Web renames the Connections tab to **Connectors** at `/v2/connectors`, shows connectors by display name, and lets one connection hold several auth methods.
+- Refresh the pinned Server and CLI source links to the `v1.2.0` tags.
+- Validate the CLI baseline's renamed Connectors page source.
+- Synchronize the Codex, Claude Code, and Cursor plugin manifests at version 0.29.13.
+
 ## 0.29.12 - 2026-09-30
 
 - Advance the immutable SDK source baseline and all SDK source links to the published sdk-go/v1.2.1 release, which contains the five-SDK missing/inactive error rename.

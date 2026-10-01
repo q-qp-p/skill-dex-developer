@@ -159,7 +159,7 @@ def main() -> None:
         "Connector configuration path",
     )
     require_text(
-        arguments.dex_root / "web" / "app" / "v2" / "connections" / "ConnectionsPage.tsx",
+        arguments.dex_root / "web" / "app" / "v2" / "connectors" / "ConnectorsPage.tsx",
         "provider.command.execute",
         "use.configuration.save",
         "connector.frame.resize",
