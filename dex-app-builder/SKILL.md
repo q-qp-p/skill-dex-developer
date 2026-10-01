@@ -177,6 +177,8 @@ durable fact, record its owner, access pattern, scale/contention expectation,
 Dex primitive, and any proven reason an external store is required. For every
 integration, record its classification, required Trigger/Query/Mutation/UI capabilities, matching
 released connector capability, and any contribution or internal-library gap.
+For each LLM use, record whether it is generic, a named model, a named
+provider, or provider-native.
 Actors describe participants; roles group authenticated people with the same
 visibility and allowed operations; permissions describe individual Actions.
 Default to `admin`, justify every additional role, and obtain explicit user

@@ -2,6 +2,12 @@
 
 All notable changes to Dex Skills are documented here.
 
+## 0.29.14 - 2026-09-30
+
+- Route OpenAI, Claude, and Gemini text generation through the `llm` connector (`connectors/superdurable/llm/v0.2.0`), whose model picker reads each provider's live model list so new lab models need no application change.
+- Map generic, named-model, named-provider, and provider-native LLM intents to compositions, and record that classification in the connector capability matrix.
+- Describe one `llm` connection holding every added provider with its own key, a connection default model from their live lists, and `defect` for a provider the connection has not added.
+
 ## 0.29.13 - 2026-09-30
 
 - Advance the Dex Server and CLI baselines to `v1.2.0`, whose Dex Web renames the Connections tab to **Connectors** at `/v2/connectors`, shows connectors by display name, and lets one connection hold several auth methods.

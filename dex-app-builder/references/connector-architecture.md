@@ -92,6 +92,37 @@ required capability exists. Do not bypass a suitable connector with a direct
 provider SDK, custom webhook, generic HTTP call, or application-specific
 credential store.
 
+## Text generation
+
+Text generation with OpenAI, Claude, or Gemini uses the `llm` connector
+(`connectors/superdurable/llm`, package `llmrouter`). Its `generateText` Query
+runs each provider connector's released Query, and its model picker merges the
+providers' live model lists, so a new lab model needs no code or release. Use a
+provider's own connector only for a provider-native operation, a
+provider-specific setting, or a lab `llm` does not route.
+
+| User intent | Composition |
+| --- | --- |
+| Generic, such as "summarize with an LLM" | `llm` Step with the model picker; `Model` is the Step's pick. |
+| Named model, such as "use Claude Opus" | Keep the picker and fall back in code: `cmp.Or(pick, "anthropic/<exact-model-id>")`. Take the ID from the user or the provider connector's README; never invent one. |
+| Named provider only, such as "use Claude" | `cmp.Or(pick, "anthropic")` |
+| Provider-native feature or unrouted lab | The provider's own connector. |
+
+One `llm` connection holds every provider the application uses: in Dex Web
+**Connectors**, the user adds each provider with its own key, then picks the
+connection's default model from the added providers' live lists. A Step pick
+overrides that default, and a blank connection model uses the first added
+provider's default model. A model whose provider the connection has not added
+selects `defect` with no request.
+
+A model is `provider/model` or a provider alone; a bare model ID selects
+`defect`. Keep requests portable by leaving `Temperature` and
+`ReasoningEffort` unset and `MaxOutputTokens` zero or generous. Do not add a
+per-run model to start input unless the user asks, because anyone who can
+start the Flow could then bill any provider the connection reaches. Model
+provider failover as Flow branches. Follow the release-tagged connector README
+for the connection, key fields, and exact API.
+
 ## UI and live state
 
 Connector UI components are application components, not new Dex primitives. Browser code uses the application API or typed Flow RPCs.
