@@ -33,6 +33,28 @@ For an application queue UI, prefer one application snapshot RPC that returns du
 
 Use **dexcli flow search**, **summary**, **state**, and **history** for narrower JSON output. Use **--no-hydrate** when payload contents are unnecessary or sensitive.
 
+## Inspect raw Temporal payloads
+
+With Dex CLI v1.4.2, run the local protobuf Codec Server to inspect Dex's
+internal Temporal payloads in Temporal Cloud or a local Temporal Web UI:
+
+```bash
+dexcli codec-server
+```
+
+Configure **http://127.0.0.1:8804** as the Codec Server URL in Temporal Web UI.
+The browser connects directly to this process. Temporal Cloud and HTTP/HTTPS
+origins on localhost or loopback IP addresses are accepted on any port, so an
+automatically selected local UI port needs no extra server arguments. External
+and malformed origins are rejected. The codec server binds only to loopback;
+keep it local and stop it with Ctrl+C when finished. Leave access-token and
+cross-origin credential forwarding disabled.
+
+The codec converts known Dex binary protobuf payloads to ProtoJSON. Unknown
+message types and other encodings pass through unchanged. The same tooling
+applies to all five SDK languages. See the released
+[CLI codec server usage](https://github.com/superdurable/dex/blob/cli-v1.4.2/cli/README.md#view-temporal-protobuf-payloads).
+
 ## Indexed Attribute capacity
 
 The default local **dexcli dev** stack starts Temporal with SQLite. SQLite allocates a fixed number of custom Search Attribute slots per namespace and type. In a fresh local database, Dex uses three of those slots for system indexes, leaving this initial capacity for application Indexed Attributes:

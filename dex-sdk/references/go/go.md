@@ -39,6 +39,13 @@ For RPC delivery, register the application's bound method with application-owned
 
 Use the released [Slack example](https://github.com/superdurable/dex-connectors-library/tree/connectors/slack/v0.11.0/connectors/slack/examples/thread-approval) and [Gmail example](https://github.com/superdurable/dex-connectors-library/tree/connectors/google/gmail/v0.13.0/connectors/google/gmail/examples/thread-reply) as exact integration references. Their modules pin the exact Connector SDK releases they support.
 
+## Raw Temporal payload inspection
+
+Use **dexcli codec-server** with CLI v1.4.2 to inspect Dex internal payloads
+in Temporal Cloud or a local Temporal Web UI. Follow the shared
+[codec-server guidance](../core/operations.md#inspect-raw-temporal-payloads);
+local UI ports need no additional server arguments.
+
 ## Hosted configuration and recovery boundary
 
 Use the [Core native project configuration contract](../core/operations.md#native-hosted-project-configuration)

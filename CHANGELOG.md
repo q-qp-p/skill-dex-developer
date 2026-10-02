@@ -2,6 +2,15 @@
 
 All notable changes to Dex Skills are documented here.
 
+## 0.29.19 - 2026-10-01
+
+- Advance the CLI baseline and CLI source links to released cli-v1.4.2; keep
+  SDK, Server, and template baselines unchanged.
+- Describe raw Temporal payload inspection with the local protobuf Codec
+  Server, including automatic local UI ports and accepted loopback origins.
+- Link the shared codec-server guidance from all five language handbooks and
+  synchronize plugin and marketplace manifests.
+
 ## 0.29.18 - 2026-10-01
 
 - Move released Connector discovery to the application entry checkpoint, before

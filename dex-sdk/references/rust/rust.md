@@ -20,6 +20,13 @@ The example defaults are Dex at `127.0.0.1:8801`, Worker bind at `127.0.0.1:8803
 
 The Connector local JSON loader and generated `NewLocalConnection` API are Go-only. Do not invent a Rust loader or deserialize Dex Web's credential file into Flow state. For a Rust application, keep provider credentials behind an application-owned secret/runtime adapter until an official Rust Connector SDK exposes the same contract.
 
+## Raw Temporal payload inspection
+
+Use **dexcli codec-server** with CLI v1.4.2 to inspect Dex internal payloads
+in Temporal Cloud or a local Temporal Web UI. Follow the shared
+[codec-server guidance](../core/operations.md#inspect-raw-temporal-payloads);
+local UI ports need no additional server arguments.
+
 ## Hosted configuration and recovery boundary
 
 Use the [Core native project configuration contract](../core/operations.md#native-hosted-project-configuration)
