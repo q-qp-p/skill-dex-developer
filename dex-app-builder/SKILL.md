@@ -62,6 +62,29 @@ claim to create files, run tests, build artifacts, or deploy the application.
 Recommend continuing the confirmed plan in Codex or another coding-agent host
 connected to the target repository.
 
+## External capability selection
+
+For an application that calls an external provider, read
+[released capability discovery](references/connector-architecture.md#released-capability-discovery)
+before inspecting Connector SDK implementation packages. Fetch the canonical
+published catalog at
+`https://superdurable.github.io/dex-connectors-library/catalog.yaml`, match the
+requested operation, verify its immutable release manifest, and inspect that
+released Go submodule's generated operation factory and examples. The Connector
+SDK supplies infrastructure; the presence of a low-level wire-format or provider
+SDK package does not replace the published operation factory.
+
+For text generation, first read the
+[text-generation selection rules](references/connector-architecture.md#text-generation).
+They distinguish the released routing Connector, provider selection and model
+configuration from low-level protocol implementation. The application chooses a
+stable logical connection name; configuring credentials happens after its
+manifest is prepared and is not a prerequisite for writing or compiling source.
+A missing dependency in the workspace is a reason to resolve the selected exact
+published submodule, not to recreate its provider client or ask the user to pick
+SDK plumbing. After the manifest and required signatures are verified, implement
+and let the next actual compiler or FDG diagnostic drive further source reads.
+
 ## Template stack authority and repository bootstrap
 
 Inspect the repository before selecting a language, creating manifests, or

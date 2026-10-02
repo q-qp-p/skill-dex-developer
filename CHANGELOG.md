@@ -2,6 +2,14 @@
 
 All notable changes to Dex Skills are documented here.
 
+## 0.29.18 - 2026-10-01
+
+- Move released Connector discovery to the application entry checkpoint, before
+  low-level SDK investigation; link text-generation selection at that boundary.
+- Distinguish application use of generated operation factories from provider
+  protocol implementation, and separate source authoring from credential entry.
+- Keep exact template, Server, CLI and SDK baselines unchanged.
+
 ## 0.29.17 - 2026-10-01
 
 - Treat clear application requests and existing host choices as implementation
