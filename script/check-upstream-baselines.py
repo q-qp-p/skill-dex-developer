@@ -280,16 +280,21 @@ def main() -> None:
     )
     if template_sdk is None or SEMVER.fullmatch(template_sdk.group(1)) is None:
         fail("template baseline must pin a stable Dex Go SDK")
+    example = arguments.template_root / "internal" / "process" / "example_flow.go"
     require_text(
-        arguments.template_root / "internal" / "process" / "flow.go",
+        example,
+        "type ExampleFlow struct",
+        "type ExampleStep struct",
+        "dex.DefineStartStep(ExampleStep{})",
+        "dex.GracefulComplete(nil)",
         "GetDexSummary",
         "GetDexDisplay",
-        "ActionRequiresPermission",
         "// dex:group",
+        "// dex:explanation",
     )
-    if "// dex:action" in (
-        arguments.template_root / "internal" / "process" / "flow.go"
-    ).read_text():
+    if (arguments.template_root / "internal" / "process" / "flow.go").exists():
+        fail("template must not retain the old approval scaffold")
+    if "// dex:action" in example.read_text():
         fail("template must use typed Action registration without dex:action")
     print("validated Dex Server, CLI, and basic-process template baselines")
 

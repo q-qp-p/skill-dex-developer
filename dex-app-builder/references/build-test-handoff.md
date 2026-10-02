@@ -9,6 +9,12 @@ then regenerate; never hand-edit generated Go or TypeScript clients. The
 generated directories exist only as ignored local build outputs. Never stage,
 commit, or include them in a pull request.
 
+The released starter has one `ExampleFlow` and one `ExampleStep`. For the first
+business feature, replace that scaffold rather than retaining it alongside the
+requested Flow. Remove unused sample Steps, RPCs, registration and manifest
+entries; apply the same rule to older BasicProcessFlow templates. Preserve
+unrelated business Flows in imported or already-developed applications.
+
 Read `.superverse/template.json` for the exact command surface. In a fresh
 checkout, restore its locked dependencies through the declared bootstrap
 command before generation or checks (normally `make bootstrap`, including
