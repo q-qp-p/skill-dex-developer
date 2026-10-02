@@ -72,6 +72,7 @@ LANGUAGE_TOPICS = {
 }
 APP_BUILDER_REFERENCES = {
     "workspace-bootstrap.md",
+    "fdg-authoring.md",
     "business-contract.md",
     "application-surface.md",
     "backend-implementation.md",

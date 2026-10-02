@@ -87,6 +87,7 @@ configuration. A missing module is resolved at its exact released version.
 | --- | --- |
 | Missing business requirements, actors or ownership | [Business contract](references/business-contract.md); record concise decisions instead of requesting already supplied facts |
 | Participant/custom UI or management coverage | [Application surface](references/application-surface.md) and [UI workflow](references/ui-workflow.md); clear requests need no extra static-wireframe approval |
+| Go Flow rendering, Summary/Display or Inbox Actions | [FDG authoring](references/fdg-authoring.md): exact syntax and focused diagnostics |
 | Flow, persistence, RPC, Connector or OpenAPI changes | [Backend implementation](references/backend-implementation.md), selecting the relevant headings; use the Dex SDK Core/Go routing rather than loading all references |
 | Verification, source handoff or deployment | [Verification and handoff](references/verification-handoff.md); distinguish source readiness from configured real execution |
 

@@ -5,8 +5,8 @@ Read the sibling [Dex SDK skill](../../dex-sdk/SKILL.md) completely, then follow
 Dex SDK supplies the public SDK guidance. The platform constraints in this skill are stricter and take precedence: use only the Go SDK, keep external effects in `Execute`, keep `WaitFor` free of provider or Dex mutations, and require strict FDG 2.0 rendering.
 
 Read [Flow modeling](../../dex-sdk/references/core/modeling.md), [pattern
-selection](../../dex-sdk/references/core/patterns.md), and [Dex Web
-v2](dex-web-v2.md) before editing a Flow. State the Flow identity,
+selection](../../dex-sdk/references/core/patterns.md), and [Go FDG
+authoring](fdg-authoring.md) before editing a Flow. State the Flow identity,
 input/output, Steps, transitions, Attributes, Channels, RPCs, timers, retries,
 recovery, and connector boundaries before code. New applications default to no
 SubFlows: use parallel Steps inside one lifecycle, and use independently

@@ -55,6 +55,7 @@ Then load only the references required by the task:
 | Task | Core reference | Language reference |
 | --- | --- | --- |
 | First application or architecture | [Getting started](references/core/getting-started.md) and [Error handling](references/core/error-handling.md) | language entry and **error-handling.md** |
+| Go FDG, Summary/Display, Start forms or Actions | [Go FDG authoring](../dex-app-builder/references/fdg-authoring.md) | Read this focused syntax reference before parser source |
 | Flow boundary or state model | [Modeling](references/core/modeling.md) | selected language's **primitives.md** |
 | Primitive selection or exact API | [Primitives](references/core/primitives.md) | selected language's **primitives.md** |
 | StepOptions, durability, timeout, heartbeat, retry, loads, locks, or failure route | [StepOptions](references/core/step-options.md) | selected language's **advanced-features.md** |

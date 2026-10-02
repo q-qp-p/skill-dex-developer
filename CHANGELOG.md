@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.29.25
+
+- Advance the template baseline to released v1.9.6, preserving application source
+  identity and canonical single-method Connector authorization IDs.
+
+- Route Go Flow rendering, Summary/Display and Action work directly to a bounded
+  FDG 2.0 authoring reference with exact field/input syntax and focused diagnostics.
+- Keep one syntax reference for Studio and standalone Dex Web, avoiding parser
+  source discovery for ordinary authoring. No business-specific patterns, Flow
+  lifecycle changes, database schema changes, or SDK upgrades are introduced.
+
+
 All notable changes to Dex Skills are documented here.
 
 ## 0.29.24 - 2026-10-02
