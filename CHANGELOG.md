@@ -2,6 +2,15 @@
 
 All notable changes to Dex Skills are documented here.
 
+## 0.29.22 - 2026-10-02
+
+- Advance the basic-process template baseline from `v1.9.2` to `v1.9.3`.
+- Restore locked template dependencies before generation and source checks in a fresh checkout.
+- Require the exact published Connector `modulePath` consistently in hosted source declarations, local validation and emitted release artifacts.
+- Keep metered Query retries aligned with provider idempotency and outcome-reconciliation guarantees; unknown paid outcomes are not blindly repeated.
+- Require the released template to preserve sandbox contract revision 3 without project-local skills.
+- Synchronize the Codex, Claude Code, and Cursor plugin manifests at version 0.29.22.
+
 ## 0.29.21 - 2026-10-02
 
 - Advance the basic-process template baseline from `v1.9.1` to `v1.9.2`.

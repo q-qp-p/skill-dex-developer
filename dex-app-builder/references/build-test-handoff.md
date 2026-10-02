@@ -9,6 +9,14 @@ then regenerate; never hand-edit generated Go or TypeScript clients. The
 generated directories exist only as ignored local build outputs. Never stage,
 commit, or include them in a pull request.
 
+Read `.superverse/template.json` for the exact command surface. In a fresh
+checkout, restore its locked dependencies through the declared bootstrap
+command before generation or checks (normally `make bootstrap`, including
+`npm --prefix web ci` and the declared Go modules). A missing generator
+executable requires dependency restoration, not repeated failing builds or a
+package upgrade. Reuse the installed dependencies until their manifests or
+lockfiles change.
+
 Read `.superverse/template.json` for the exact command surface. Use the declared
 `checkStatic` source gate when available: regenerate the Go and TypeScript
 contracts, validate every strict FDG 2.0 definition, check Go, and build the
@@ -184,7 +192,9 @@ Ensure:
   for project-scoped configuration, exact snapshot and credential versions
   survive management-host and Worker replacement without exposing secrets;
 - `dex-app.yaml` lists every Release Flow source and static connector
-  connection without configuration values or secrets;
+  connection, including its exact published `modulePath`, without configuration
+  values or secrets; local source validators and generated artifacts preserve
+  the same deployment schema;
 - `make superverse-release-artifacts` emits a valid FDG 2.0 bundle, connector
   contract, environment contract, and exact application manifest;
 - Live Publishing accepts an eligible main-branch commit regardless of author,

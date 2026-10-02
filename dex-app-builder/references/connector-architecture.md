@@ -48,6 +48,15 @@ For every external integration:
 5. Record the catalog URL, connector ID, exact capabilities, component tag, and
    immutable manifest URL in the connector capability matrix.
 
+For a hosted application, each `dex-app.yaml` Connector declaration includes the
+exact published `modulePath`, matching the generated factory and FDG identity.
+The short Connector ID does not determine the Go module path. Copy that identity
+from the immutable released manifest and declare operations and/or Trigger
+bindings. Preserve it in generated release artifacts. If a retained template's
+local validator omits or rejects this deployment field, repair that validator
+alongside the source declaration without changing SDK pins. A locally passing
+build cannot override the host's authoritative manifest schema.
+
 If the catalog, tag, or immutable manifest cannot be read or validated, stop
 connector-dependent implementation and report the verification blocker. Do not
 silently use the repository's `main` branch, install the provider's SDK, create
@@ -72,6 +81,13 @@ The application filter runs before Flow ID resolution, input mapping, or a Dex c
 Flow starts reuse the provider event ID as the request ID. The resolved Flow ID owns root-event deduplication. For RPC delivery, register the application's bound method with application-owned `dex.RPCOptions` and pass that method directly to the target. The application owns redelivery policy, bounded deduplication state when needed, and locks for the exact business state or effect that must commit atomically.
 
 Query and Mutation run from `Execute`. Mutation supplies a stable idempotency key. If the result is uncertain, persist that outcome and query before retrying. Do not let Trigger source handlers mutate Dex primitives directly.
+
+A Query can still be metered. When the provider offers neither idempotency nor
+outcome reconciliation, use one dispatch attempt for a billable operation and
+record an uncertain result as UNKNOWN. Do not blindly repeat a paid request
+because its response was lost; an explicit rerun creates a new business
+operation identity. Inspect the released factory's execution options instead
+of assuming its retry defaults satisfy this boundary.
 
 ## Application composition
 

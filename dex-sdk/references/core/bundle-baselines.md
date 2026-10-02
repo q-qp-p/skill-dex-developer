@@ -8,7 +8,7 @@ and lockfiles remain authoritative for application code.
 DEX_BASELINE=sdk-go/v1.2.1
 DEX_SERVER_BASELINE=server/v1.3.0
 DEX_CLI_BASELINE=cli-v1.4.2
-TEMPLATE_BASELINE=v1.9.2
+TEMPLATE_BASELINE=v1.9.3
 ```
 
 These values mirror the release metadata at the Dex Skills repository root.
