@@ -196,7 +196,8 @@ def main() -> None:
         "bootstrap": "make bootstrap",
         "generate": "make generate",
         "checkFdgV2": "make check-fdg-v2",
-        "testUnit": "make test-unit",
+        "checkContracts": "make check-contracts",
+        "checkStatic": "make check-static",
         "testIntegration": "make test-integration",
         "testE2E": "make test-e2e",
         "build": "make build",
@@ -221,8 +222,13 @@ def main() -> None:
         arguments.template_root / "README.md",
         "## Hosted release artifacts",
         "make superverse-release-artifacts",
-        "SUPERVERSE_CONNECTOR_CONFIG_FILE",
-        "SUPERVERSE_CONNECTOR_BROKER_URL",
+        "DEX_PROJECT_*",
+        "projectconfig/provider",
+    )
+    require_text(
+        arguments.template_root / "internal" / "connectorconfiguration" / "configuration.go",
+        "projectconfig.LoadFromEnvironment",
+        "ResolveApplicationEnvironment",
     )
     tracked_generated = git(
         arguments.template_root,

@@ -157,33 +157,97 @@ does not revoke the provider grant.
 
 ## Hosted configuration and credential boundary
 
-The application release owns only non-secret connector requirements. Keep each
-static connection in `dex-app.yaml`; `make superverse-release-artifacts` emits
-the connector contract with the full application Release. Do not put an auth
-method selection, token, service-account key, webhook secret, or environment
-configuration value in the repository or Release artifacts.
+The application release owns non-secret Connector requirements. Keep each static
+connection in `dex-app.yaml`; `make superverse-release-artifacts` emits the exact
+manifest, Connector/environment contracts and strict FDG. Auth selections,
+configuration values, API keys, OAuth tokens and webhook secrets do not belong
+in source, generated artifacts or Flow state.
 
-In Superverse, the user selects an authorization method declared by the exact
-connector release and completes configuration in the target environment's
-hosted Dex Web. Superverse persists an immutable non-secret configuration
-revision and stores credential material separately under KMS protection. The
-browser, Dex Web, application, and configuration init container never receive
-refresh tokens or KMS decrypt authority.
+The target's authenticated management host validates configuration against those
+exact requirements and stores ordinary settings separately from credentials.
+Standalone Dex Web remains available. A hosting platform may instead put all
+management UI in Studio and the adapted configuration/OAuth API in its existing
+Go server, with direct public SDK calls to engine-only Dex `api,interpreter`
+services. Do not require a management iframe, shared UI package, separate Dex Web
+runtime or second Go bootstrap in that platform path. Preserve the chosen host's
+scope, source revision, actor and instance admission checks. Git, Release and
+deployment lifecycle belong to the hosting platform, not the open-source engine.
 
-The deployment mounts the exact configuration snapshot selected by its
-revision, object version, and SHA-256 digest. The application reads it through
-`SUPERVERSE_CONNECTOR_CONFIG_FILE`; it receives only an internal broker URL and
-a release-bound workload credential for provider access. The broker performs
-connector-specific refresh, refresh-token rotation, concurrency control, and
-least-privilege operation credential resolution. Application code must not
-read credential S3 objects, implement its own refresh loop, or persist tokens
-in Flow state.
+Use the official Connector SDK's versioned project configuration protocol. The
+[SDK v0.17.0 loader](https://github.com/superdurable/dex-connectors-library/blob/sdkgo/v0.17.0/sdkgo/projectconfig/environment.go)
+and [storage contract](https://github.com/superdurable/dex-connectors-library/blob/sdkgo/v0.17.0/sdkgo/projectconfig/README.md)
+are the authority for this boundary. This reference version does not authorize
+upgrading an application's accepted template or Connector pins; inspect its
+existing bootstrap and report a compatibility blocker if the required supported
+loader is absent.
 
-A non-secret configuration edit creates a new revision and needs a redeploy.
-Credential refresh or rotation applies on the next Connector call without a
-restart. Missing configuration, digest mismatch, an unsupported connector
-driver, or a terminal refresh failure must fail closed and surface either
-deployment-blocked or reauthorization-required state.
+`projectconfig.LoadFromEnvironment` uses AWS's default rotating credential chain
+and reads the exact accepted ordinary snapshot without credential reads or provider
+refresh at startup. Trusted deployment configuration supplies:
+
+| Variable | Meaning |
+| --- | --- |
+| `DEX_PROJECT_ID` | Fixed project identity. |
+| `DEX_PROJECT_SCOPE` | `live` or `preview`. |
+| `DEX_PROJECT_SESSION_ID` | Required for Preview; absent for Live. |
+| `DEX_PROJECT_CONFIG_KEY` | Exact `projects/<projectID>/live/configuration/head` or `projects/<projectID>/preview/<sessionID>/configuration/head`. |
+| `DEX_PROJECT_CONFIG_VERSION` | Exact immutable object version, never latest. |
+| `DEX_PROJECT_CONFIG_DIGEST` | `sha256:<hex>` over the accepted object bytes. |
+| `DEX_PROJECT_STORAGE_BUCKET` | Private versioned bucket. |
+| `DEX_PROJECT_STORAGE_PREFIX` | Optional fixed outer environment prefix. |
+| `DEX_PROJECT_STORAGE_KMS_KEY_ARN` | Exact hosted KMS key ARN; no alias. |
+| `AWS_REGION` | Region for the default AWS configuration. |
+
+Local versioned-storage testing additionally needs
+`DEX_PROJECT_ALLOW_LOCAL_STORAGE=true` and an explicit supported local
+`DEX_PROJECT_STORAGE_ENDPOINT`; hosted deployments omit both. These variables
+are deployment identity, not user-editable application environment fields.
+Storage IAM must allow the exact configuration version, required connection
+heads/private objects, conditional credential updates and referenced application
+secrets. Credentials and KMS decrypt authority belong only to trusted host/SDK
+processes; they are never returned to browser components or business Flow code.
+There is no mounted configuration file, configuration-reader init container or
+credential broker in this protocol.
+
+Resolve the accepted application's environment through
+`LoadedProject.ResolveApplicationEnvironment`, then apply it in main before
+constructing business clients, Workers, HTTP servers or goroutines. Secret
+references pin private immutable objects by scope, key, version and digest.
+Configuration reads never load latest in place of a missing accepted version.
+
+Connection settings and Step configuration have different identities. Decode a
+Connector's connection-level config with
+`LoadedProject.Configuration.DecodeConnectionConfiguration(ConnectionKey, &config)`;
+use `provider.LoadOperationConfiguration` only for the exact Flow/Step operation
+configuration declared in FDG. A valid Worker registration alone cannot establish
+that the provider client received its required connection settings. Read the
+installed Connector factory and configuration types, then verify application
+startup against the real accepted snapshot before calling a provider.
+
+Inspect the generated Connector's credential codec and the released typed
+adapter before wiring project credentials. Secret wrappers may intentionally
+reject JSON marshaling: do not serialize public `Credentials` directly, invent
+field names, or treat a missing key as empty usable credentials. Keep any required
+typed codec at the bootstrap adapter boundary, use the manifest's exact fields,
+and let the official store own credential resolution and refresh.
+
+The official typed `projectconfig/provider` adapter resolves current connection
+credentials at actual use. Business code neither reads credential objects nor
+implements refresh, token exchange or token persistence. Refresh requires known
+expired access credentials; unknown expiry or an unclassified HTTP 401 is not
+permission to rotate. A durable CAS/fence admits one provider dispatch. Concurrent
+or restarted callers join and recover a persisted immutable result; timeout,
+lock expiry or response loss never grants a second dispatch. If a provider rotated
+but no private result survived, require reauthorization instead of repeating the
+uncertain exchange. No token or raw provider failure belongs in a Flow or log.
+
+A settings edit creates another ordinary revision; existing deployments continue
+to read their accepted version until explicitly replaced. Preview and Live use
+separate scopes. Credentials remain current within one scope, so replacing a Live
+API key or OAuth connection affects subsequent same-name uses across deployed
+builds. Missing configuration, wrong digest/scope, unsupported capability or a
+terminal refresh failure surfaces deployment-blocked or reauthorization-required
+state. Verify real storage, Worker and provider behavior before handoff.
 
 ## AI agents
 

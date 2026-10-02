@@ -2,6 +2,23 @@
 
 All notable changes to Dex Skills are documented here.
 
+## 0.29.17 - 2026-10-01
+
+- Treat clear application requests and existing host choices as implementation
+  authorization; ask only for missing user-owned business decisions.
+- Separate production-source verification from real hosted acceptance and keep
+  both Go and frontend generation/build paths in the source gate.
+- Distinguish connection settings, operation configuration and credential codecs
+  at the official project bootstrap; retain actual dependency verification.
+- Align application guidance with the template's real-dependency test policy.
+- Advance the template baseline to released `v1.9.0` (`8d845f98de1fff9dde5b321d931ac1f5cdbcf085`), whose application bootstrap consumes canonical project configuration without changing the template Go or Dex SDK pins.
+
+- Correct project-scoped application bootstrap to the released standard Connector SDK loader with trusted `DEX_PROJECT_*` scope, canonical key, exact object version/digest and AWS identity.
+- Remove obsolete mounted configuration-file and credential-broker guidance; keep tokens, actual-use refresh and uncertain exchange recovery inside the official SDK boundary.
+- Distinguish native platform Studio/Go management with engine-only Dex from the retained standalone Dex Web development path.
+- Align Live source/configure/build/deploy and Sandbox Preview handoff while preserving application template, Go/SDK and Dex release pins.
+- Synchronize all five plugin/marketplace manifests.
+
 ## 0.29.15 - 2026-10-01
 
 - Advance the immutable Server and CLI baselines to v1.3.0; retain the SDK source and application template baselines.

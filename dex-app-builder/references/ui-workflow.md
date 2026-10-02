@@ -8,12 +8,14 @@ Dex Web v2 capability gap.
 
 ## No custom UI
 
-Dex Web owns every process-management interaction. Adapt the template to keep:
+The host owns process management: native Studio on a platform, or Dex Web for
+standalone development. With no separate participant UI requested, select this
+mode without a redundant question. The template retains:
 
 - a non-business Hello World React page;
 - the Go HTTP server and OpenAPI source;
 - locally generated Go server interfaces and TypeScript client;
-- one `GetApplicationInfo` operation used by the page;
+- one `GetApplicationInfo` operation used by the page, plus health;
 - generation, build, and smoke-test commands.
 
 Remove process state, management operations, Action/Attribute proxy endpoints,
@@ -92,13 +94,12 @@ Add the confirmed loading, validation, empty, success, failure, retry, recovery,
 and terminal behavior. The browser calls the application API; it never imports
 a Dex client or accesses raw Dex primitives.
 
-Use component-level mocks of the generated client for isolated loading,
-validation, empty, failure, retry, and terminal states. If a browser-only edge
-case cannot be triggered economically through the real application, use
-request interception inside that Playwright test only. Do not add an
-application-level mock API, a second Go business backend, product mock routes,
-or user-visible Mock Controls. Prove waits, RPCs, retries, Worker replacement,
-provider effects, and terminal behavior with the real Dex and Connector end-to-end path; mock evidence cannot substitute for it.
+Follow the template's real-dependency test policy. Exercise loading, validation,
+failure, retry and terminal states through real APIs; when a case cannot be
+executed, record its coverage gap. Do not add component mocks, intercepted API
+responses, fake providers, an application-level mock API or Mock Controls.
+Prove waits, RPCs, retries, Worker replacement, provider effects and terminal
+behavior through the actual Dex and Connector end-to-end path.
 
 Do not claim application-level UI controls provide platform RBAC. A permission
 selector filters work; it does not grant permission. Enforce identity-to-
@@ -110,5 +111,5 @@ provider secrets server-side.
 Only after the real end-to-end journey passes may the UI add imagery, custom
 icons, branding, animation, refined typography, decorative styling, and
 responsive fine-tuning. Preserve the generated client boundary and confirmed
-behavior. Then rerun frontend component tests, the real end-to-end journey,
+behavior. Then rerun the real end-to-end journey,
 accessibility checks, and the production build.

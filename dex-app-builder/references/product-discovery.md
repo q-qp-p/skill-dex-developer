@@ -1,6 +1,10 @@
 # Product discovery
 
-Do not start implementation until the product owner confirms the business model.
+Resolve the business model from the request, retained answers and host context.
+A clear request to build the product authorizes routine implementation choices.
+Record reasonable defaults and continue; ask only when an unresolved business,
+authorization or integration decision materially changes the outcome. Do not ask
+users to choose SDK methods, compile fixes or another approval of the same scope.
 
 ## Stack checkpoint
 
