@@ -198,8 +198,6 @@ def main() -> None:
         "checkFdgV2": "make check-fdg-v2",
         "checkContracts": "make check-contracts",
         "checkStatic": "make check-static",
-        "testIntegration": "make test-integration",
-        "testE2E": "make test-e2e",
         "build": "make build",
         "dev": "make dev",
         "releaseArtifacts": "make superverse-release-artifacts",
@@ -247,9 +245,16 @@ def main() -> None:
         "scripts/with-mock.sh",
         "web/e2e/mock-basic-process.spec.ts",
         "web/src/MockControls.tsx",
+        "internal/process/integration_test.go",
+        "scripts/run-e2e.sh",
+        "web/e2e/basic-process.spec.ts",
+        "web/playwright.config.ts",
     ):
         if (arguments.template_root / removed_path).exists():
-            fail(f"template baseline still contains removed mock path: {removed_path}")
+            fail(f"template baseline still contains removed scaffolding: {removed_path}")
+    template_web = json.loads((arguments.template_root / "web/package.json").read_text())
+    if "test:e2e" in template_web.get("scripts", {}) or "@playwright/test" in template_web.get("devDependencies", {}):
+        fail("source-only template must not install an application browser test framework")
     template_cli_baseline = (
         arguments.template_root / "DEX_CLI_BASELINE"
     ).read_text().strip()

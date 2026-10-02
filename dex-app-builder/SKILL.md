@@ -441,6 +441,14 @@ on the next Connector call without changing Flow state or rebuilding the app.
 
 Read [build, test, and handoff](references/build-test-handoff.md). Run narrow checks while iterating, then the source gate declared by the template and all requested real acceptance scenarios. Every Flow must pass FDG 2.0 JSON analysis with `valid: true`. A source gate does not prove business execution; a missing test service must not be reported as a pass.
 
+Default application authoring produces source without integration/browser test
+suites, mock providers, fixtures, or test-framework dependencies. Generate an
+application test suite only when the user requests it. Source checks and both
+production builds remain required. A missing private Connector key leaves
+configured execution pending; it does not block handoff of complete, checked
+source to Studio Configuration. Host acceptance and Connector-library tests
+have their own scope and are not removed by this application default.
+
 For No custom UI, verify the Hello World page, `GetApplicationInfo`
 generated-client call, local regeneration and compilation, production build,
 absence of management routes, Dex Web actions/display, and any retained
@@ -451,17 +459,18 @@ scaffolding.
 For Custom UI, wait until the Go backend and its real Dex and Connector paths
 run before replacing inert wireframe controls with generated TypeScript client
 calls. Then implement the confirmed loading, validation, empty, success,
-failure, retry, recovery, and terminal behavior and run the real end-to-end
-journey. Follow the application repository real-dependency test policy. For the template, exercise UI
-states through the real API; do not introduce component mocks or intercepted API
-responses. Report a case requiring unavailable dependencies as incomplete.
+failure, retry, recovery, and terminal behavior. Exercise the configured real
+journey without generating a separate test framework unless requested. Follow
+the application repository real-dependency test policy for requested tests; do not
+introduce component mocks or intercepted API responses. Report a case requiring
+unavailable dependencies as incomplete, separately from source readiness.
 Do not create an application-level mock server. Do not create a second Go business backend, product mock routes,
 or user-visible Mock Controls.
 Mock evidence never replaces real Dex durability, Connector, or application E2E evidence.
 
 Only after the real Dex and Connector end-to-end journey passes may the Custom
 UI add images, custom icons, branding, animation, refined responsive behavior,
-or other visual polish. Rerun affected real E2E and the production build after polishing. Do not generate or source visual assets
+or other visual polish. Recheck the affected real journey and production build after polishing; this does not require adding an application test suite. Do not generate or source visual assets
 before this stage.
 
 Use a real Dex Server for waits, RPCs, Channels, retries, Worker replacement, terminal behavior, Work Queue permission history, and connector boundaries. Use deadline-based convergence rather than fixed sleeps.

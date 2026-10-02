@@ -2,6 +2,15 @@
 
 All notable changes to Dex Skills are documented here.
 
+## 0.29.21 - 2026-10-02
+
+- Advance the basic-process template baseline from `v1.9.1` to `v1.9.2`.
+- Default application authoring to source checks and production builds without generated integration/browser suites, mocks, or test-framework dependencies.
+- Separate source readiness from configured real execution; missing private credentials remain an explicit runtime acceptance gap, not a source handoff blocker.
+- Preserve requested real acceptance, imported application tests, and the independent platform/SDK/Connector verification scope.
+- Require the released template to preserve sandbox contract revision 3 without project-local skills.
+- Synchronize the Codex, Claude Code, and Cursor plugin manifests at version 0.29.21.
+
 ## 0.29.20 - 2026-10-02
 
 - Advance the basic-process template baseline from `v1.9.0` to `v1.9.1`.

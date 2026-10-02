@@ -16,13 +16,23 @@ production backend and frontend. A retained older template may require separate
 `make build` and `make check-fdg-v2` commands. Preserve its declared commands;
 do not invent a removed test target or hand-edit generated outputs.
 
-A source handoff and real business acceptance are separate milestones. Run the
-full declared check in CI or standalone development with actual dependencies.
+A source handoff and real business acceptance are separate milestones. Default
+applications do not add integration/browser test suites, mocks, fixtures, or
+test-framework dependencies. The source-only template's full check covers
+generation, strict FDG, formatting/modules/vet, types, and production builds.
+Generate application tests only when the user explicitly requests them. When
+applying an authorized source-only migration, remove inherited template test
+scaffolding and synchronize commands, manifest, checker, docs, and unused
+dependencies. Preserve unrelated tests in imported applications.
+
 A hosted authoring sandbox can hand off clean, pushed, source-verified code for
-Preview configuration even when it lacks an isolated integration stack. Record
-that missing evidence and complete the requested Preview/Live journey through
-the host; never call compilation a provider or deployment success. Repair a
-source-gate failure autonomously from its actual diagnostics before handoff.
+Preview configuration without a private Connector key or isolated test stack.
+Missing configuration does not make otherwise complete source blocked. Record
+real execution as pending and complete the requested Preview/Live journey
+through the host; never call compilation a provider or deployment success.
+An explicitly requested executed test remains incomplete until its real
+dependencies pass. Repair actual source-gate failures before handoff. This
+default does not remove platform acceptance or Connector-library verification.
 
 Keep the template release's `go.mod`, `go.sum`, npm lockfile, Go toolchain,
 Dex Server/CLI baselines, generators, and Make targets unchanged unless the
@@ -49,12 +59,14 @@ fields, timeline, or graph inspection out of the custom backend and UI.
 During Flow and Connector design, finalize `openapi/openapi.yaml`, run
 `make generate`, and implement the generated Go server interfaces before wiring
 the generated TypeScript client into the UI. Run real Dex and Connector
-integration and E2E before visual polish. Follow the repository's real-dependency policy: no unit tests, component mocks,
-fake providers, or intercepted API responses in the template. Trigger edge cases
-through actual APIs, or record the unverified invariant. Check both production
-artifacts after an API change; a successful Go compile does not prove that the
-frontend's generated imports still exist. Run relevant checks after each edit
-batch and the declared full check with real dependencies before final acceptance.
+journeys before visual polish; this does not require generating an
+application test suite. For explicitly requested tests, follow the repository's
+real-dependency policy: no unit tests, component mocks, fake providers, or
+intercepted API responses in the template. Trigger cases through actual APIs,
+or record the unverified invariant. Check both production artifacts after an
+API change; a successful Go compile does not prove that the frontend's generated
+imports still exist. Run relevant source checks after each edit batch and keep
+the requested real acceptance result separate from source readiness.
 
 Before installing a database, cache, ORM, or separate read model, review the
 storage decision matrix and name the exact query, concurrency, transaction, or
@@ -68,7 +80,7 @@ reconciliation instead of treating a successful happy-path write as proof.
 Only actual dependency calls establish Dex durability, Worker replacement,
 Timer, RPC, retry, provider or application E2E behavior.
 
-For standalone development, show Dex Web early. Once the first Flow graph renders, keep one user-facing `dexcli dev` stack running with a persistent `--flow-rendering-dir`, stable ports, and persistent state, and give the user its URL before continuing. Then keep implementing and testing against isolated test stacks. Do not wait until verification passes to start it, and do not let test scripts reuse or stop it. Report its URL again at handoff. In a platform with native Studio management,
+For standalone development, show Dex Web early. Once the first Flow graph renders, keep one user-facing `dexcli dev` stack running with a persistent `--flow-rendering-dir`, stable ports, and persistent state, and give the user its URL before continuing. Continue implementation and source checks; use isolated test stacks only for explicitly requested automated tests, and never let them reuse or stop the user's stack. Do not wait until verification passes to start it. Report its URL again at handoff. In a platform with native Studio management,
 use that existing surface and authenticated Go backend instead; Dex engine Pods
 need only `api,interpreter`. Do not start a second management server or infer that
 this platform boundary removes standalone Dex Web support.
@@ -93,7 +105,11 @@ Validate every Flow file, not only the template's `internal/process/flow.go`; se
 
 ## Durable verification
 
-Use a real Dex Server when behavior crosses a Client, Worker, wait, RPC, Channel, Timer, Stream, retry, provider, or process boundary.
+This section guides requested runtime acceptance, not a requirement to generate
+test scaffolding in every application. Use the host's real Preview/Live path
+when available. SDK and Connector contributors retain their own verification
+requirements. Use a real Dex Server when behavior crosses a Client, Worker,
+wait, RPC, Channel, Timer, Stream, retry, provider, or process boundary.
 
 Cover:
 
@@ -183,8 +199,9 @@ Ensure:
   AWS identity; it never substitutes latest, a mounted configuration file or
   a credential broker. Resolve/apply application environment before Workers
   start, and keep provider tokens entirely inside the official SDK boundary;
-- known token expiry, concurrent calls, credential rotation, lost exchange
-  responses and Worker restart have real integration coverage when supported;
+- requested acceptance for known token expiry, concurrent calls, credential rotation,
+  lost exchange responses and Worker restart records actual results or explicit
+  gaps, without recreating the released Connector's test suite in the app;
   retries join an admitted exchange and only an immutable result authorizes
   recovery. Unknown expiry or an unclassified 401 never triggers refresh;
 - connector fork/PR status and any release blocker are explicit;
