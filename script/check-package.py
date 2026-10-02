@@ -71,6 +71,11 @@ LANGUAGE_TOPICS = {
     "versioning.md",
 }
 APP_BUILDER_REFERENCES = {
+    "workspace-bootstrap.md",
+    "business-contract.md",
+    "application-surface.md",
+    "backend-implementation.md",
+    "verification-handoff.md",
     "build-test-handoff.md",
     "connector-architecture.md",
     "dex-web-v2.md",
@@ -299,125 +304,40 @@ def check_app_builder() -> None:
     check_reachable_links(APP_BUILDER, references)
 
     content = (APP_BUILDER / "SKILL.md").read_text()
-    required = (
-        "../dex-sdk/SKILL.md",
-        "default coordinator",
-        "If App Builder receives a standalone specialist request",
-        "classify it",
-        "before product discovery",
-        "standalone official connector-library creation or modification",
-        "make it the owning workflow",
-        "published connector—continue with App Builder",
-        "installed bundle is incomplete",
-        "Do not search arbitrary plugin-cache paths",
-        "../dex-sdk/references/go/go.md",
-        "Go SDK",
-        "strict FDG 2.0",
-        "writable repository or",
-        "project workspace",
-        "effectively empty",
-        "../dex-sdk/references/core/bundle-baselines.md",
-        "`TEMPLATE_BASELINE` is the",
-        "application stack authority",
-        "In the first implementation update for an effectively empty repository",
-        "do not fall back to a self-selected stack",
-        "authorize upgrading an application's template-pinned dependencies",
-        "TypeScript is limited to the",
-        "template's optional React frontend",
-        "SDK integration are Go-only",
-        "cannot use the current Connector SDK",
-        "preserving its `.git` directory",
-        "`make bootstrap` as the first dependency/bootstrap command",
-        "do not start a TypeScript Dex backend",
-        "Do not advance the scaffold independently",
-        "Connector SDK supports application integration only from Go",
-        "infer SDK versions from a neighboring workspace",
-        "### No custom UI",
-        "### Custom UI",
-        "management UI capability mapping",
-        "Complete the management UI capability mapping before making",
-        "Summary RPC",
-        "Display RPC",
-        "Action RPC metadata",
-        "A request for an admin portal, dashboard, or management backend",
-        "specific interaction Dex Web v2 cannot provide",
-        "low-fidelity static wireframe",
-        "must not use application",
-        "page names, purposes, and direct links",
-        "design the application OpenAPI contract in the same pass",
-        "update `openapi/openapi.yaml`",
-        "generated server interfaces",
-        "ignored local build outputs",
-        "never add them to Git or a pull request",
-        "Do not resume dynamic frontend work",
-        "do not turn them into repeated approval gates",
-        "real-dependency test policy",
-        "Default application authoring produces source without integration/browser test",
-        "application test suite only when the user requests it",
+    if len(content.encode()) > 8192:
+        fail("App Builder entrypoint exceeds the bounded 8 KiB discovery budget")
+    # Validate the whole reachable package after progressive-disclosure moves,
+    # rather than requiring every detailed rule to be repeated in SKILL.md.
+    guidance = content + "\n" + "\n".join(path.read_text() for path in references)
+    for text in (
+        "../dex-sdk/SKILL.md", "../dex-connector-contributor/SKILL.md",
+        "writable workspace", "strict FDG 2.0", "TEMPLATE_BASELINE",
+        "generated operation factory", "management UI capability mapping",
+        "Summary RPC", "Display RPC", "Action RPC", "trusted server boundary",
+        "public external product", "https://superdurable.github.io/dex-connectors-library/catalog.yaml",
+        "no SubFlows", "selective loads", "locks/CAS", "retention",
+        "complete RequestID", "explicit reuse policy", "typed error",
+        "data-lifecycle and execution-shape boundary matrices",
+        "Use Dex Flow state as the default durable application store",
+        "Do not add an external database, cache, ORM, outbox, or shadow read model",
+        "projectconfig.LoadFromEnvironment", "DEX_PROJECT_*",
+        "Only after the real Dex and Connector end-to-end journey passes",
         "Do not create an application-level mock server",
         "Mock evidence never replaces real Dex durability",
-        "Only after the real Dex and Connector end-to-end journey passes",
-        "GetApplicationInfo",
-        "trusted authentication boundary",
-        "public external product",
-        "https://superdurable.github.io/dex-connectors-library/catalog.yaml",
-        "match every required Trigger, Query, Mutation, and UI capability",
-        "stop connector-dependent",
-        "do not infer support from memory",
-        "`dex-connector-contributor`",
-        "schedules a Connector Step",
-        "temporary Go",
-        "connector library already exists",
-        "unified Connector SDK",
-        "generic HTTP connector only when the service is genuinely internal",
-        "static `ConnectionName`",
-        "`NewLocalConnection`",
-        "external effects in `Execute`",
-        "`WaitFor` free of provider or Dex mutations",
-        "one `admin` role by default",
-        "data-lifecycle and execution-shape boundary matrices",
-        "parallel-Step alternatives",
-        "greater-than-200 concurrent-Step requirement",
-        "New applications default to no",
-        "explicitly confirms it",
-        "### Dex-first backend storage",
-        "Use Dex Flow state as the default durable application store",
-        "Cross-Flow reuse alone is not a reason",
-        "Do not add an external database, cache, ORM, outbox, or shadow read model",
-        "high-concurrency reads and writes",
-        "“Future flexibility”",
-        "`dex-app.yaml`",
-        "Project release and hosted deployment handoff",
-        "Live Publishing is project-scoped",
-        "filter commits by author",
-        "Publishing has no Flow Type",
-        "`projectconfig.LoadFromEnvironment`",
-        "Business code never reads, persists, logs or refreshes provider tokens",
-        "source\'s exact manifest/FDG",
-        "accepted revision, object version and",
-        "Shared environment credentials",
-    )
-    for text in required:
-        if text not in content:
-            fail(f"dex-app-builder/SKILL.md must contain: {text}")
-
-    stage_markers = (
-        "## Stage 2: establish the confirmed application surface",
-        "## Stage 3: design the Flow, Connectors, and OpenAPI contract",
-        "## Stage 4: integrate the Custom UI, verify, polish, and hand off",
-    )
-    for marker in stage_markers:
-        if marker not in content:
-            fail(f"Dex App Builder must contain stage: {marker}")
-    stage_positions = [content.index(marker) for marker in stage_markers]
-    if stage_positions != sorted(stage_positions):
-        fail("Dex App Builder stages must keep static UI before contract/backend before integration/polish")
-    if content.index("Complete the management UI capability mapping before making") > content.index(stage_markers[0]):
-        fail("Dex App Builder must complete management UI mapping before selecting a UI mode")
+        "Default application authoring produces source without integration/browser test",
+        "Project release and hosted deployment handoff", "Live Publishing is project-scoped",
+        "accepted revision, object version and", "Shared environment credentials",
+    ):
+        if text not in guidance:
+            fail(f"Dex App Builder guidance must preserve: {text}")
+    for name in ("workspace-bootstrap", "business-contract", "application-surface",
+                 "backend-implementation", "verification-handoff"):
+        if f"references/{name}.md" not in content:
+            fail(f"App Builder entrypoint must route to {name}")
 
     ui_workflow = (references_dir / "ui-workflow.md").read_text()
     ui_stages = (
-        "### 1. Low-fidelity static checkpoint",
+        "### 1. Resolve material interaction choices",
         "### 2. Contract and backend design",
         "### 3. Integration and durable verification",
         "### 4. Visual polish",

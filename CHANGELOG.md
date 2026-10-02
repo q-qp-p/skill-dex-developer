@@ -2,6 +2,17 @@
 
 All notable changes to Dex Skills are documented here.
 
+## 0.29.24 - 2026-10-02
+
+- Keep the App Builder entrypoint within 8 KiB and move detailed bootstrap, business, UI, backend and handoff rules into linked references with complete package membership validation.
+- Use bounded catalog and exact installed-module reads, retain verified API facts, and implement before repeating already resolved discovery.
+- Clear participant UI requests do not require another wireframe approval. Missing private credentials defer real execution rather than source implementation.
+- Let a host commit tool own the final full source gate; generate API packages before module import resolution.
+
+- Advance the basic-process template baseline from `v1.9.4` to `v1.9.5`.
+- Require the released template to preserve sandbox contract revision 3 without project-local skills.
+- Synchronize the Codex, Claude Code, and Cursor plugin manifests at version 0.29.24.
+
 ## 0.29.23 - 2026-10-02
 
 - Validate the one-Step ExampleFlow and require replacing starter Flows for the first business feature.

@@ -23,7 +23,9 @@ executable requires dependency restoration, not repeated failing builds or a
 package upgrade. Reuse the installed dependencies until their manifests or
 lockfiles change.
 
-Read `.superverse/template.json` for the exact command surface. Use the declared
+Generate ignored API packages before resolving their imports with `go mod tidy`.
+When the host commit tool owns the full source gate, use focused checks during
+editing and avoid repeating that full gate immediately before handoff. Use the declared
 `checkStatic` source gate when available: regenerate the Go and TypeScript
 contracts, validate every strict FDG 2.0 definition, check Go, and build the
 production backend and frontend. A retained older template may require separate
@@ -61,7 +63,8 @@ Controls, mock launch scripts, and mock E2E. Verify the Hello World page
 through the generated client. Do not run a mock approval checkpoint for an
 inert shell.
 
-For **Custom UI**, use `npm --prefix web run dev` for the low-fidelity static
+For **Custom UI** with unresolved consequential interaction choices, use
+`npm --prefix web run dev` for the optional low-fidelity static
 checkpoint and verify only that each direct page URL and navigation path renders.
 Do not introduce a mock server, model lifecycle states, generate visual assets,
 or polish the surface before the page inventory is confirmed.

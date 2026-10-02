@@ -40,7 +40,12 @@ management UI capability mapping. Keep operations already covered by Dex Web v2
 on its native Run, Work Queue, detail, Action, edit, timeline, and graph
 surfaces.
 
-### 1. Low-fidelity static checkpoint
+### 1. Resolve material interaction choices
+
+A clear implementation request already authorizes its stated page, fields and
+behavior. Implement those directly. Use the optional static checkpoint below
+only when a consequential interaction choice remains unresolved; ask about that
+choice, without requiring another approval of already supplied requirements.
 
 Agree only on the information architecture needed to unblock backend design:
 
@@ -60,13 +65,13 @@ page URLs.
 
 Run `npm --prefix web run dev` on a stable local port and verify that every
 page URL renders. Give the user a page inventory with each name, purpose, and
-direct URL. Ask for explicit confirmation of the page set, navigation, fields,
-and actions. Do not ask the user to approve colors, typography, imagery,
+direct URL. Ask about the unresolved page set, navigation, fields or actions.
+Do not ask the user to approve colors, typography, imagery,
 responsive refinements, dynamic states, or production behavior at this point.
 
 ### 2. Contract and backend design
 
-After the static checkpoint is confirmed, design the Flow, Connector
+Once interaction requirements are known, design the Flow, Connector
 capabilities, and application OpenAPI contract together. Map every approved UI
 action to an application operation backed by a Flow start, typed RPC, query, or
 confirmed ingress. Define authentication and permission enforcement,
@@ -88,8 +93,9 @@ release requirements.
 
 ### 3. Integration and durable verification
 
-When the Go application boundary and its real Dex and Connector paths run,
-replace the wireframe's inert controls with generated TypeScript client calls.
+Implement the Go boundary and UI against the same generated OpenAPI contract.
+Replace any wireframe's inert controls with generated TypeScript client calls.
+Missing private credentials defer real execution, not source implementation.
 Add the confirmed loading, validation, empty, success, failure, retry, recovery,
 and terminal behavior. The browser calls the application API; it never imports
 a Dex client or accesses raw Dex primitives.

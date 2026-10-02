@@ -181,8 +181,10 @@ Choose **Custom UI** only for a recorded Dex Web v2 capability gap, such as a
 participant-facing journey, a fundamentally different navigation model, domain
 visualization, or a complex interaction the platform does not provide. Record
 which requirement forces the custom surface.
-The first UI checkpoint confirms only the necessary pages, navigation, fields,
-and actions through a low-fidelity static wireframe. It does not authorize an
+When consequential interaction choices remain unresolved, an optional UI
+checkpoint clarifies the necessary pages, navigation, fields and actions through
+a low-fidelity static wireframe. A clear implementation request already supplies
+confirmation for its stated behavior. It does not authorize an
 interactive mock, visual system, imagery, animation, or other polish before the
 Flow, Connector, and OpenAPI contract are designed.
 
