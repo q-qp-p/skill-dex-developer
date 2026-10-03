@@ -6,6 +6,8 @@ Read only the sections relevant to the task.
 
 Use a Flow as the top-level durable business execution. It owns the Step list, persistence schema, and RPC handlers. Give the Flow type and execution ID stable business meanings.
 
+Name each Flow type after its domain, such as `ApprovalFlow`, and never just `Flow`. Go, Java, Python, and Rust derive the default Flow type from the type or class name without its package or module, so Flow types must be unique within one Worker registry. Dex Web, run history, and Flow type searches show that name as written.
+
 Docs: https://docs.superdurable.io/primitives/flow
 
 ## Step and Wait

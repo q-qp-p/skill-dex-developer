@@ -1,5 +1,6 @@
 # TypeScript gotchas
 
+- `getFlowType` and `getStepType` are required. Return a domain Flow type such as `ApprovalFlow`, never just `Flow`, and keep each Flow type unique within one Worker.
 - Types are erased. A `Codec<T>` is the runtime contract; generic annotations do not validate input.
 - `Wait` is a Dex description, not a Promise. Return it from `waitFor`; do not `await` it.
 - Async `execute`, `waitFor`, and RPC handlers may await Client calls and yield the Node event loop. Synchronous CPU work blocks all Worker calls.

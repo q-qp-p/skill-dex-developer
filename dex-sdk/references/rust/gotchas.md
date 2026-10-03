@@ -6,6 +6,10 @@ Define each `Attribute`, `Channel`, and `Stream` at module scope with `static La
 
 When a Flow owns an `AttributeMap` or `ChannelMap`, clone that initialized schema only to give Steps owned access. Never clone Context state to avoid reasoning about ownership.
 
+## Flow type names
+
+The default Flow and Step types are the last path segment of the Rust type name. Name each Flow type after its domain, such as `ApprovalFlow`, never just `Flow`; the module path does not separate two types with the same name.
+
 ## Borrowed Step graph
 
 `StepList` borrows Step fields from the Flow. Build the Flow with all Steps it may register, including Steps reached only by RPC movement or failure recovery. Constructing a fresh Step in `go_to` can be valid where the API accepts it, but the Step type still must be present in the Flow's registered graph.

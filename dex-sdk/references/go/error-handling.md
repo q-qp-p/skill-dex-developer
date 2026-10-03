@@ -42,7 +42,7 @@ Follow the shared [missing query target rule](../core/error-handling.md#missing-
 
 Return an error when Step options should decide retry. Use `dex.RetryAfter` only when the application knows a meaningful delay. Never add an in-memory retry loop around Step work; it disappears with the Worker and hides attempts.
 
-[Pinned runnable source](https://github.com/superdurable/dex/blob/sdk-go/v1.2.1/examples/go/patterns/polling/backoff.go)
+[Pinned runnable source](https://github.com/superdurable/dex/blob/sdk-go/v1.5.0/examples/go/patterns/polling/backoff.go)
 <!-- dex-source: examples/go/patterns/polling/backoff.go -->
 ```go
 result, err := step.service.AttemptExternalAPICall("Poll for BackoffPollingFlow")

@@ -116,7 +116,7 @@ Do not add or update a project-local skill submodule. The coding-agent host
 supplies the immutable Dex Skills release independently from the application
 template.
 
-Template scripts call `dexcli` from `PATH` and do not check its version. Run `dexcli version` first and require at least `v0.14.0`. When upgrading the global CLI would break other projects pinned to older Servers, install a project-local CLI and put its directory first on `PATH` for the template commands; `scripts/check-fdg-v2.sh` also honors `DEXCLI`.
+Template scripts call `dexcli` from `PATH` and do not check its version. Run `dexcli version` first and require at least `v0.14.0`. While `go.mod` pins a Go SDK before v1.5.0, also require a CLI before v1.5.0: `dexcli` v1.5.0 names Flow and Step types without the Go package, so its FDG would not match the Worker. The template's own `DEX_CLI_BASELINE` release satisfies both. When upgrading the global CLI would break other projects pinned to older Servers, install a project-local CLI and put its directory first on `PATH` for the template commands; `scripts/check-fdg-v2.sh` also honors `DEXCLI`.
 
 Validate every Flow file, not only the template's `internal/process/flow.go`; see [Dex Web v2 validation](dex-web-v2.md#validation).
 

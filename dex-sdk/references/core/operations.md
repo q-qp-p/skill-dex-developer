@@ -35,7 +35,7 @@ Use **dexcli flow search**, **summary**, **state**, and **history** for narrower
 
 ## Inspect raw Temporal payloads
 
-With Dex CLI v1.4.2, run the local protobuf Codec Server to inspect Dex's
+With Dex CLI v1.4.2 or later, run the local protobuf Codec Server to inspect Dex's
 internal Temporal payloads in Temporal Cloud or a local Temporal Web UI:
 
 ```bash
@@ -53,7 +53,7 @@ cross-origin credential forwarding disabled.
 The codec converts known Dex binary protobuf payloads to ProtoJSON. Unknown
 message types and other encodings pass through unchanged. The same tooling
 applies to all five SDK languages. See the released
-[CLI codec server usage](https://github.com/superdurable/dex/blob/cli-v1.4.2/cli/README.md#view-temporal-protobuf-payloads).
+[CLI codec server usage](https://github.com/superdurable/dex/blob/cli-v1.5.0/cli/README.md#view-temporal-protobuf-payloads).
 
 ## Indexed Attribute capacity
 

@@ -1,5 +1,6 @@
 # Java gotchas
 
+- The default Flow and Step types are the simple class names. Name each Flow class after its domain, such as `ApprovalFlow`, never just `Flow`; the Java package does not separate two classes with the same simple name.
 - `Step<I>` requires a concrete `Class<I>`; use a holder class for generic data.
 - Flows with `@RPC` methods and those methods cannot be `final`, because typed stubs intercept them. Kotlin equivalents must be `open`.
 - Register every Step instance once in `StepList` and every persisted definition in `PersistenceSchema`.

@@ -20,19 +20,22 @@ For an idempotent start, set one stable `StartFlowOptions.requestId` and `ignore
 
 For an explicitly best-effort external `client.writeStream`, log sanitized identity and discard only an `instanceof DexServiceError` failure. Rethrow other values so codec, definition, and programming defects remain visible.
 
-[Pinned example error classification](https://github.com/superdurable/dex/blob/sdk-go/v1.2.1/examples/typescript/src/service-errors.ts)
+[Pinned example error classification](https://github.com/superdurable/dex/blob/sdk-go/v1.5.0/examples/typescript/src/service-errors.ts)
 <!-- dex-source: examples/typescript/src/service-errors.ts -->
 ```typescript
 export function isFlowAlreadyStarted(error: unknown): boolean {
-  return error instanceof DexServiceError && error.code === grpcAlreadyExists;
+  return error instanceof FlowAlreadyStartedError;
 }
 
 export function isFlowMissingOrInactive(error: unknown): boolean {
-  return error instanceof DexServiceError && error.code === grpcNotFound;
+  return (
+    error instanceof FlowNotActiveOrNotFoundError ||
+    error instanceof FlowNotFoundError
+  );
 }
 ```
 
-The runnable examples use code classification only where one service code intentionally combines missing and inactive outcomes. Prefer exported concrete errors in new application code.
+The runnable examples classify with the exported concrete errors and treat `FlowNotActiveOrNotFoundError` and `FlowNotFoundError` as one missing-or-inactive outcome.
 
 ## Query-only Get failures
 
